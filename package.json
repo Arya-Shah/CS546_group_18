@@ -1,0 +1,23 @@
+{
+  "name": "cs546_group_18",
+  "version": "1.0.0",
+  "description": "CS546 Group 18 Project: Apartment Hunt Helper",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Arya Shah  20012884, Connor S. Durkin 10443573 , Jayanth Kanala 20020619 , Gnaneswar Koyalamoodi 20017853 ",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.7",
+    "express": "^4.18.2",
+    "mongodb": "^6.3.0"  ,
+    "xss": "^1.0.8",
+    "express-handlebars": "^5.2.0",
+    "express-session": "^1.17.1",
+    "handlebars": "^4.7.6",
+    "bcrypt": "^5.0.0"
+  }
+}
