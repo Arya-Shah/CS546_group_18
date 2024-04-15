@@ -1,6 +1,7 @@
 import { users } from '../config/mongoCollections.js';
 import uuid from 'uuid';
 import bcrypt from 'bcrypt';
+import validators from '../helper.js';
 
 const saltRounds = 16;
 
@@ -10,7 +11,7 @@ return await userCollection.find({}).toArray();
 };
 
 export const getUserById = async (id) => {
-if (!id || typeof id !== 'string') throw 'Invalid ID input';
+if (!validators.isValidUuid(id)) throw 'Invalid ID input';
 const userCollection = await users();
 const user = await userCollection.findOne({ userId: id });
 if (!user) throw 'User not found';
@@ -18,18 +19,18 @@ return user;
 };
 
 export const addUser = async (firstName, lastName, email, hasProperty, city, state, password) => {
-if (!firstName || typeof firstName !== 'string' || firstName.trim().length === 0)
+if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
 throw 'Invalid first name input';
-if (!lastName || typeof lastName !== 'string' || lastName.trim().length === 0)
+if (!lastName || !validators.isValidString(lastName) || lastName.trim().length === 0)
 throw 'Invalid last name input';
-if (!email || typeof email !== 'string' || email.trim().length === 0)
+if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
 throw 'Invalid email input';
-if (typeof hasProperty !== 'boolean') throw 'Invalid hasProperty input';
-if (!city || typeof city !== 'string' || city.trim().length === 0)
+if (!validators.isBoolean(hasProperty)) throw 'Invalid hasProperty input';
+if (!city || !validators.isValidString(city) || city.trim().length === 0)
 throw 'Invalid city input';
-if (!state || typeof state !== 'string' || state.trim().length === 0)
+if (!state || !validators.isValidString(state) || state.trim().length === 0)
 throw 'Invalid state input';
-if (!password || typeof password !== 'string' || password.trim().length === 0)
+if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
 throw 'Invalid password input';
 
 const userCollection = await users();
@@ -55,7 +56,7 @@ return { userInserted: true };
 };
 
 export const updateUser = async (userId, updatedUser) => {
-if (!userId || typeof userId !== 'string') throw 'Invalid user ID input';
+if (!userId || !validators.isValidUuid(userId)) throw 'Invalid user ID input';
 if (!updatedUser || typeof updatedUser !== 'object' || Array.isArray(updatedUser))
 throw 'Invalid updatedUser input';
 
@@ -90,12 +91,11 @@ const updateResponse = await userCollection.updateOne(
 );
 if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
 throw 'Error occurred while updating user';
-
 return { userUpdated: true };
 };
 
 export const removeUser = async (userId) => {
-if (!userId || typeof userId !== 'string') throw 'Invalid user ID input';
+if (!userId || !validators.isValidUuid(userId)) throw 'Invalid user ID input';
 
 const userCollection = await users();
 const deletionInfo = await userCollection.deleteOne({ userId: userId });
@@ -103,6 +103,5 @@ const deletionInfo = await userCollection.deleteOne({ userId: userId });
 if (deletionInfo.deletedCount === 0) {
 throw `Error occurred while deleting user with ID ${userId}`;
 }
-
 return { userDeleted: true };
 };
