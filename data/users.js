@@ -1,4 +1,4 @@
-import { users } from './mongoCollections.js';
+import { users } from '../config/mongoCollections.js';
 import uuid from 'uuid';
 import bcrypt from 'bcrypt';
 
