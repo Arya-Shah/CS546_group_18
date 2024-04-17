@@ -27,10 +27,62 @@ export const isBoolean = (bool) => {
 return typeof bool === 'boolean';
 };
 
+
+//Function: updateRating
+//Update Landlord Review
+
+const updateRating = async (landlordId) => {
+        
+    //Validate UUID
+        isValidUuid(landlordId);
+
+    //Retreive User Collection
+        const userCollection = await users();
+
+    //Pull Landlord
+        const landlord = await userCollection.findOne({userId: landlordId});
+
+    if (!landlord){
+        throw 'Landlord not found.';
+    }
+
+    let kindnessRatingTotal = 0;
+    let maintenanceResponsivenessRatingTotal = 0;
+    let overallCommunicationRatingTotal = 0;
+    let professionalismRatingTotal = 0;
+    let handinessRatingTotal = 0;
+    let depositHandlingRatingTotal = 0;
+
+    for (let landlordReview of landlord.landlordReviews){
+        kindnessRatingTotal += landlordReview.kindnessRating;
+        maintenanceResponsivenessRatingTotal += landlordReview.maintenanceResponsivenessRating;
+        overallCommunicationRatingTotal += landlordReview.overallCommunicationRating;
+        professionalismRatingTotal += landlordReview.professionalismRating;
+        handinessRatingTotal += landlordReview.handinessRating;
+        depositHandlingRatingTotal += landlordReview.depositHandlingRating;
+    }
+
+    let newAverageRatings = {
+        kindnessRating: kindnessRatingTotal / landlord.landlordReviews.length,
+        maintenanceResponsivenessRating: maintenanceResponsivenessRatingTotal / landlord.landlordReviews.length,
+        overallCommunicationRating: overallCommunicationRatingTotal / landlord.landlordReviews.length, 
+        professionalismRating: professionalismRatingTotal / landlord.landlordReviews.length, 
+        handinessRating: handinessRatingTotal / landlord.landlordReviews.length, 
+        depositHandlingRating: depositHandlingRatingTotal / landlord.landlordReviews.length
+    }
+
+    await userCollection.updateOne(
+        {userId: landlordId},
+        {$set: {averageRatings: newAverageRatings}}
+    );
+
+}
+
 export default {
 isValidString,
 isValidEmail,
 isValidUuid,
 isValidPassword,
-isBoolean
+isBoolean, 
+updateRating
 };
