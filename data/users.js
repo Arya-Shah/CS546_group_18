@@ -5,103 +5,269 @@ import validators from '../helper.js';
 
 const saltRounds = 16;
 
+//Function: getAllUsers
 export const getAllUsers = async () => {
-const userCollection = await users();
-return await userCollection.find({}).toArray();
+
+    //Retreive User Collection
+        const userCollection = await users();
+
+    //Return collection as array
+        return await userCollection.find({}).toArray();
+
 };
 
+
+//Function: getUserById
 export const getUserById = async (id) => {
-if (!validators.isValidUuid(id)) throw 'Invalid ID input';
-const userCollection = await users();
-const user = await userCollection.findOne({ userId: id });
-if (!user) throw 'User not found';
-return user;
-};
 
+    //Validation
+        if (!validators.isValidUuid(id)) 
+            throw 'Invalid ID input';
+            
+    
+    //Retreive user collection and specific user
+        const userCollection = await users();
+        const user = await userCollection.findOne({ userId: id });
+   
+    //Validation (cont.)
+        if (!user) 
+            throw 'User not found';
+    
+    //Return 
+        return user;
+
+    };
+
+//Function: addUser    
 export const addUser = async (firstName, lastName, email, hasProperty, city, state, password) => {
-if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
-throw 'Invalid first name input';
-if (!lastName || !validators.isValidString(lastName) || lastName.trim().length === 0)
-throw 'Invalid last name input';
-if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
-throw 'Invalid email input';
-if (!validators.isBoolean(hasProperty)) throw 'Invalid hasProperty input';
-if (!city || !validators.isValidString(city) || city.trim().length === 0)
-throw 'Invalid city input';
-if (!state || !validators.isValidString(state) || state.trim().length === 0)
-throw 'Invalid state input';
-if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
-throw 'Invalid password input';
+    
+    
+    //Validation
+        if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
+            throw 'Invalid first name input';
 
-const userCollection = await users();
-const hashedPassword = await bcrypt.hash(password, saltRounds);
-let newUser = {
-userId: uuid.v4(),
-firstName: firstName.trim(),
-lastName: lastName.trim(),
-email: email.trim().toLowerCase(),
-hasProperty: hasProperty,
-city: city.trim(),
-state: state.trim(),
-hashedPassword: hashedPassword,
-reviewIds: [],
-commentsIds: [],
-reportsIds: []
+        if (!lastName || !validators.isValidString(lastName) || lastName.trim().length === 0)
+            throw 'Invalid last name input';
+
+        if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
+            throw 'Invalid email input';
+
+        if (!validators.isBoolean(hasProperty)) 
+            throw 'Invalid hasProperty input';
+        
+        if (!city || !validators.isValidString(city) || city.trim().length === 0)
+            throw 'Invalid city input';
+        
+        if (!state || !validators.isValidString(state) || state.trim().length === 0)
+            throw 'Invalid state input';
+        
+        if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
+            throw 'Invalid password input';
+
+    //Retrieve user collection
+        const userCollection = await users();
+    
+    //Set hashed password 
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    //New User Object
+    let newUser = {
+        userId: uuid.v4(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: email.trim().toLowerCase(),
+        hasProperty: hasProperty,
+        properties: [],
+        city: city.trim(),
+        state: state.trim(),
+        hashedPassword: hashedPassword,
+        reviewIds: [],
+        commentsIds: [],
+        reportsIds: [],
+        averageRatings: [],
+        landlordReviews: []
+    };
+
+    //Insert new user object into collection
+        const insertInfo = await userCollection.insertOne(newUser);
+    
+    
+    //Validation (cont.)    
+    if (!insertInfo.acknowledged || !insertInfo.insertedId)
+        throw 'Could not add new user';
+
+    //Return
+        return {userInserted: true};
+
 };
 
-const insertInfo = await userCollection.insertOne(newUser);
-if (!insertInfo.acknowledged || !insertInfo.insertedId)
-throw 'Could not add new user';
-return { userInserted: true };
-};
 
+//Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
-if (!userId || !validators.isValidUuid(userId)) throw 'Invalid user ID input';
-if (!updatedUser || typeof updatedUser !== 'object' || Array.isArray(updatedUser))
-throw 'Invalid updatedUser input';
 
-const userCollection = await users();
-const updatedUserData = {};
+    //Validation 
 
-if (updatedUser.firstName) {
-updatedUserData.firstName = updatedUser.firstName.trim();
-}
-if (updatedUser.lastName) {
-updatedUserData.lastName = updatedUser.lastName.trim();
-}
-if (updatedUser.email) {
-updatedUserData.email = updatedUser.email.trim().toLowerCase();
-}
-if (updatedUser.hasProperty !== undefined) {
-updatedUserData.hasProperty = updatedUser.hasProperty;
-}
-if (updatedUser.city) {
-updatedUserData.city = updatedUser.city.trim();
-}
-if (updatedUser.state) {
-updatedUserData.state = updatedUser.state.trim();
-}
-if (updatedUser.password) {
-updatedUserData.hashedPassword = await bcrypt.hash(updatedUser.password, saltRounds);
-}
+        if (!userId || !validators.isValidUuid(userId)) 
+            throw 'Invalid user ID input';
+        
+        if (!updatedUser || typeof updatedUser !== 'object' || Array.isArray(updatedUser))
+            throw 'Invalid updatedUser input';
 
-const updateResponse = await userCollection.updateOne(
-{ userId: userId },
-{ $set: updatedUserData }
-);
-if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
-throw 'Error occurred while updating user';
-return { userUpdated: true };
+    
+    //Retrieve user collection
+        const userCollection = await users();
+    
+    //Create object for updated user information 
+        const updatedUserData = {};
+    
+    //Validate and add updated user information to object 
+        if (updatedUser.firstName) {
+        
+            if (!updatedUser.firstName || !validators.isValidString(updatedUser.firstName ) || updatedUser.firstName.trim().length === 0)
+                throw 'Invalid first name input';
+
+            updatedUserData.firstName = updatedUser.firstName.trim();
+        }
+
+        if (updatedUser.lastName) {
+
+            if (!updatedUser.lastName || !validators.isValidString(updatedUser.lastName) || updatedUser.lastName.trim().length === 0)
+                throw 'Invalid first name input';
+
+            updatedUserData.lastName = updatedUser.lastName.trim();
+        
+        }
+
+        if (updatedUser.email) {
+
+            if (!updatedUser.email || !validators.isValidEmail(updatedUser.email) || updatedUser.email.trim().length === 0)
+                throw 'Invalid email input';
+
+            updatedUserData.email = updatedUser.email.trim().toLowerCase();
+        
+        }
+
+        if (updatedUser.hasProperty !== undefined) {
+
+            if (!validators.isBoolean(updatedUser.hasProperty)) 
+                throw 'Invalid hasProperty input';
+
+            updatedUserData.hasProperty = updatedUser.hasProperty;
+        
+        }
+        
+        if (updatedUser.city) {
+
+            if (!updatedUser.city || !validators.isValidString(updatedUser.city) || updatedUser.city.trim().length === 0)
+                throw 'Invalid city input';
+
+            updatedUserData.city = updatedUser.city.trim();
+        
+        }
+        
+        if (updatedUser.state) {
+            
+            if (!updatedUser.state || !validators.isValidString(updatedUser.state) || updatedUser.state.trim().length === 0)
+                throw 'Invalid state input';
+
+            updatedUserData.state = updatedUser.state.trim();
+        
+        }
+        
+        if (updatedUser.password){
+
+            if (!updatedUser.password || !validators.isValidPassword(updatedUser.password) || updatedUser.password.trim().length === 0)
+                throw 'Invalid password input';
+            
+            updatedUserData.hashedPassword = await bcrypt.hash(updatedUser.password, saltRounds);
+
+        }
+
+    //Update user with object
+        const updateResponse = await userCollection.updateOne(
+            { userId: userId },
+            { $set: updatedUserData }
+        );
+    
+    
+    //Validation (cont.)
+        if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
+            throw 'Error occurred while updating user';
+
+    //Return
+        return { userUpdated: true };
+
 };
 
+
+//Function: removeUser
 export const removeUser = async (userId) => {
-if (!userId || !validators.isValidUuid(userId)) throw 'Invalid user ID input';
 
-const userCollection = await users();
-const deletionInfo = await userCollection.deleteOne({ userId: userId });
+    //Validation
+        if (!userId || !validators.isValidUuid(userId)) 
+            throw 'Invalid user ID input';
 
-if (deletionInfo.deletedCount === 0) {
-throw `Error occurred while deleting user with ID ${userId}`;
-}
-return { userDeleted: true };
+    
+    //Retreive User Collection
+        const userCollection = await users();
+
+    //Delete user
+        const deletionInfo = await userCollection.deleteOne({ userId: userId });
+
+    //Validation (cont.) 
+        if (deletionInfo.deletedCount === 0) {
+            throw `Error occurred while deleting user with ID ${userId}`;
+        }
+    
+    //Return
+    return { userDeleted: true };
+};
+
+
+//Function: addLandlordReview
+export const addLandlordReview = async (landlordId, reviewData, userId) => {
+
+    //Retrieve Landlord
+        const landlord = await getUserById(landlordId);
+    
+    //Set constants (reviewId and date)
+        const reviewId = uuid.v4(); 
+        const date = new Date().toISOString(); 
+    
+    //Validation
+        if (!reviewData || Object.keys(reviewData).length === 0)
+            throw 'Invalid Review: Review data is required.';
+
+        if (!landlord.hasProperty)
+            throw 'Invalid landlord ID or landlord does not exist';
+
+    //Create Review Object
+    //To Do: Validate Ratings
+    const updatedReviewData = {
+        reviewId: reviewId, 
+        userId: userId, 
+        kindnessRating: reviewData.kindnessRating,
+        maintenanceResponsivenessRating: reviewData.maintenanceResponsivenessRating,
+        overallCommunicationRating: reviewData.overallCommunicationRating, 
+        professionalismRating: reviewData.professionalismRating,
+        handinessRating: reviewData.handinessRating, 
+        depositHandlingRating: reviewData.depositHandlingRating, 
+        reviewText: reviewData.reviewText, 
+        dateCreated: date, 
+        reports: [] 
+    } 
+
+    //Update User with review id
+    const userUpdateStatus = await updateUser(userId, {reviewIds: reviewId});
+        if (!userUpdateStatus){throw 'Failed to update user information with new review.'}
+         
+    //Update Landlord with review
+    const landlordUpdateStatus = await updateUser(landlordId, {reviews: updatedReviewData});
+        if (!landlordUpdateStatus){throw 'Failed to update landlord informaiton with new review.'}
+
+    //To Do: Recalculate Landlord's average ratings
+    
+    //Return 
+    return { reviewAdded: true };
+    
 };
