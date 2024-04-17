@@ -23,7 +23,6 @@ export const getUserById = async (id) => {
     //Validation
         if (!validators.isValidUuid(id)) 
             throw 'Invalid ID input';
-            
     
     //Retreive user collection and specific user
         const userCollection = await users();
@@ -38,9 +37,9 @@ export const getUserById = async (id) => {
 
     };
 
+
 //Function: addUser    
 export const addUser = async (firstName, lastName, email, hasProperty, city, state, password) => {
-    
     
     //Validation
         if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
@@ -91,7 +90,6 @@ export const addUser = async (firstName, lastName, email, hasProperty, city, sta
     //Insert new user object into collection
         const insertInfo = await userCollection.insertOne(newUser);
     
-    
     //Validation (cont.)    
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
         throw 'Could not add new user';
@@ -112,7 +110,6 @@ export const updateUser = async (userId, updatedUser) => {
         
         if (!updatedUser || typeof updatedUser !== 'object' || Array.isArray(updatedUser))
             throw 'Invalid updatedUser input';
-
     
     //Retrieve user collection
         const userCollection = await users();
@@ -189,7 +186,6 @@ export const updateUser = async (userId, updatedUser) => {
             { $set: updatedUserData }
         );
     
-    
     //Validation (cont.)
         if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
             throw 'Error occurred while updating user';
@@ -207,7 +203,6 @@ export const removeUser = async (userId) => {
         if (!userId || !validators.isValidUuid(userId)) 
             throw 'Invalid user ID input';
 
-    
     //Retreive User Collection
         const userCollection = await users();
 
