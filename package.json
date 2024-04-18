@@ -17,8 +17,12 @@
     "express-handlebars": "^5.2.0",
     "express-session": "^1.17.1",
     "handlebars": "^4.7.6",
-    "mongodb": "^6.3.0",
+    "mongodb": "^6.5.0",
     "uuid": "^9.0.1",
     "xss": "^1.0.8"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
   }
 }
