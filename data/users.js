@@ -302,7 +302,7 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     //Update User with review id
     const userUpdateStatus = await updateUser(userId, {reviewIds: reviewId});
         if (!userUpdateStatus){throw 'Failed to update user information with new review.'}
-         
+        
     //Update Landlord with review
     const landlordUpdateStatus = await updateUser(landlordId, {reviews: updatedReviewData});
         if (!landlordUpdateStatus){throw 'Failed to update landlord informaiton with new review.'}
@@ -313,4 +313,98 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     //Return 
     return { reviewAdded: true };
     
+};
+
+// Function: Add a property to user's bookmarks
+export const addBookmark = async (userId, propertyId) => {
+    if (!userId || !validators.isValidUuid(userId))
+        throw 'Invalid user ID input';
+    if (!propertyId || !validators.isValidUuid(propertyId))
+        throw 'Invalid property ID input';
+
+    const userCollection = await users();
+    const updateInfo = await userCollection.updateOne(
+        { userId: userId },
+        { $addToSet: { bookmarkedProperties: propertyId } }
+    );
+
+    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        throw 'Failed to add bookmark';
+    
+    return { bookmarkAdded: true };
+};
+
+// Function: Remove a property from user's bookmarks
+export const removeBookmark = async (userId, propertyId) => {
+    if (!userId || !validators.isValidUuid(userId))
+        throw 'Invalid user ID input';
+    if (!propertyId || !validators.isValidUuid(propertyId))
+        throw 'Invalid property ID input';
+
+    const userCollection = await users();
+    const updateInfo = await userCollection.updateOne(
+        { userId: userId },
+        { $pull: { bookmarkedProperties: propertyId } }
+    );
+
+    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        throw 'Failed to remove bookmark';
+    
+    return { bookmarkRemoved: true };
+};
+
+// Function: Get all bookmarked properties for a user
+export const getBookmarkedProperties = async (userId) => {
+    if (!userId || !validators.isValidUuid(userId))
+        throw 'Invalid user ID input';
+
+    const userCollection = await users();
+    const user = await userCollection.findOne(
+        { userId: userId },
+        { projection: { bookmarkedProperties: 1 } }
+    );
+
+    if (!user)
+        throw 'User not found';
+
+    return user.bookmarkedProperties || [];
+};
+
+export const searchPropertiesByName = async (title) => {
+    const result = [];
+    const errorObject = { status: 400 };
+
+    if (!title || typeof title !== "string" || !validators.isValidString(title)) {
+        errorObject.error = "Provided input must be a valid string.";
+        throw errorObject;
+    }
+
+    title = title.trim();
+    if (title.length === 0) {
+        errorObject.error = "No input provided to search.";
+        throw errorObject;
+    }
+
+    const propertyCollection = await properties();
+    await propertyCollection.createIndex({ name: "text" });
+    const propertiesList = await propertyCollection.find({
+        $text: { $search: title }
+    }).toArray();
+    
+
+    if (!propertiesList || propertiesList.length === 0) {
+        errorObject.status = 404;
+        errorObject.error = `No properties were found for "${title}".`;
+        throw errorObject;
+    }
+
+    propertiesList.forEach(property => {
+        result.push({
+            propertyName: property.name,
+            location: property.location,
+            propertyId: property._id
+        });
+    });
+
+    return result;
 };
