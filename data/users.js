@@ -81,6 +81,7 @@ export const addUser = async (firstName, lastName, email, hasProperty, city, sta
         city: city.trim(),
         state: state.trim(),
         hashedPassword: hashedPassword,
+        reviews: [],
         reviewIds: [],
         commentsIds: [],
         reportsIds: [],
@@ -230,10 +231,6 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     //Retrieve Landlord
         const landlord = await getUserById(landlordId);
     
-    //Set constants (reviewId and date)
-        const reviewId = uuid.v4(); 
-        const date = new Date().toISOString(); 
-    
     //Validation
         if (!reviewData || Object.keys(reviewData).length === 0)
             throw 'Invalid Review: Review data is required.';
@@ -242,11 +239,20 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
             throw 'Invalid landlord ID or landlord does not exist';
 
     //Create Review Object
-        const updatedReviewData = {};
+        const updatedReviewData = {
+            'userId': null,
+            'reviewId' : uuid.v4(),
+            'date' : new Date().toISOString(),
+            'reports' : [],
+            'kindnessRating': null,
+            'maintenanceResponsivenessRating': null,
+            'overallCommunicationRating': null,
+            'professionalismRating': null,
+            'handinessRating': null,
+            'depositHandlingRating': null,
+            'reviewText': null,
+        };
 
-        updatedReviewData.reviewId = reviewId;
-        updatedReviewData.date = date;
-        updatedReviewData.reports = [];
         
     //Validation (cont.) and add to review object
         if (!userId || !validators.isValidUuid(userId)) {
@@ -257,62 +263,109 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
 
         const validRatings = [1, 2, 3, 4, 5];
 
-        if (!kindnessRating || typeof kindnessRating !== 'number' || !validRatings.includes(kindnessRating)) {
+        if (!reviewData.kindnessRating || typeof reviewData.kindnessRating !== 'number' || !validRatings.includes(reviewData.kindnessRating)) {
             throw new Error('Invalid kindnessRating input');
         } else {
-            updatedReviewData.kindnessRating = kindnessRating;
+            updatedReviewData.kindnessRating = reviewData.kindnessRating;
         }
 
-        if (!maintenanceResponsivenessRating || typeof maintenanceResponsivenessRating !== 'number' || !validRatings.includes(maintenanceResponsivenessRating)) {
+        if (!reviewData.maintenanceResponsivenessRating || typeof reviewData.maintenanceResponsivenessRating !== 'number' || !validRatings.includes(reviewData.maintenanceResponsivenessRating)) {
             throw new Error('Invalid maintenanceResponsivenessRating input');
         } else {
-            updatedReviewData.maintenanceResponsivenessRating = maintenanceResponsivenessRating;
+            updatedReviewData.maintenanceResponsivenessRating = reviewData.maintenanceResponsivenessRating;
         }
 
-        if (!overallCommunicationRating || typeof overallCommunicationRating !== 'number' || !validRatings.includes(overallCommunicationRating)) {
+        if (!reviewData.overallCommunicationRating || typeof reviewData.overallCommunicationRating !== 'number' || !validRatings.includes(reviewData.overallCommunicationRating)) {
             throw new Error('Invalid overallCommunicationRating input');
         } else {
-            updatedReviewData.overallCommunicationRating = overallCommunicationRating;
+            updatedReviewData.overallCommunicationRating = reviewData.overallCommunicationRating;
         }
 
-        if (!professionalismRating || typeof professionalismRating !== 'number' || !validRatings.includes(professionalismRating)) {
+        if (!reviewData.professionalismRating || typeof reviewData.professionalismRating !== 'number' || !validRatings.includes(reviewData.professionalismRating)) {
             throw new Error('Invalid professionalismRating input');
         } else {
-            updatedReviewData.professionalismRating = professionalismRating;
+            updatedReviewData.professionalismRating = reviewData.professionalismRating;
         }
 
-        if (!handinessRating || typeof handinessRating !== 'number' || !validRatings.includes(handinessRating)) {
+        if (!reviewData.handinessRating || typeof reviewData.handinessRating !== 'number' || !validRatings.includes(reviewData.handinessRating)) {
             throw new Error('Invalid handinessRating input');
         } else {
-            updatedReviewData.handinessRating = handinessRating;
+            updatedReviewData.handinessRating = reviewData.handinessRating;
         }
 
-        if (!depositHandlingRating || typeof depositHandlingRating !== 'number' || !validRatings.includes(depositHandlingRating)) {
+        if (!reviewData.depositHandlingRating || typeof reviewData.depositHandlingRating !== 'number' || !validRatings.includes(reviewData.depositHandlingRating)) {
             throw new Error('Invalid depositHandlingRating input');
         } else {
-            updatedReviewData.depositHandlingRating = depositHandlingRating;
+            updatedReviewData.depositHandlingRating = reviewData.depositHandlingRating;
         }
 
-        if (!reviewText || !validators.isValidString(reviewText) || reviewText.trim().length === 0) {
+        if (!reviewData.reviewText || !validators.isValidString(reviewData.reviewText) || reviewData.reviewText.trim().length === 0) {
             throw new Error('Invalid reviewText input');
         } else {
-            updatedReviewData.reviewText = reviewText;
+            updatedReviewData.reviewText = reviewData.reviewText;
         }
 
     //Update User with review id
-    const userUpdateStatus = await updateUser(userId, { $push: { reviewIds: reviewId });
-        if (!userUpdateStatus){throw 'Failed to update user information with new review.'}
+        const userUpdateStatus = await updateUser(
+            {'userId' : userId}, 
+            { $push: { reviewIds:  updatedReviewData.reviewId }});
         
+        if (!userUpdateStatus)
+            throw 'Failed to update user information with new review.';
+            
     //Update Landlord with review
-    const landlordUpdateStatus = await updateUser(landlordId, { $push: { reviews: updatedReviewData } });
-        if (!landlordUpdateStatus){throw 'Failed to update landlord informaiton with new review.'}
+        const landlordUpdateStatus = await updateUser(landlordId, { $push: { reviews: updatedReviewData } });
+            
+        if (!landlordUpdateStatus)
+            throw 'Failed to update landlord informaiton with new review.';
 
     //To Do: Recalculate Landlord's average ratings
-    helpers.updateRating(landlordId);
+        validators.updateRating(landlordId);
     
     //Return 
-    return { reviewAdded: true };
+        return { reviewAdded: true };
     
+};
+
+// Function: removeCommentReply, removes comment from property or reply from comment
+export const removeLandlordReview = async (userId, landlordId, landlordReviewId) => {
+    
+    //Validations    
+        if (!userId || !validators.isValidUuid(userId))
+            throw 'Invalid user ID input';
+
+        if (!landlordId || !validators.isValidUuid(landlordId))
+            throw 'Invalid landlord ID input';
+
+        if (!landlordReviewId || !validators.isValidUuid(landlordReviewId))
+            throw 'Invalid user landlordReviewId input';
+
+    //Pull property collection
+        const userCollection = await users();
+    
+    //Try to pull comment from property
+        let updateInfo = await userCollection.updateOne(
+            {'userId': landlordId},
+            { $pull: {'reviews.reviewId': landlordReviewId} }
+        );
+
+    //Throw Error if Failed 
+        if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+            throw 'Failed to remove comment or reply.';
+
+    //Remove reviewId from user's object
+
+        const userUpdateStatus = await userCollection.updateOne(
+            {'userId': userId},
+            { $pull: { 'reviewIds': landlordReviewId } }
+        );
+
+        if (!userUpdateStatus.acknowledged || userUpdateStatus.modifiedCount === 0)
+            throw 'Failed to update user information with removed review.';
+
+    //Return
+        return { commentOrReplyPulled: true };
+        
 };
 
 // Function: Add a property to user's bookmarks
