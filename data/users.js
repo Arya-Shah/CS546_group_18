@@ -300,11 +300,11 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         }
 
     //Update User with review id
-    const userUpdateStatus = await updateUser(userId, {reviewIds: reviewId});
+    const userUpdateStatus = await updateUser(userId, { $push: { reviewIds: reviewId });
         if (!userUpdateStatus){throw 'Failed to update user information with new review.'}
         
     //Update Landlord with review
-    const landlordUpdateStatus = await updateUser(landlordId, {reviews: updatedReviewData});
+    const landlordUpdateStatus = await updateUser(landlordId, { $push: { reviews: updatedReviewData } });
         if (!landlordUpdateStatus){throw 'Failed to update landlord informaiton with new review.'}
 
     //To Do: Recalculate Landlord's average ratings
