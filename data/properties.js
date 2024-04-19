@@ -27,7 +27,6 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
             replies : [],
             reports : []
         };
-    
 
     //Pull property collection
         const propertyCollection = await properties();
@@ -182,3 +181,68 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
     return { likeAdded: true };
     
 };
+
+
+//Function: removeLikeDislike, removes like or dislike to comment or reply
+export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
+    
+    //Validations    
+        if (!propertyOrCommentId || !validators.isValidUuid(propertyOrCommentId))
+            throw 'Invalid property ID input';   
+    
+    //Validations    
+        if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
+            throw 'Invalid indicidation if like or dislike should be added';   
+    
+    //Pull property collection
+        const propertyCollection = await properties();
+    
+    //Try to add like or dislike to comment from property
+        
+        let updateInfo;    
+    
+        if(likeOrDislike === 'like'){
+            
+            updateInfo = await propertyCollection.updateOne(
+                { 'comments.commentId': propertyOrCommentId },
+                { $inc: { 'comments.$.likes': -1 } }
+            );
+    
+        } else {
+            
+            updateInfo = await propertyCollection.updateOne(
+                { 'comments.commentId': propertyOrCommentId },
+                { $inc: { 'comments.$.dislikes': -1 } }
+            );
+    
+        };
+    
+    //If failed, try to add like or dislike to reply
+        if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
+            
+            if(likeOrDislike === 'like'){
+                
+                updateInfo = await propertyCollection.updateOne(
+                    { 'replies.commentId': propertyOrCommentId },
+                    { $inc: { 'replies.$.likes': -1 } }
+                );
+            
+            } else{ 
+                
+                updateInfo = await propertyCollection.updateOne(
+                    { 'replies.commentId': propertyOrCommentId },
+                    { $inc: { 'replies.$.dislikes': -1 } }
+                );
+            }
+    
+        }
+    
+    //Throw Error if Failed 
+        if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+            throw 'Failed to decrement likes on comment or reply.';
+    
+    //Return
+        return { likeRemoved: true };
+        
+    };
+    
