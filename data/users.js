@@ -98,7 +98,7 @@ export const addUser = async (firstName, lastName, email, hasProperty, city, sta
         throw 'Could not add new user';
 
     //Return
-        return {userInserted: true};
+        return {userInserted: true, userId: newUser.userId};
 
 };
 
