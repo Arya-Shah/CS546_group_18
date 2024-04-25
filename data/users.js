@@ -1,6 +1,8 @@
 import { users } from '../config/mongoCollections.js';
-import uuid from 'uuid';
-import bcrypt from 'bcrypt';
+// import uuid from 'uuid';
+// import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs'
+import { v4 as uuid } from 'uuid';
 import validators from '../helper.js';
 
 const saltRounds = 16;
@@ -72,7 +74,7 @@ export const addUser = async (firstName, lastName, email, hasProperty, city, sta
     
     //New User Object
     let newUser = {
-        userId: uuid.v4(),
+        userId: uuid(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         email: email.trim().toLowerCase(),
@@ -88,7 +90,6 @@ export const addUser = async (firstName, lastName, email, hasProperty, city, sta
         averageRatings: {},
         landlordReviews: []
     };
-
     //Insert new user object into collection
         const insertInfo = await userCollection.insertOne(newUser);
     
@@ -460,4 +461,141 @@ export const searchPropertiesByName = async (title) => {
     });
 
     return result;
+};
+
+//Function addLandLordReport (report created by user on landlord)
+export const addLandLordReport = async (landlordId, reportData, userId) => {
+    const landlord = await getUserById(landlordId);
+//Set constants (reportId and date)
+    const date = new Date().toISOString();//date when report is raised.
+    // checking content of reportData
+    if (!reportData || Object.keys(reportData).length === 0)
+        throw 'Invalid Report: Report content is required.';
+    if (!landlord.hasProperty)
+        throw 'Invalid landlord ID or landlord does not exist';
+    const updatedReportData = {
+        'report_id': uuid(),
+        "userId": null, //user id of customer reporter_id/userId
+        "reported_item_type": null, //property or landlord
+        "report_reason": null,//report reason
+        "report_description": null,//description of reporting
+        "reported_at": null,// date of report raised
+        "status": "pending",//status of the report which is managed by landlord
+        "resolved_at": null // Date when status is resolved.
+      };
+
+    updatedReportData.reported_at = date;
+    if (!userId || !validators.isValidUuid(userId)) {
+        throw new Error('Invalid user ID input');
+    } else {
+        updatedReportData.userId = userId;
+    }
+const userReportUpdateStatus = await updateUser(userId, {reportIds: updatedReportData.report_id});
+if (!userReportUpdateStatus){throw 'Failed to update user information with new review.'}
+const landlordReportUpdateStatus = await updateUser(landlordId, {reports: updatedReportData});
+if (!landlordReportUpdateStatus){throw 'Failed to update landlord informaiton with new review.'}
+
+return { reportAdded: true };
+};
+
+//Function: addLandlordReview
+export const addLandlordReview = async (landlordId, reviewData, userId) => {
+
+    //Retrieve Landlord
+        const landlord = await getUserById(landlordId);
+    
+    //Validation
+        if (!reviewData || Object.keys(reviewData).length === 0)
+            throw 'Invalid Review: Review data is required.';
+
+        if (!landlord.hasProperty)
+            throw 'Invalid landlord ID or landlord does not exist';
+
+    //Create Review Object
+        const updatedReviewData = {
+            'userId': null,
+            'reviewId' : uuid.v4(),
+            'date' : new Date().toISOString(),
+            'reports' : [],
+            'kindnessRating': null,
+            'maintenanceResponsivenessRating': null,
+            'overallCommunicationRating': null,
+            'professionalismRating': null,
+            'handinessRating': null,
+            'depositHandlingRating': null,
+            'reviewText': null,
+        };
+
+        
+    //Validation (cont.) and add to review object
+        if (!userId || !validators.isValidUuid(userId)) {
+            throw new Error('Invalid user ID input');
+        } else {
+            updatedReviewData.userId = userId;
+        }
+
+        const validRatings = [1, 2, 3, 4, 5];
+
+        if (!reviewData.kindnessRating || typeof reviewData.kindnessRating !== 'number' || !validRatings.includes(reviewData.kindnessRating)) {
+            throw new Error('Invalid kindnessRating input');
+        } else {
+            updatedReviewData.kindnessRating = reviewData.kindnessRating;
+        }
+
+        if (!reviewData.maintenanceResponsivenessRating || typeof reviewData.maintenanceResponsivenessRating !== 'number' || !validRatings.includes(reviewData.maintenanceResponsivenessRating)) {
+            throw new Error('Invalid maintenanceResponsivenessRating input');
+        } else {
+            updatedReviewData.maintenanceResponsivenessRating = reviewData.maintenanceResponsivenessRating;
+        }
+
+        if (!reviewData.overallCommunicationRating || typeof reviewData.overallCommunicationRating !== 'number' || !validRatings.includes(reviewData.overallCommunicationRating)) {
+            throw new Error('Invalid overallCommunicationRating input');
+        } else {
+            updatedReviewData.overallCommunicationRating = reviewData.overallCommunicationRating;
+        }
+
+        if (!reviewData.professionalismRating || typeof reviewData.professionalismRating !== 'number' || !validRatings.includes(reviewData.professionalismRating)) {
+            throw new Error('Invalid professionalismRating input');
+        } else {
+            updatedReviewData.professionalismRating = reviewData.professionalismRating;
+        }
+
+        if (!reviewData.handinessRating || typeof reviewData.handinessRating !== 'number' || !validRatings.includes(reviewData.handinessRating)) {
+            throw new Error('Invalid handinessRating input');
+        } else {
+            updatedReviewData.handinessRating = reviewData.handinessRating;
+        }
+
+        if (!reviewData.depositHandlingRating || typeof reviewData.depositHandlingRating !== 'number' || !validRatings.includes(reviewData.depositHandlingRating)) {
+            throw new Error('Invalid depositHandlingRating input');
+        } else {
+            updatedReviewData.depositHandlingRating = reviewData.depositHandlingRating;
+        }
+
+        if (!reviewData.reviewText || !validators.isValidString(reviewData.reviewText) || reviewData.reviewText.trim().length === 0) {
+            throw new Error('Invalid reviewText input');
+        } else {
+            updatedReviewData.reviewText = reviewData.reviewText;
+        }
+
+    //Update User with review id
+        const userUpdateStatus = await updateUser(
+            {'userId' : userId}, 
+            { $push: { reviewIds:  updatedReviewData.reviewId }});
+        
+        if (!userUpdateStatus)
+            throw 'Failed to update user information with new review.';
+            
+    //Update Landlord with review
+        const landlordUpdateStatus = await updateUser(landlordId, { $push: { reviews: updatedReviewData } });
+            
+        if (!landlordUpdateStatus)
+            throw 'Failed to update landlord informaiton with new review.';
+
+    //To Do: Recalculate Landlord's average ratings
+        validators.updateRating(landlordId);
+    
+    //Return 
+        return { reviewAdded: true };
+    
 };

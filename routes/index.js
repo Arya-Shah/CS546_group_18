@@ -2,7 +2,8 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import { getAllUsers, getUserById, addUser, updateUser, removeUser, addLandlordReview, removeBookmark, addBookmark, getBookmarkedProperties,
-    searchPropertiesByName, } from '../data/users.js';
+    searchPropertiesByName, addLandLordReport } from '../data/users.js';
+    import xss from 'xss';
 
     
 
@@ -127,6 +128,25 @@ router.get('/properties/search', async (req, res) => {
     } catch (error) {
         const status = error.status || 400;
         res.status(status).json({ error: error.error || error.toString() });
+    }
+});
+
+
+// rise a report on property and landlord
+router.post('/users/:userId/report/:propertyId', async (req, res) => {
+    try {
+        // Extract necessary data from request body or parameters
+        const { landlordId } =xss(req.params.landlordId);
+        const { reportData  } = xss(req.body.description);
+        const {userId} = xss(req.body.userId);
+        // Call the addLandlordReport function
+        const result = await addLandLordReport(landlordId, reportData, userId);
+
+        // Return success response
+        res.json(result);
+    } catch (error) {
+        // Return error response if something goes wrong
+        res.status(400).json({ error: error.message });
     }
 });
 
