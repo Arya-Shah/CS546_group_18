@@ -4,9 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title}}</title>
+<<<<<<< HEAD
     <link rel="stylesheet" href="/public/css/styles.css">
 </head>
 <body>
+=======
+    <link rel="stylesheet" href="/public/css/style.css">
+    {{#if data}}
+    <link rel="stylesheet" href="/public/css/{{data.themePreference}}.css">
+    {{/if}}
+    <link rel="shortcut icon" href="#">
+</head>
+{{#if data}}
+<body class="{{data.themePreference}}">
+{{else}}
+<body>
+{{/if}}
+{{#if success}}
+<p class="success"> {{success}}</p>
+{{/if}}
+>>>>>>> 42798d498ead8de64b1a6c3b380ee6a5d7a6190c
     {{{body}}}
     <script src="/public/js/client_side_validation.js"></script>
 </body>

@@ -2,6 +2,14 @@
 <p class="error">{{error}}</p>
 {{/if}}
 <div id="userView">
+<<<<<<< HEAD
 <p id="welcome">Welcome {{data.firstName}} {{data.lastName}}, the time is now: {{currentTime}}.</p>
+=======
+<p id="welcome">Welcome {{data.firstName}} {{data.lastName}}, the time is now: {{currentTime}}. Your role in the system is: {{data.role}}.</p>
+<p id="quote">Favorite Quote: {{data.favoriteQuote}}</p>
+{{#if isAdmin}}
+    <a id="adminLink" href="/admin">Admin Page</a>
+{{/if}}
+>>>>>>> 42798d498ead8de64b1a6c3b380ee6a5d7a6190c
 <a id="logoutLink" href="/logout">Logout</a>
 </div>
