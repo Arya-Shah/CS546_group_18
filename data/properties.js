@@ -1,6 +1,152 @@
 //Imports
 import { users } from '../config/mongoCollections.js';
 import { properties } from '../config/mongoCollections.js';
+import { v4 as uuid } from "uuid";
+import validators from "../helper.js";
+
+
+//Function: getAllProperties
+export const getAllProperties = async () => {
+
+    //Retreive Property Collection
+    const propertyCollection = await properties();
+
+    //Return collection as array
+    return await propertyCollection.find({}).toArray();
+
+};
+
+
+//Function: getPropertyById
+export const getPropertyById = async (id) => {
+ 
+    //Validation
+    if (!validators.isValidUuid(id)) throw "Invalid ID input";
+
+    //Retreive property collection and specific property
+    const propertyCollection = await properties();
+    const property = await propertyCollection.findOne({ propertyId: id });
+
+    //Validation (cont.)
+    if (!property) throw "Property not found";
+
+    //Return
+    return property;
+
+};
+
+
+//Function: addProperty
+export const addProperty = async (
+  propertyName,
+  address,
+  city,
+  state,
+  zipcode,
+  longitude,
+  latitude,
+  propertyCategory,
+  bedrooms,
+  bathrooms
+) => {
+  
+    //Validation
+    if (
+      !propertyName ||
+      !validators.isValidString(propertyName) ||
+      propertyName.trim().length === 0
+    )
+      throw "Invalid property name input";
+
+    if (
+      !address ||
+      !validators.isValidString(address) ||
+      address.trim().length === 0
+    )
+      throw "Invalid address input";
+
+    if (address.trim().length < 5 || 
+        address.trim().length > 100)
+        throw "The provided address needs to be between 5 and 100 characters.";
+
+    if (!city || 
+        !validators.isValidString(city) || 
+        city.trim().length === 0)
+      throw "Invalid city input";
+
+    if (!state || 
+        !validators.isValidString(state) || 
+        state.trim().length === 0)
+      throw "Invalid city input";
+
+    if (!zipcode || 
+        !validators.isValidString(zipcode) || 
+        !validators.isValidZipcode(zipcode) ||
+        zipcode.trim().length === 0)
+      throw "Invalid zipcode input";
+
+    if (!longitude || 
+        !validators.isValidString(longitude) || 
+        !validators.isValidLongitude(longitude) ||
+        longitude.trim().length === 0)
+      throw "Invalid longitude input";
+
+    if (!latitude || 
+        !validators.isValidString(latitude) || 
+        !validators.isValidLatitude(latitude) ||
+        latitude.trim().length === 0)
+      throw "Invalid latitude input";
+    
+    if (!propertyCategory || 
+        !validators.isValidString(propertyCategory) || 
+        propertyCategory.trim().length === 0 || 
+        !validators.isValidPropertyCategory(propertyCategory))
+      throw "Invalid propertyCategory input";
+
+    if (!bedrooms || 
+        !validators.isValidString(bedrooms) || 
+        bedrooms.trim().length === 0 ||
+        isNaN(parseFloat(bedrooms)))
+    throw "Invalid bedrooms input";
+
+    if (!bathrooms || 
+        !validators.isValidString(bathrooms) || 
+        bathrooms.trim().length === 0 ||
+        isNaN(parseFloat(bathrooms)))
+    throw "Invalid bathrooms input";
+
+    //Retrieve property collection
+    const propertyCollection = await properties();
+
+    //New Property Object
+    let newProperty = {
+        propertyId: uuid(),
+        propertyName: propertyName,
+        address: address,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        longitude: longitude,
+        latitude: latitude,
+        propertyCategory: propertyCategory,
+        bedrooms: bedrooms,
+        bathrooms: bathrooms,
+        averageRatings: {},
+        reviews: [],
+        comments: []
+    };
+    
+    //Insert new property object into collection
+    const insertInfo = await propertyCollection.insertOne(newProperty);
+
+    //Validation (cont.)
+    if (!insertInfo.acknowledged || !insertInfo.insertedId)
+      throw "Could not add new property";
+
+    //Return
+    return { propertyInserted: true, propertyId: newProperty.propertyId};
+};
+
 
 // Function: addCommentReply, adds comment to property or reply to comment
 export const addCommentReply = async (userId, propertyOrCommentId, commentText) => {
