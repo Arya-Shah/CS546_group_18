@@ -17,13 +17,17 @@ router
 .post(async (req, res) => {
   //code here for POST
   try{
-  let firstName = req.body.firstName.trim()
-  let lastName = req.body.lastName.trim()
-  let username = req.body.username.trim()
-  let password = req.body.password.trim()
-  let confirmPassword = req.body.confirmPassword.trim()
+  let firstName = req.body.firstName.trim();
+  let lastName = req.body.lastName.trim();
+  let username = req.body.username.trim();
+  let password = req.body.password.trim();
+  let confirmPassword = req.body.confirmPassword.trim();
+  let email = req.body.email.trim();
+  let hasProperty = req.body.hasProperty.trim();
+  let city = req.body.city.trim();
+  let state = req.body.state.trim();
 
-  if(!firstName || !lastName || !username || !password || !confirmPassword){
+  if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !hasProperty || !city || !state){
     return res.status(400).render('register', { error: 'All fields must be provided.' });
   }
   if(firstName.length < 2 || lastName.length < 2 || firstName.length > 25 || lastName.length > 25){
@@ -47,13 +51,26 @@ return res.status(400).render('register', { error: 'There needs to be at least o
 if(password !== confirmPassword){
 return res.status(400).render('register', { error: 'Password did not match.' });
 }
-await registerUser(req.body.firstName, req.body.lastName, req.body.username, req.body.password);
+// Validate email
+if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+  return res.status(400).render('register', { error: 'Invalid email format.' });
+}
+// Validate boolean field hasProperty
+if (!['true', 'false'].includes(hasProperty.toLowerCase())) {
+  return res.status(400).render('register', { error: 'hasProperty must be either "true" or "false".' });
+}
+// Validate city and state if required
+if (!/^[a-zA-Z\s]+$/.test(city) || !/^[a-zA-Z\s]+$/.test(state)) {
+  return res.status(400).render('register', { error: 'City and state must contain only alphabetic characters and spaces.' });
+}
+await registerUser(req.body.firstName, req.body.lastName, req.body.username, req.body.password, req.body,state, req.body.email, req.body.hasProperty);
 return res.status(200).render('login', {
 layout: 'main',
 success: 'User Created successfully', 
 });
 }catch(e){
       res.status(e.status?e.status:500).render('register', { error: e.error?e.error:e, form: req.body });
+      console.log(e)
   }
 });
 
@@ -126,4 +143,4 @@ return res.status(200).render("logout", {
 });
 });
 
-export default router;
+  export default router;

@@ -1,15 +1,17 @@
-{{#if error}}
-<p class="error">{{error}}</p>
-{{/if}}
-<div id="userView">
-<<<<<<< HEAD
-<p id="welcome">Welcome {{data.firstName}} {{data.lastName}}, the time is now: {{currentTime}}. Your role in the system is: {{data.role}}.</p>
-<p id="quote">Favorite Quote: {{data.favoriteQuote}}</p>
-{{#if isAdmin}}
-    <a id="adminLink" href="/admin">Admin Page</a>
-{{/if}}
-=======
-<p id="welcome">Welcome {{data.firstName}} {{data.lastName}}, the time is now: {{currentTime}}.</p>
->>>>>>> 337b4e9d42a6520ba2ac5703559227cc8b1466d9
-<a id="logoutLink" href="/logout">Logout</a>
+{{!-- User Profile --}}
+<h2>{{user.name}}'s Profile</h2>
+<div class="user-details">
+<p>Email: {{user.email}}</p>
+<p>Rental History: </p>
+<ul>
+{{#each user.rentalHistory}}
+<li>{{this.propertyName}} - {{this.duration}}</li>
+{{/each}}
+</ul>
+<p>Bookmarked Properties: </p>
+<ul>
+{{#each user.bookmarks}}
+<li>{{this.propertyName}} - {{this.rating}}</li>
+{{/each}}
+</ul>
 </div>

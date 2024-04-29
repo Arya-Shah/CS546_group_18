@@ -1,6 +1,6 @@
 import express from 'express';
 import session from 'express-session';
-import { engine } from 'express-handlebars';
+import engine  from 'express-handlebars';
 import { authMiddleware } from './middleware.js';
 import configRoutes from './routes/index.js';
 import { fileURLToPath } from 'url';

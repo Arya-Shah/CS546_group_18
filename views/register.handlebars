@@ -1,45 +1,8 @@
-<<<<<<< HEAD
-{{!--
-
-registration handelbars
-
---}}
-
-
-=======
->>>>>>> 337b4e9d42a6520ba2ac5703559227cc8b1466d9
 <h1>Register</h1>
 {{#if error}}
 <p class="error"> {{error}}</p>
 {{/if}}
 <form id="signup-form" method="POST" action="/register">
-<<<<<<< HEAD
-<label for="firstName">First Name</label>
-<input type="text" id="firstName" name="firstName" required>
-<label for="lastName">Last Name</label>
-<input type="text" id="lastName" name="lastName" required>
-<label for="username">Username</label>
-<input type="text" id="username" name="username" required>
-<label for="password">Password</label>
-<input type="password" id="password" name="password" required>
-<label for="confirmPassword">Confirm Password</label>
-<input type="password" id="confirmPassword" name="confirmPassword" required>
-<label for="favoriteQuote">Favorite Quote</label>
-<input type="text" id="favoriteQuote" name="favoriteQuote" required>
-<label for="themePreference">Theme Preference</label>
-<select id="themePreference" name="themePreference" required>
-    <option value="light">Light</option>
-    <option value="dark">Dark</option>
-</select>
-<label for="role">Role</label>
-<select id="role" name="role" required>
-    <option value="admin">Admin</option>
-    <option value="user">User</option>
-</select>
-<button id="submitButton" type="submit">Register</button>
-</form>
-<a href="/login">Already have an account? Click here to log-in</a>
-=======
 <label for="firstname">First Name</label>
 <input type="text" id="firstName" name="firstName">
 <label for="lastname">Last Name</label>
@@ -50,7 +13,17 @@ registration handelbars
 <input type="password" id="password" name="password">
 <label for="confirmPassword">Confirm Password</label>
 <input type="password" id="confirmPassword" name="confirmPassword">
+<label for="email">Email</label>
+<input type="text" id="email" name="email">
+<label for="city">city</label>
+<input type="text" id="city" name="city">
+<label for="state">state</label>
+<input type="text" id="state" name="state">
+<select id="hasProperty" name="hasProperty" required>
+    Do you have a property?
+    <option value="true">yes</option>
+    <option value="false">no</option>
+</select>
 <button id="submitButton" type="submit">Register</button>
 </form>
 <a href="/login">Already have an account? Click here to log-in</a>
->>>>>>> 337b4e9d42a6520ba2ac5703559227cc8b1466d9

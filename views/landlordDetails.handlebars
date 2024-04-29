@@ -1,0 +1,12 @@
+{{!-- Landlord Details --}}
+<h2>{{landlord.name}}</h2>
+<div class="landlord-details">
+<p>Total Properties: {{landlord.propertiesCount}}</p>
+<p>Average Rating: {{landlord.averageRating}}</p>
+<h3>Reviews</h3>
+{{#each landlord.reviews}}
+<div class="review">
+<p>{{this.user}}: {{this.content}}</p>
+</div>
+{{/each}}
+</div>

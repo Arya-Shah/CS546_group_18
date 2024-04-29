@@ -1,0 +1,13 @@
+{{!-- Property Details --}}
+<h2>{{property.name}}</h2>
+<div class="property-details">
+<p>Address: {{property.address}}</p>
+<p>Rating: {{property.rating}}</p>
+<div id="propertyMap"></div> <!-- Placeholder for map integration -->
+<h3>Reviews</h3>
+{{#each property.reviews}}
+<div class="review">
+<p>{{this.user}}: {{this.content}}</p>
+</div>
+{{/each}}
+</div>

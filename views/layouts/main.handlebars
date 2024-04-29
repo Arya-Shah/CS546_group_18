@@ -1,24 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
-    {{#if data}}
-    <link rel="stylesheet" href="/public/css/{{data.themePreference}}.css">
-    {{/if}}
-    <link rel="shortcut icon" href="#">
-</head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{title}}</title>
+<link rel="stylesheet" href="/public/css/styles.css">
 {{#if data}}
-<body class="{{data.themePreference}}">
-{{else}}
-<body>
 {{/if}}
+<link rel="shortcut icon" href="#">
+</head>
+<body>
+<header>
+<nav>
+<div class="logo">
+<a href="/">Apartment Hunt Helper</a>
+</div>
+<div class="user-container">
+    {{#if user}}
+        <a href="/user/profile">{{user.name}}</a>
+        <a href="/logout">Logout</a>
+    {{else}}
+        <a href="login">Login</a>
+        <a href="register">Sign Up</a>
+    {{/if}}
+    </div>
+<div class="search-container">
+<form action="/search" method="GET">
+<input type="text" placeholder="Search.." name="search">
+<button type="submit">Search</button>
+</form>
+</div>
+<div class="user-container">
+<!-- Add logic to show/hide based on user session -->
+<a href="/user/profile">Profile</a>
+<a href="/logout">Logout</a>
+</div>
+</nav>
+</header>
+
+<main>
+{{{body}}}
+</main>
+
+<footer>
+<p>&copy; 2024 Apartment Hunt Helper. All rights reserved.</p>
+</footer>
 {{#if success}}
 <p class="success"> {{success}}</p>
 {{/if}}
-    {{{body}}}
-    <script src="/public/js/client_side_validation.js"></script>
+<script src="/public/js/client_side_validation.js"></script>
 </body>
 </html>

@@ -1,0 +1,11 @@
+{{!-- Community Forum --}}
+<h2>Community Forum</h2>
+<div class="forum-threads">
+{{#each threads}}
+<div class="thread">
+<h3>{{this.title}}</h3>
+<p>{{this.summary}}</p>
+<!-- Add link to full thread discussion -->
+</div>
+{{/each}}
+</div>
