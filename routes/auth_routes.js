@@ -23,11 +23,10 @@ router
   let password = req.body.password.trim();
   let confirmPassword = req.body.confirmPassword.trim();
   let email = req.body.email.trim();
-  let hasProperty = req.body.hasProperty.trim();
   let city = req.body.city.trim();
   let state = req.body.state.trim();
 
-  if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !hasProperty || !city || !state){
+  if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !city || !state){
     return res.status(400).render('register', { error: 'All fields must be provided.' });
   }
   if(firstName.length < 2 || lastName.length < 2 || firstName.length > 25 || lastName.length > 25){
@@ -55,15 +54,11 @@ return res.status(400).render('register', { error: 'Password did not match.' });
 if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
   return res.status(400).render('register', { error: 'Invalid email format.' });
 }
-// Validate boolean field hasProperty
-if (!['true', 'false'].includes(hasProperty.toLowerCase())) {
-  return res.status(400).render('register', { error: 'hasProperty must be either "true" or "false".' });
-}
 // Validate city and state if required
 if (!/^[a-zA-Z\s]+$/.test(city) || !/^[a-zA-Z\s]+$/.test(state)) {
   return res.status(400).render('register', { error: 'City and state must contain only alphabetic characters and spaces.' });
 }
-await registerUser(req.body.firstName, req.body.lastName, req.body.username, req.body.password, req.body,state, req.body.email, req.body.hasProperty);
+await registerUser(firstName, lastName, username, password, city, state, email);
 return res.status(200).render('login', {
 layout: 'main',
 success: 'User Created successfully', 
@@ -115,25 +110,8 @@ router
     }
 });
 
-router.route('/user').get(async (req, res) => {
-try{
-return res.status(200).render("user", {
-  // get code for user
-});
-} catch(e){
-res.status(500).render('user', { error: e, form: req.body });
-}
-});
 
-router.route('/admin').get(async (req, res) => {
-try{
-  return res.status(200).render("admin", {
-      // post code for user
-  });
-} catch(e){
-  res.status(500).render('user', { error: e, form: req.body });
-}
-});
+
 
 router.route('/logout').get(async (req, res) => {
 //code here for GET

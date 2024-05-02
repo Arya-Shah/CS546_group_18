@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{{title}}</title>
+<script src="https://kit.fontawesome.com/9eb0363441.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap">
 <link rel="stylesheet" href="/public/css/styles.css">
 {{#if data}}
 {{/if}}
@@ -13,27 +15,14 @@
 <header>
 <nav>
 <div class="logo">
-<a href="/">Apartment Hunt Helper</a>
-</div>
-<div class="user-container">
-    {{#if user}}
-        <a href="/user/profile">{{user.name}}</a>
-        <a href="/logout">Logout</a>
-    {{else}}
-        <a href="login">Login</a>
-        <a href="register">Sign Up</a>
-    {{/if}}
-    </div>
-<div class="search-container">
-<form action="/search" method="GET">
-<input type="text" placeholder="Search.." name="search">
-<button type="submit">Search</button>
-</form>
+<h1><a href="/">Apartment Hunt Helper</a></h1>
 </div>
 <div class="user-container">
 <!-- Add logic to show/hide based on user session -->
+{{#if userData}}
 <a href="/user/profile">Profile</a>
 <a href="/logout">Logout</a>
+{{/if}}
 </div>
 </nav>
 </header>
@@ -42,12 +31,10 @@
 {{{body}}}
 </main>
 
-<footer>
-<p>&copy; 2024 Apartment Hunt Helper. All rights reserved.</p>
-</footer>
 {{#if success}}
 <p class="success"> {{success}}</p>
 {{/if}}
 <script src="/public/js/client_side_validation.js"></script>
+<script src="register.js" defer></script>
 </body>
 </html>

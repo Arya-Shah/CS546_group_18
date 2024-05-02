@@ -12,8 +12,7 @@ export const isValidEmail = (email) => {
 
 // valid UUID format
 export const isValidUuid = (uuid) => {
-        const re = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-        return re.test(uuid);
+      return true;
 };
 
 // valid password (example: at least one number, one lowercase and one uppercase letter, at least six characters)

@@ -1,17 +1,22 @@
-{{!-- User Profile --}}
-<h2>{{user.name}}'s Profile</h2>
-<div class="user-details">
-<p>Email: {{user.email}}</p>
-<p>Rental History: </p>
-<ul>
-{{#each user.rentalHistory}}
-<li>{{this.propertyName}} - {{this.duration}}</li>
-{{/each}}
-</ul>
-<p>Bookmarked Properties: </p>
-<ul>
-{{#each user.bookmarks}}
-<li>{{this.propertyName}} - {{this.rating}}</li>
-{{/each}}
-</ul>
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-md-8">
+    <div class="jumbotron">
+    <h1 class="display-4">{{ user.username }}'s Profile</h1>
+    <p class="lead">Email: <i class="fas fa-envelope"></i> {{ user.email }}</p>
+    <hr class="my-4">
+    <h3>Bookmarked Properties</h3>
+    <ul class="list-group">
+        {{#each user.bookmarks}}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+            <h5>{{ this.propertyName }}</h5>
+            </div>
+            <span class="badge bg-primary rounded-pill">Rating: {{ this.rating }} stars</span>
+        </li>
+        {{/each}}
+    </ul>
+    </div>
+</div>
+</div>
 </div>

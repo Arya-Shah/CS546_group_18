@@ -31,15 +31,18 @@ addLandLordReport
 // }
 // });
 
-// router.route('/users/:userId')
-// .get(async (req, res) => {
-// try {
-//     const user = await getUserById(req.params.userId);
-//     return res.json(user);
-// } catch (e) {
-//     return res.status(404).json({ error: e.toString() });
-// }
-// })
+router.route('/')
+.get(async (req, res) => {
+try {
+let id = req.session.user._id;
+    const user = await getUserById(id);
+    return res.status(200).render("user", {
+        user:user,
+    });
+} catch (e) {
+    return res.status(404).json({ error: e.toString() });
+}
+})
 // .put(async (req, res) => {
 // try {
 //     // Example validation directly in the route

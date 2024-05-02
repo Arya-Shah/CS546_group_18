@@ -1,13 +1,8 @@
 body {
 font-size: 120%;
-font-family: Arial, sans-serif;
+font-family: 'Montserrat', sans-serif;
+font-weight: 500;
 background-color: rgb(255, 255, 255);
-}
-
-h1 {
-color: #333;
-padding: 10px;
-text-align: center;
 }
 
 .error{
@@ -53,12 +48,11 @@ background-color: #3334371b;
 }
 
 input[type="submit"] {
-background-color: #333;
-color: white;
-border: none;
-padding: 10px 20px;
-border-radius: 4px;
-cursor: pointer;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
 
 input[type="submit"]:hover {
@@ -69,24 +63,10 @@ color: #0645AD;
 text-decoration: none;
 }
 
-/* Reset some basic elements */
-/* body, h1, h2, h3, p, form {
-margin: 0;
-padding: 0;
-} */
-
-/* Basic styling for the body */
-/* body {
-font-family: 'Arial', sans-serif;
-line-height: 1.6;
-background: #f4f4f4;
-padding-bottom: 40px; /* Footer Height */
-/* } */
-
 /* Header styling */
 header {
-background: #333;
-color: #fff;
+background: #ffffff;
+color: #000000 ;
 padding: 10px 0;
 }
 
@@ -98,7 +78,8 @@ padding: 0 20px;
 }
 
 nav .logo a {
-color: #fff;
+color: #000000;
+font-size: xx-large;
 text-decoration: none;
 font-weight: bold;
 }
@@ -118,7 +99,7 @@ cursor: pointer;
 }
 
 nav .user-container a {
-color: #fff;
+color: #050505;
 text-decoration: none;
 margin-left: 10px;
 }
@@ -126,7 +107,6 @@ margin-left: 10px;
 /* Main content styling */
 main {
 padding: 20px;
-min-height: calc(100vh - 80px); /* Header and Footer */
 }
 
 /* Footer styling */
@@ -141,7 +121,6 @@ height: 40px; /* Footer Height */
 line-height: 40px; /* Center the text vertically */
 }
 
-/* Additional global styles */
 h2 {
 margin-bottom: 20px;
 }
@@ -154,25 +133,50 @@ border-radius: 5px;
 box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Responsive design for small screens */
 @media screen and (max-width: 768px) {
 nav {
-    flex-direction: column;
+flex-direction: column;
 }
 
 nav .search-container, nav .user-container {
-    margin-top: 10px;
+margin-top: 10px;
 }
 
 nav .search-container form {
-    width: 100%;
+width: 100%;
 }
 
 nav .search-container input[type="text"] {
-    width: 80%;
+width: 80%;
 }
 
 nav .search-container button {
-    width: 20%;
+width: 20%;
 }
+}
+
+.card {
+border-radius: 5px; 
+}
+
+.card-body h2 {
+margin-bottom: 0.5rem; /* Adjust margin for username */
+}
+
+.card-body p {
+font-size: 1rem; 
+color: #888; 
+}
+
+.list-group-item {
+border-color: rgba(0, 0, 0, 0.1); /* Add subtle border to list items */
+}
+
+.list-group-item h5 {
+font-size: 1rem; /* Maintain larger font size for property names */
+font-weight: bold; 
+}
+
+.badge {
+font-size: 0.8rem; 
 }

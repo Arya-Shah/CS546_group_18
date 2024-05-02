@@ -4,6 +4,7 @@ import { users } from "../config/mongoCollections.js";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
+import {ObjectId} from 'mongodb';
 
 const saltRounds = 16;
 
@@ -15,75 +16,6 @@ const userCollection = await users();
 //Return collection as array
 return await userCollection.find({}).toArray();
 };
-
-// export const registerUser = async (
-//     firstName,
-//     lastName,
-//     username,
-//     password
-//     ) => {
-//     const errorObject = {
-//     status: 400,
-//     };
-
-//     if(!firstName || !lastName || !username || !password){
-//         errorObject = 'All fields must be provided.';
-//         throw errorObject
-//     }
-
-//     firstName.trim();
-//     lastName.trim();
-//     username.trim();
-//     password.trim();
-
-//     if(firstName.length < 2 || lastName.length < 2 || firstName.length > 25 || lastName.length > 25){
-//     errorObject = 'Firstname and Lastname should be between 2 and 25.';
-//     throw errorObject}
-
-//     if (!/^[a-zA-Z\s]+$/.test(firstName) || !/^[a-zA-Z\s]+$/.test(lastName)) {
-//     errorObject = 'First and last name must be characters and cannot contain numbers.';
-//     throw errorObject}
-
-//     if(username.length < 5 || username.length > 10){
-
-//     errorObject = 'username should be between 5 and 10.';
-//     throw errorObject}
-
-//     if (!/^[a-zA-Z\s]+$/.test(username)) {
-//     errorObject = 'username must be characters and cannot contain numbers.';
-//     throw errorObject}
-
-//     if(password.length < 8){
-//     errorObject = 'password should be greater than 8.';
-//     throw errorObject;
-//     }
-//     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-//     errorObject = 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character';
-//     throw errorObject;
-//     }
-
-//     const userRow = await getUserByName(username);
-
-//     if (Object.keys(userRow).length !== 0) {
-//     errorObject.error = "User with this username already exists.";
-//     throw errorObject;
-//     }
-
-//     let newUser = {
-//     firstName: firstName,
-//     lastName: lastName,
-//     username: username,
-//     password: await bcrypt.hash(password, saltRounds)
-//     };
-//     const userCollection = await users();
-//     const insertInfo = await userCollection.insertOne(newUser);
-//     if (!insertInfo.acknowledged || !insertInfo.insertedId) {
-//     errorObject.status = 500;
-//     errorObject.error = "Internal Server Error.";
-//     throw errorObject;
-//     }
-//     return { insertedUser: true };
-//     };
 
 export const loginUser = async (username, password) => {
 const errorObject = {
@@ -111,13 +43,12 @@ if (!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-
 errorObject = 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character' ;
 throw errorObject;
 }
-
 const userRow = await getUserByName(username);
 if (Object.keys(userRow).length === 0) {
 errorObject.error = "Either the username or password is invalid";
 throw errorObject;
 }
-let compareResult = await bcrypt.compare(password, userRow.password);
+let compareResult = await bcrypt.compare(password, userRow.hashedPassword);
 if (!compareResult) {
 errorObject.error = "Either the username or password is invalid";
 throw errorObject;
@@ -143,7 +74,7 @@ if (!/^[a-zA-Z\s]+$/.test(username)) {
 errorObject = 'username must be characters and cannot contain numbers.';
 throw errorObject;
 }  
-username = username.trim();
+username = username.trim().toLowerCase();
 const usersCollection = await users();
 const userRow = await usersCollection.findOne({ username: username });
 if (userRow === null) {
@@ -162,7 +93,7 @@ export const getUserById = async (id) => {
         
 //Retreive user collection and specific user
     const userCollection = await users();
-    const user = await userCollection.findOne({ userId: id });
+    const user = await userCollection.findOne({ _id: new ObjectId(id) });
 //Validation (cont.)
     if (!user) 
         throw 'User not found';
@@ -171,7 +102,7 @@ export const getUserById = async (id) => {
 };
 
 //Function: registerUser    
-export const registerUser = async (firstName, lastName, email, hasProperty, city, state, password) => {
+export const registerUser = async (firstName, lastName, username, password, city, state, email, isLandlord, isAdmin) => {
 //Validation
     if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
         throw 'Invalid first name input';
@@ -183,20 +114,17 @@ lastName.trim().length === 0
 )
 throw "Invalid last name input";
 
-    // if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
-    //     throw 'Invalid email input';
+    if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
+        throw 'Invalid email input';
 
-    // if (!validators.isBoolean(hasProperty)) 
-    //     throw 'Invalid hasProperty input';
+    if (!city || !validators.isValidString(city) || city.trim().length === 0)
+        throw 'Invalid city input';
     
-    // if (!city || !validators.isValidString(city) || city.trim().length === 0)
-    //     throw 'Invalid city input';
+    if (!state || !validators.isValidString(state) || state.trim().length === 0)
+        throw 'Invalid state input';
     
-    // if (!state || !validators.isValidString(state) || state.trim().length === 0)
-    //     throw 'Invalid state input';
-    
-    // if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
-    //     throw 'Invalid password input';
+    if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
+        throw 'Invalid password input';
 
 //Retrieve user collection
 const userCollection = await users();
@@ -206,22 +134,30 @@ const hashedPassword = await bcrypt.hash(password, saltRounds);
 
 //New User Object
 let newUser = {
-userId: uuid(),
 firstName: firstName.trim(),
 lastName: lastName.trim(),
+username:username.trim().toLowerCase(),
 email: email.trim().toLowerCase(),
-hasProperty: hasProperty,
+isLandlord: false,
+isAdmin: false,
 properties: [],
 city: city.trim(),
 state: state.trim(),
 hashedPassword: hashedPassword,
-reviews: [],
+reviews: [], 
 reviewIds: [],
 commentsIds: [],
 reportsIds: [],
 averageRatings: {},
 landlordReviews: [],
 };
+
+//Check if username exists
+const userRow = await getUserByName(username);
+if(username === userRow.username){
+    throw "Username Already Exists."
+}
+
 //Insert new user object into collection
 const insertInfo = await userCollection.insertOne(newUser);
 
@@ -284,13 +220,6 @@ if (
     throw "Invalid email input";
 
 updatedUserData.email = updatedUser.email.trim().toLowerCase();
-}
-
-if (updatedUser.hasProperty !== undefined) {
-if (!validators.isBoolean(updatedUser.hasProperty))
-    throw "Invalid hasProperty input";
-
-updatedUserData.hasProperty = updatedUser.hasProperty;
 }
 
 if (updatedUser.city) {
@@ -371,9 +300,6 @@ const landlord = await getUserById(landlordId);
 //Validation
 if (!reviewData || Object.keys(reviewData).length === 0)
 throw "Invalid Review: Review data is required.";
-
-if (!landlord.hasProperty)
-throw "Invalid landlord ID or landlord does not exist";
 
 //Create Review Object
 const updatedReviewData = {
@@ -635,8 +561,7 @@ const landlord = await getUserById(landlordId);
 const date = new Date().toISOString(); //date when report is raised.
 if (!reportData || Object.keys(reportData).length === 0)
 throw "Invalid Report: Report content is required.";
-//   if (!landlord.hasProperty)
-//     throw "Invalid landlord ID or landlord does not exist";
+
 const updatedReportData = {
 report_id: uuid(),
 userId: null, //user id of customer reporter_id/userId

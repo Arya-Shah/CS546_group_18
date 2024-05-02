@@ -44,6 +44,18 @@ app.use(async (req, res, next) => {
     );
     next();
 });
+
+app.use((req, res, next) => {
+    let userData = false;
+if(req.session.user){
+    userData = true;
+}
+const globalData = {
+    userData: userData
+}
+    res.locals = { ...res.locals, ...globalData };
+    next();
+});
 app.use(authMiddleware);
 configRoutes(app);
 
