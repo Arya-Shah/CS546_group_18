@@ -62,7 +62,7 @@ export const isValidLatitude = (latitude) => {
 };
 
 
-//Valid Property Category
+//Function: isValidPropertyCategory
 export const isValidPropertyCategory = (propertyCategory) => {
     
     const propertyCategories = ['Apartment', 'House', 'Condo', 'Townhouse', 'Studio'];
@@ -72,6 +72,15 @@ export const isValidPropertyCategory = (propertyCategory) => {
     } else {
         return false;
     }
+    
+};
+
+//Function: isValidThreadCategory
+export const isValidThreadCategory = (threadCategory) => {
+    
+    const threadCategories = ['General', 'Neighborhoods', 'Properties', 'Landlords', 'Advice'];
+
+    return threadCategories.includes(threadCategory);
     
 };
 
