@@ -131,7 +131,6 @@ const userCollection = await users();
 
 //Set hashed password
 const hashedPassword = await bcrypt.hash(password, saltRounds);
-
 //New User Object
 let newUser = {
 firstName: firstName.trim(),

@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-import {registerUser,loginUser} from '../data/users.js';
+import {registerUser,loginUser,addLandLordReport} from '../data/users.js';
 
 router.route('/').get(async (req, res) => {
 //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -121,4 +121,53 @@ return res.status(200).render("logout", {
 });
 });
 
+router.route('/report').get(async (req,res)=>{
+  try{
+    return res.status(200).render('report',{ layout: 'main',
+    error: '', })
+  }catch(e){
+    res.status(500).render('report',{error:e, form:req.body});
+  }
+})
+.post(async (req,res) =>{
+  console.log(req.body);
+  let reportReason = req.body.reportReason;
+  console.log(reportReason.length);
+  if(reportReason.length < 5){
+    return res.status(400).render('report', { error: 'Enter more Description!.' });
+  }else{
+    try {
+    const userId = req.session.user.userId;
+    const result = await addLandLordReport(userId, reportReason,req.body.reportedItemId);
+    console.log("is greater");
+    res.json(result);
+    }catch(e){
+      res.status(500).render('report', { error: e, form: req.body });
+    }
+  }
+})
+
   export default router;
+
+  // rise a report on property and landlord
+router.post('/report/:userId', async (req, res) => {
+  try {
+      console.log("in post!");
+      // Extract necessary data from request body or parameters
+      // const  landlordId  =req.params.landlordId;
+      const  reportData   = req.body.report_description;
+      const userId = req.body.userId;
+      // Call the addLandlordReport function
+      const result = await addLandLordReport(userId, reportData);
+      // Return success response
+      res.json(result);
+  } catch (error) {
+      // Return error response if something goes wrong
+      res.status(400).json({ error: error.message });
+  }
+});
+
+router.get('/report/:userId', async(req,res) =>{
+  res.render('report');
+})
+
