@@ -236,8 +236,8 @@ export const addProperty = async (
     return { propertyInserted: true, propertyId: newProperty.propertyId};
 };
 
-//Function: updateUser
-export const updateUser = async (propertyId, updatedProperty) => {
+//Function: updateProperty
+export const updateProperty = async (propertyId, updatedProperty) => {
     
     //Validation
     if (!propertyId || !validators.isValidUuid(propertyId)) throw "Invalid property ID input";
@@ -396,9 +396,6 @@ export const removeProperty = async (propertyId) => {
 //Function: addPropertyReview
 export const addPropertyReview = async (propertyId, reviewData, userId) => {
     
-    //Retrieve Property
-        const property = await getPropertyById(propertyId);
-    
     //Validation
         if (!reviewData || Object.keys(reviewData).length === 0)
             throw "Invalid Review: Review data is required.";
@@ -488,7 +485,7 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     }
     
     //Update User with review id
-    const userUpdateStatus = await updateUser(
+    const userUpdateStatus = await users.updateUser(
         { userId: userId },
         { $push: { reviewIds: updatedReviewData.reviewId } }
     );
@@ -497,12 +494,12 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         throw "Failed to update user information with new property review.";
     
     //Update property with review
-    const propertyUpdateStatus = await updatedProperty(propertyId, {
+    const propertyUpdateStatus = await updateProperty(propertyId, {
         $push: { reviews: updatedReviewData },
     });
     
     if (!propertyUpdateStatus)
-    throw "Failed to update property informaiton with new review.";
+        throw "Failed to update property informaiton with new review.";
     
     //To Do: Recalculate Property's average ratings
     validators.updateRatingProperty (propertyId);
@@ -636,18 +633,18 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
         const propertyCollection = await properties();
     
     //Try to pull comment from property
-        let updateInfo = await propertyCollection.updateOne(
-            { $pull: {'comments.commentId': propertyOrCommentId} }
-        );
+    const updateInfo = await propertyCollection.updateOne(
+        { 'comments.commentId': propertyOrCommentId },
+        { $pull: { comments: { commentId: propertyOrCommentId } } }
+    );
 
     //If failed, try to pull reply
-        if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
-        
-            updateInfo = await propertyCollection.updateOne(
-                { $pull: {'replies.commentId': propertyOrCommentId} }
-            );
-
-        }
+    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
+        updateInfo = await propertyCollection.updateOne(
+            { 'comments.replies.commentId': propertyOrCommentId },
+            { $pull: { 'comments.$.replies': { commentId: propertyOrCommentId } } }
+        );
+    }
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
@@ -744,7 +741,7 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
     
     //Validations    
         if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
-            throw 'Invalid indicidation if like or dislike should be added';   
+            throw 'Invalid indication if like or dislike should be added';   
     
     //Pull property collection
         const propertyCollection = await properties();
@@ -798,4 +795,43 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
         
     };
     
+// Function: addPropertyReport (report created by user on property)
+export const addPropertyReport = async (userId, propertyId, reportData, reportReason) => {
+    
+    if (!userId || !validators.isValidUuid(userId)) {
+        throw new Error("Invalid user ID input");
+    }
 
+    const property = await getPropertyById(propertyId);
+
+    if (!property)
+        throw new Error("Invalid property ID or property does not exist");
+
+    if (!reportData || Object.keys(reportData).length === 0)
+        throw new Error("Invalid Report: Report content is required.");
+
+    if (!reportReason || typeof reportReason !== 'string' || reportReason.trim().length === 0)
+        throw new Error("Invalid Report Reason: Report reason is required and must be a non-empty string.");
+
+    const updatedReportData = {
+        report_id: uuid(),
+        userId: userId, 
+        propertyId: propertyId, 
+        report_reason: reportReason, 
+        report_description: reportData, 
+        reported_at: new Date().toISOString(), 
+        status: "pending", 
+        resolved_at: null
+    };
+
+    property.reports.push(updatedReportData);
+
+    const propertyReportUpdateStatus = await updateProperty(propertyId, {
+        $push: { reports: updatedReportData },
+    });
+
+    if (!propertyReportUpdateStatus)
+        throw new Error("Failed to update property information with the report.");
+
+    return { reportAdded: true };
+};
