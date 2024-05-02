@@ -554,7 +554,7 @@ return result;
 };
 
 //Function addLandLordReport (report created by user on landlord)
-export const addLandLordReport = async (userId, reportData) => {
+export const addLandLordReport = async (userId, reportData,reportReason) => {
     console.log("called addLandLordReport", userId, reportData);
     const userData = await getUserById(userId);
     const date = new Date().toISOString(); //date when report is raised.
@@ -575,6 +575,8 @@ export const addLandLordReport = async (userId, reportData) => {
   
     updatedReportData.reported_at = date;
     updatedReportData.report_description=reportData;
+    updatedReportData.report_reason = reportReason;
+
     if (!userId || !validators.isValidUuid(userId)) {
       throw new Error("Invalid user ID input");
     } else {
