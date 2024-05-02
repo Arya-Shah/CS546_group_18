@@ -170,6 +170,7 @@ return { userInserted: true, userId: newUser.userId };
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
+    console.log(userId,updatedUser);
 //Validation
 
 if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
@@ -179,7 +180,7 @@ if (
 typeof updatedUser !== "object" ||
 Array.isArray(updatedUser)
 )
-throw "Invalid updatedUser input";
+throw new Error("Invalid updatedUser input");
 
 //Retrieve user collection
 const userCollection = await users();
@@ -194,7 +195,7 @@ if (
     !validators.isValidString(updatedUser.firstName) ||
     updatedUser.firstName.trim().length === 0
 )
-    throw "Invalid first name input";
+    throw new Error("Invalid first name input");
 
 updatedUserData.firstName = updatedUser.firstName.trim();
 }
@@ -205,7 +206,7 @@ if (
     !validators.isValidString(updatedUser.lastName) ||
     updatedUser.lastName.trim().length === 0
 )
-    throw "Invalid first name input";
+    throw new Error("Invalid first name input");
 
 updatedUserData.lastName = updatedUser.lastName.trim();
 }
@@ -216,7 +217,7 @@ if (
     !validators.isValidEmail(updatedUser.email) ||
     updatedUser.email.trim().length === 0
 )
-    throw "Invalid email input";
+    throw new Error("Invalid email input");
 
 updatedUserData.email = updatedUser.email.trim().toLowerCase();
 }
@@ -227,7 +228,7 @@ if (
     !validators.isValidString(updatedUser.city) ||
     updatedUser.city.trim().length === 0
 )
-    throw "Invalid city input";
+    throw new Error("Invalid city input");
 
 updatedUserData.city = updatedUser.city.trim();
 }
@@ -238,7 +239,7 @@ if (
     !validators.isValidString(updatedUser.state) ||
     updatedUser.state.trim().length === 0
 )
-    throw "Invalid state input";
+    throw new Error("Invalid state input");
 
 updatedUserData.state = updatedUser.state.trim();
 }
@@ -249,12 +250,16 @@ if (
     !validators.isValidPassword(updatedUser.password) ||
     updatedUser.password.trim().length === 0
 )
-    throw "Invalid password input";
+    throw new Error("Invalid password input");
 
 updatedUserData.hashedPassword = await bcrypt.hash(
     updatedUser.password,
     saltRounds
 );
+}
+if(updatedUser.reportsIds){
+    updatedUserData.reportsIds = updatedUser.reportsIds;
+    console.log("dude here!!");
 }
 
 //Update user with object
@@ -262,7 +267,7 @@ const updateResponse = await userCollection.updateOne(
 { userId: userId },
 { $set: updatedUserData }
 );
-
+console.log("updateResponse: ",updatedUserData,updateResponse,updateResponse.acknowledged,updateResponse.modifiedCount);
 //Validation (cont.)
 if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
 throw "Error occurred while updating user";
@@ -555,13 +560,12 @@ return result;
 
 //Function addLandLordReport (report created by user on landlord)
 export const addLandLordReport = async (userId, reportData,reportReason) => {
-    console.log("called addLandLordReport", userId, reportData);
     const userData = await getUserById(userId);
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
       throw new Error("Invalid Report: Report content is required.");
-    if (!userData.hasProperty)
-      throw new Error("Invalid landlord ID or landlord does not exist");
+    // if (!userData.hasProperty)
+    //   throw new Error("Invalid landlord ID or landlord does not exist");
     const updatedReportData = {
       report_id: uuid(),
       userId: null, //user id of customer reporter_id/userId
@@ -582,26 +586,30 @@ export const addLandLordReport = async (userId, reportData,reportReason) => {
     } else {
       updatedReportData.userId = userId;
     }
-  
-    userData.reportsIds.push(updatedReportData);
-    // console.log(userData);
-    // const userReportUpdateStatus = await update(userId,userData);
+
+  userData.reportsIds.push(updatedReportData);
   
   
-    // complete the validation before using this method!
-    const userReportUpdateStatus = await updateUser(
-       userId ,userData
-    );
-  
-    if (!userReportUpdateStatus)
-      throw new Error("Failed to update user information with the report.");
-  
-    // const landlordReportUpdateStatus = await updateUser(landlordId, {
-    //   $push: { reports: updatedReportData },
-    // });
-    // console.log(landlordReportUpdateStatus);
-    // if (!landlordReportUpdateStatus)
-    //   throw "Failed to update landlord informaiton with new report.";
+  // complete the validation before using this method!
+  const userReportUpdateStatus = await updateUser(
+     userId ,userData
+  );
+
+  if (!userReportUpdateStatus)
+    throw new Error("Failed to update user information with the report.");
+//       const userReportUpdateStatus = await updateUser(userId, {
+//     $push: { reportsIds: updatedReportData },
+//   });
+//   console.log(userReportUpdateStatus);
+//   if (!userReportUpdateStatus)
+//     throw new Error("Failed to update user informaiton with new report.");
+
+  // const landlordReportUpdateStatus = await updateUser(landlordId, {
+  //   $push: { reports: updatedReportData },
+  // });
+  // console.log(landlordReportUpdateStatus);
+  // if (!landlordReportUpdateStatus)
+  //   throw "Failed to update landlord informaiton with new report.";
   
     return { reportAdded: true };
   };

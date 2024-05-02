@@ -169,43 +169,43 @@ form.addEventListener('input', function (e) {
 //     }
 // });
 
-const reportForm= document.getElementById('reportForm');
-// console.log(reportForm);
-// const reportForm = document.querySelector('#reportForm');
-reportForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    const min = 5,
-        max = 10;
-    const reportedItemId = document.getElementById('reportedItemId');
-    const reportReason = document.getElementById('reportReason');
-    if (!isRequired(reportReason)) {
-        showError(reportReason, 'reportReason cannot be blank.');
-    }else if (!isBetween(username.length, min, max)) {
-        showError(usernameEl, `Username must be between ${min} and ${max} characters.`)
-    }
-    console.log(reportedItemId,reportReason);
-    const reportedItemIdError = document.getElementById('reportedItemIdError');
-    const reportReasonError = document.getElementById('reportReasonError');
-    reportedItemId.classList.remove('error');
-    reportReason.classList.remove('error');
-    reportedItemIdError.textContent = "";
-    reportReasonError.textContent = "";
+// const reportForm= document.querySelector('#reportForm');
+// // console.log(reportForm);
+// // const reportForm = document.querySelector('#reportForm');
+// reportForm.addEventListener('submit', function (e) {
+//     e.preventDefault();
+//     const min = 5,
+//         max = 10;
+//     const reportedItemId = document.getElementById('reportedItemId');
+//     const reportReason = document.getElementById('reportReason');
+//     if (!isRequired(reportReason)) {
+//         showError(reportReason, 'reportReason cannot be blank.');
+//     }else if (!isBetween(username.length, min, max)) {
+//         showError(usernameEl, `Username must be between ${min} and ${max} characters.`)
+//     }
+//     console.log(reportedItemId,reportReason);
+//     const reportedItemIdError = document.getElementById('reportedItemIdError');
+//     const reportReasonError = document.getElementById('reportReasonError');
+//     reportedItemId.classList.remove('error');
+//     reportReason.classList.remove('error');
+//     reportedItemIdError.textContent = "";
+//     reportReasonError.textContent = "";
 
-    let isValid = true;
-    if (!reportedItemId.value) {
-        isValid = false;
-        reportedItemId.classList.add('error');
-        reportedItemIdError.textContent = "Please select a reason";
-    }
-    if (!reportReason.value.trim()|| reportReason.value === '') {
-        isValid = false;
-        reportReason.classList.add('error');
-        reportReasonError.textContent = "Please provide a reason for the report";
-    }
+//     let isValid = true;
+//     if (!reportedItemId.value) {
+//         isValid = false;
+//         reportedItemId.classList.add('error');
+//         reportedItemIdError.textContent = "Please select a reason";
+//     }
+//     if (!reportReason.value.trim()|| reportReason.value === '') {
+//         isValid = false;
+//         reportReason.classList.add('error');
+//         reportReasonError.textContent = "Please provide a reason for the report";
+//     }
 
-    if (isValid) {
-        this.submit();
-    }
-});
+//     if (isValid) {
+//         this.submit();
+//     }
+// });
 
 
