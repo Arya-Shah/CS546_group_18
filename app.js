@@ -5,11 +5,25 @@ import { authMiddleware } from './middleware.js';
 import configRoutes from './routes/index.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import exphbs from 'express-handlebars';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
+const handlebarsInstance = exphbs.create({
+    defaultLayout: 'main',
+    // Specify helpers which are only registered on this instance.
+    helpers: {
+      asJSON: (obj, spacing) => {
+        if (typeof spacing === 'number')
+          return new Handlebars.SafeString(JSON.stringify(obj, null, spacing));
+  
+        return new Handlebars.SafeString(JSON.stringify(obj));
+      }
+    },
+    // partialsDir: ['views/partials/']
+  });
 
 app.use('/public', express.static('public'));
 app.use(express.json());
@@ -57,6 +71,8 @@ const globalData = {
     next();
 });
 app.use(authMiddleware);
+app.engine('handlebars', handlebarsInstance.engine);
+app.set('view engine', 'handlebars');
 configRoutes(app);
 
 app.listen(3000, () => {

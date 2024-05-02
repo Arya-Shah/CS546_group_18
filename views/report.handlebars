@@ -1,11 +1,27 @@
 {{!-- <form action="/report">
 </form> --}}
 <form id="reportForm" action="/report" method="POST">
-    <label for="reportedItemId">Reported Item ID:</label>
-    <input type="text" id="reportedItemId" name="reportedItemId" required>
+{{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
+    <label for="reportedItemId">Reason to report:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="safety">Safety Concerns</option>
+        <option value="unfair_treatment">Unfair Treatment</option>
+        <option value="violation_of_lease">Violation of Lease Agreement</option>
+        <option value="health_code_violations">Health Code Violations</option>
+        <option value="financial_disputes">Financial Disputes</option>
+        <option value="noise_or_disturbances">Noise or Disturbances</option>
+        <option value="illegal_activities">Illegal Activities</option>
+        <option value="property_mismanagement">Property Mismanagement</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
 
     <label for="reportReason">Reason for Report:</label>
-    <textarea id="reportReason" name="reportReason" required></textarea>
+    <textarea id="reportReason" name="reportReason" placeholder="Give more information on what's been bothering you." required></textarea>
+    <p id="reportReasonError" class="error-msg"></p>
 
     <button type="submit">Submit Report</button>
 </form>

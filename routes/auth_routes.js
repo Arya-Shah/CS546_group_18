@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-import {registerUser,loginUser} from '../data/users.js';
+import {registerUser,loginUser,addLandLordReport} from '../data/users.js';
 
 router.route('/').get(async (req, res) => {
 //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -121,4 +121,31 @@ return res.status(200).render("logout", {
 });
 });
 
+router.route('/report').get(async (req,res)=>{
+  try{
+    return res.status(200).render('report',{ layout: 'main',
+    error: '', })
+  }catch(e){
+    res.status(500).render('report',{error:e, form:req.body});
+  }
+})
+.post(async (req,res) =>{
+  console.log(req.body);
+  let reportReason = req.body.reportReason;
+  console.log(reportReason.length);
+  if(reportReason.length < 5){
+    return res.status(400).render('report', { error: 'Enter more Description!.' });
+  }else{
+    try {
+    const userId = req.session.user.userId;
+    const result = await addLandLordReport(userId, reportReason,req.body.reportedItemId);
+    console.log("is greater");
+    res.json(result);
+    }catch(e){
+      res.status(500).render('report', { error: e, form: req.body });
+    }
+  }
+})
+
   export default router;
+
