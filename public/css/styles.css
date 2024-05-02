@@ -15,6 +15,7 @@ background-color: rgba(0, 255, 123, 0.749);
 border: 1px solid rgba(26, 255, 0, 0.842);
 }
 
+/* login and regsiter */
 form {
 align-content: center;
 display: flex;
@@ -62,6 +63,16 @@ a {
 color: #0645AD;
 text-decoration: none;
 }
+
+.jumbotron {
+    background-color: rgba(255, 255, 255, 0.566);
+    padding: 50px 0; 
+}
+
+.container {
+    max-width: 650px; 
+}
+
 
 /* Header styling */
 header {
