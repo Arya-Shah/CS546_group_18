@@ -631,9 +631,10 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
 
     //Pull property collection
         const propertyCollection = await properties();
-    
+
     //Try to pull comment from property
-    const updateInfo = await propertyCollection.updateOne(
+    let updateInfo; 
+    updateInfo = await propertyCollection.updateOne(
         { 'comments.commentId': propertyOrCommentId },
         { $pull: { comments: { commentId: propertyOrCommentId } } }
     );
