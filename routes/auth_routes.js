@@ -149,25 +149,3 @@ router.route('/report').get(async (req,res)=>{
 
   export default router;
 
-  // rise a report on property and landlord
-router.post('/report/:userId', async (req, res) => {
-  try {
-      console.log("in post!");
-      // Extract necessary data from request body or parameters
-      // const  landlordId  =req.params.landlordId;
-      const  reportData   = req.body.report_description;
-      const userId = req.body.userId;
-      // Call the addLandlordReport function
-      const result = await addLandLordReport(userId, reportData);
-      // Return success response
-      res.json(result);
-  } catch (error) {
-      // Return error response if something goes wrong
-      res.status(400).json({ error: error.message });
-  }
-});
-
-router.get('/report/:userId', async(req,res) =>{
-  res.render('report');
-})
-
