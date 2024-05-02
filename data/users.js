@@ -125,7 +125,7 @@ throw "Invalid last name input";
     
     if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
         throw 'Invalid password input';
-
+a
 //Retrieve user collection
 const userCollection = await users();
 
@@ -137,8 +137,8 @@ firstName: firstName.trim(),
 lastName: lastName.trim(),
 username:username.trim().toLowerCase(),
 email: email.trim().toLowerCase(),
-isLandlord: false,
-isAdmin: false,
+isLandlord: isLandlord,
+isAdmin: isAdmin,
 properties: [],
 city: city.trim(),
 state: state.trim(),
@@ -553,28 +553,103 @@ result.push({
 return result;
 };
 
+export const getAllPendingReports = async (userId) => {
+  const adminData = await getUserById(userId);
+  if (!adminData.isAdmin) throw new Error("user doesn't have access");
+  const userData = await getAllUsers();
+  const usersWithReports = userData.filter(
+    (user) => user.reportsIds && user.reportsIds.length > 0
+  );
+  if (usersWithReports.length === 0) {
+    throw new Error("No reports found.");
+  }
+  //const reportsOnly = usersWithReports.map(user => user.reportsIds);
+  const pendingReports = userData.flatMap(user => 
+    (user.reportsIds || []).filter(report => report.status === 'pending')
+  );
+
+  // Check if any pending reports were found
+  if (pendingReports.length === 0) {
+    throw new Error("No pending reports found.");
+  }
+  return pendingReports;
+
+};
+
+export const getReportbyId = async(userId,reportId) =>{
+    const adminData = await getUserById(userId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const userData = await getAllUsers();
+    const usersWithReports = userData.filter(
+        (user) => user.reportsIds && user.reportsIds.length > 0
+    );
+    if (usersWithReports.length === 0) {
+        throw new Error("No reports found.");
+    }
+
+    const reportWithId = userData.flatMap(user => 
+        (user.reportsIds || []).filter(report => report.reportId === reportId)
+      );
+
+    if(reportWithId == null){
+        throw new Error("Report with report id provided is not found");
+    }
+    return reportWithId;
+};
+
+export const updatePostReportStatus= async(userId,reportId) =>{
+    const adminData = await getUserById(userId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const reportData = await getReportbyId(reportId);
+    if(reportData == null){
+        throw new Error("Report with report id provided is not found");
+    }
+
+    const updatedReportData = reportData.status("Post Report");
+
+    return updatedReportData;
+  
+};
+
+export const updateDeleteReportStatus= async(userId,reportId) =>{
+    const adminData = await getUserById(userId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const reportData = await getReportbyId(reportId);
+    if(reportData == null){
+        throw new Error("Report with report id provided is not found");
+    }
+
+    const updatedReportData = reportData.status("Delete");
+
+    return updatedReportData;
+  
+};
+
 //Function addLandLordReport (report created by user on landlord)
-export const addLandLordReport = async (userId, reportData,reportReason) => {
-    console.log("called addLandLordReport", userId, reportData);
+export const addLandLordReport = async (userId,landlordId, reported_item_type,report_description,reportReason) => {
+    //console.log("called addLandLordReport", userId, reportData);
     const userData = await getUserById(userId);
+
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
       throw new Error("Invalid Report: Report content is required.");
-    if (!userData.hasProperty)
-      throw new Error("Invalid landlord ID or landlord does not exist");
+    const landlordData= await getUserById(landlordId);
+    if(!landlordData.isLandlord)
+       throw new Error("Person you are trying to report is not a landlord");
     const updatedReportData = {
       report_id: uuid(),
-      userId: null, //user id of customer reporter_id/userId
-      reported_item_type: null, //property or landlord
-      report_reason: null, //report reason
-      report_description: null, //description of reporting
+      userId: userId, //user id of customer reporter_id/userId
+      landlordId:landlordId,
+      reported_item_type: reported_item_type, //property or landlord
+      report_reason: reportReason, //report reason
+      report_description: report_description, //description of reporting
       reported_at: null, // date of report raised
       status: "pending", //status of the report which is managed by landlord
       resolved_at: null, // Date when status is resolved.
     };
   
     updatedReportData.reported_at = date;
-    updatedReportData.report_description=reportData;
+    updatedReportData.report_description=report_description;
     updatedReportData.report_reason = reportReason;
 
     if (!userId || !validators.isValidUuid(userId)) {
