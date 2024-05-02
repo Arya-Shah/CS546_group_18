@@ -126,6 +126,52 @@ const updateRating = async (landlordId) => {
 
 }
 
+const updateRatingProperty = async (propertyId) => {
+        
+    //Validate UUID
+        isValidUuid(propertyId);
+
+    //Retreive User Collection
+        const propertyCollection = await properties();
+
+    //Pull Landlord
+        const property = await propertyCollection.findOne({propertyId: propertyId});
+
+    if (!property){
+        throw 'Property not found.';
+    }
+
+    let locationDesirabilityRatingTotal = 0; 
+    let ownerResponsivenessRatingTotal = 0; 
+    let propertyConditionRatingTotal = 0; 
+    let communityRatingTotal = 0; 
+    let amenitiesRatingTotal = 0;
+
+    for (let propertyReview of property.reviews){
+        locationDesirabilityRatingTotal += propertyReview.locationDesirabilityRating;
+        ownerResponsivenessRatingTotal += propertyReview.ownerResponsivenessRating;
+        propertyConditionRatingTotal += propertyReview.propertyConditionRating;
+        communityRatingTotal += propertyReview.communityRating;
+        amenitiesRatingTotal += propertyReview.amenitiesRating;
+    }
+
+    let numberOfPropertyReviews = property.reviews.length;
+
+    let newAverageRatings = {
+        locationDesirabilityRating: locationDesirabilityRatingTotal / numberOfPropertyReviews,
+        ownerResponsivenessRating: ownerResponsivenessRatingTotal / numberOfPropertyReviews,
+        propertyConditionRating: propertyConditionRatingTotal / numberOfPropertyReviews, 
+        communityRating: communityRatingTotal / numberOfPropertyReviews, 
+        amenitiesRating: amenitiesRatingTotal / numberOfPropertyReviews, 
+    }
+
+    await propertyCollection.updateOne(
+        {propertyId: propertyId},
+        {$set: {averageRatings: newAverageRatings}}
+    );
+
+}
+
 export default {
   isValidString,
   isValidEmail,
@@ -136,5 +182,6 @@ export default {
   isValidLongitude,
   isValidLatitude,
   isValidPropertyCategory,
-  updateRating
+  updateRating,
+  updateRatingProperty
 };
