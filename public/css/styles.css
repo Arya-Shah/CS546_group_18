@@ -199,3 +199,24 @@ font-size: 90%;
     }
 
 
+.report {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+.report-content {
+    margin-bottom: 10px;
+}
+.btn {
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.btn-accept {
+    background-color: green;
+    color: white;
+}
+.btn-reject {
+    background-color: red;
+    color: white;
+}

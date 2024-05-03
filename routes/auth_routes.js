@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-import {registerUser,loginUser,addLandLordReport} from '../data/users.js';
+import {registerUser,loginUser,addLandLordReport,getAllPendingReports,updatePostReportStatus} from '../data/users.js';
 
 router.route('/').get(async (req, res) => {
 //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -130,22 +130,82 @@ router.route('/report').get(async (req,res)=>{
   }
 })
 .post(async (req,res) =>{
-  let reportReason = req.body.reportReason;
-  if(reportReason.length < 5){
+  console.log(req.body);
+  let report_Reason = req.body.reportReason;
+  let reportedItem_type=req.body.reportedItem_type;
+  console.log(report_Reason.length);
+  if(report_Reason.length < 5){
     return res.status(400).render('report', { error: 'Enter more Description!.' });
   }else{
     try {
     const userId = req.session.user._id;
-    const result = await addLandLordReport(userId, reportReason,req.body.reportedItemId);
-    console.log("is greater");
-    res.status(200).render('report', { layout: 'main',
-    success: 'successfully reported!', });
-    // res.json(result);
+    // const landlordId=req.session.user.landlord_id;
+    // if(!landlordId || landlordId === undefined || landlordId === null || landlordId === ''){
+    //   res.status(500).render('report', { layout: 'main',error: 'you cannot raise a report since you do not have an apartment!', });
+    // }else{
+      const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type);
+      console.log("is greater");
+      res.status(200).render('report', { layout: 'main',
+      success: 'successfully reported!', });
+    // }
     }catch(e){
       res.status(500).render('report', { error: e, form: req.body });
     }
   }
-})
+});
+
+router.route('/moderator').get(async (req,res)=>{
+  try{
+    const userId = req.session.user._id;
+    const pendingReports = await getAllPendingReports(userId);
+    return res.status(200).render('moderator',{ layout: 'main',
+    error: '', pendingReports })
+  }catch(e){
+    res.status(500).render('moderator',{error:e, form:req.body});
+  }
+});
+
+router.route('/moderator').get(async (req, res) => {
+    try {
+        const userId = req.session.user._id;
+        const pendingReports = await getAllPendingReports(userId);
+        return res.status(200).render('moderator', { layout: 'main', error: '', pendingReports });
+    } catch (e) {
+        res.status(500).render('moderator', { error: e, form: req.body });
+    }
+});
+
+router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
+    try {
+        const reportId = req.params.reportId;
+        const userId = req.params.userId;
+        const result = await updatePostReportStatus(userId,reportId);
+        console.log("updated result:",result);
+        // updatePostReportStatus
+
+        // Implement logic to accept the report with the given reportId
+        // For example, update the status of the report in the database
+        // Once the report is accepted, you can redirect or respond accordingly
+        return res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' });
+        // return res.status(200).json({ message: 'Report accepted successfully.' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.route('/moderator/reject/:userId/:reportId').post(async (req, res) => {
+    try {
+        const reportId = req.params.reportId;
+        // updatePostReportStatus
+
+        // Implement logic to accept the report with the given reportId
+        // For example, update the status of the report in the database
+        // Once the report is accepted, you can redirect or respond accordingly
+        return res.status(200).json({ message: 'Report accepted successfully.' });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 
   export default router;
 
