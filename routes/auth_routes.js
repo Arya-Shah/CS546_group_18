@@ -130,17 +130,17 @@ router.route('/report').get(async (req,res)=>{
   }
 })
 .post(async (req,res) =>{
-  console.log(req.body);
   let reportReason = req.body.reportReason;
-  console.log(reportReason.length);
   if(reportReason.length < 5){
     return res.status(400).render('report', { error: 'Enter more Description!.' });
   }else{
     try {
-    const userId = req.session.user.userId;
+    const userId = req.session.user._id;
     const result = await addLandLordReport(userId, reportReason,req.body.reportedItemId);
     console.log("is greater");
-    res.json(result);
+    res.status(200).render('report', { layout: 'main',
+    success: 'successfully reported!', });
+    // res.json(result);
     }catch(e){
       res.status(500).render('report', { error: e, form: req.body });
     }
