@@ -170,6 +170,7 @@ return { userInserted: true, userId: newUser.userId };
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
+    console.log(userId,updatedUser);
 //Validation
 
 if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
@@ -256,12 +257,16 @@ updatedUserData.hashedPassword = await bcrypt.hash(
     saltRounds
 );
 }
+if(updatedUser.reportsIds){
+    console.log("in here!");
+}
 
 //Update user with object
 const updateResponse = await userCollection.updateOne(
 { userId: userId },
 { $set: updatedUserData }
 );
+console.log(updateResponse);
 
 //Validation (cont.)
 if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
@@ -576,7 +581,7 @@ export const getAllPendingReports = async (userId) => {
 
 };
 
-export const getReportbyId = async(userId,reportId) =>{
+export const getReportbyId = async(reportId) =>{
     const adminData = await getUserById(userId);
     if (!adminData.isAdmin) throw new Error("user doesn't have access");
     const userData = await getAllUsers();
@@ -586,10 +591,12 @@ export const getReportbyId = async(userId,reportId) =>{
     if (usersWithReports.length === 0) {
         throw new Error("No reports found.");
     }
+    console.log("usersWithReports:",usersWithReports);
 
     const reportWithId = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.reportId === reportId)
+        (user.reportsIds || []).filter(report => report.report_id === reportId)
       );
+      console.log("reportWithId:",reportWithId);
 
     if(reportWithId == null){
         throw new Error("Report with report id provided is not found");
@@ -599,13 +606,23 @@ export const getReportbyId = async(userId,reportId) =>{
 
 export const updatePostReportStatus= async(userId,reportId) =>{
     const adminData = await getUserById(userId);
+    console.log(adminData,reportId);
     if (!adminData.isAdmin) throw new Error("user doesn't have access");
     const reportData = await getReportbyId(reportId);
+    console.log("reportData:",reportData);
     if(reportData == null){
         throw new Error("Report with report id provided is not found");
     }
 
-    const updatedReportData = reportData.status("Post Report");
+    // const updatedReportData = reportData.status("Post Report");
+    reportData[0].status = "Accepted";
+    const updatedReportData = reportData[0].status;
+    const userData = await getUserById(reportData[0].userId);
+    if(!userData) throw new Error("no User Data found!")
+    const reportWithId = userData.flatMap(user => 
+    (user.reportsIds || []).filter(report => report.report_id === reportId));
+      console.log("reportWithId:",reportWithId);
+
 
     return updatedReportData;
   
@@ -625,42 +642,40 @@ export const updateDeleteReportStatus= async(userId,reportId) =>{
   
 };
 
-//Function addLandLordReport (report created by user on landlord)
-export const addLandLordReport = async (userId,landlordId, reported_item_type,report_description,reportReason) => {
-    //console.log("called addLandLordReport", userId, reportData);
-    const userData = await getUserById(userId);
 
+export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
+    //Retrieve Landlord
+    // const landlord = await getUserById(landlordId);
+    const userData = await getUserById(userId);
+    
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
       throw new Error("Invalid Report: Report content is required.");
-    const landlordData= await getUserById(landlordId);
-    if(!landlordData.isLandlord)
-       throw new Error("Person you are trying to report is not a landlord");
-    const updatedReportData = {
-      report_id: uuid(),
-      userId: userId, //user id of customer reporter_id/userId
-      landlordId:landlordId,
-      reported_item_type: reported_item_type, //property or landlord
-      report_reason: reportReason, //report reason
-      report_description: report_description, //description of reporting
-      reported_at: null, // date of report raised
-      status: "pending", //status of the report which is managed by landlord
-      resolved_at: null, // Date when status is resolved.
-    };
-  
-    updatedReportData.reported_at = date;
-    updatedReportData.report_description=report_description;
-    updatedReportData.report_reason = reportReason;
-
+    if (userData.isLandlord === true)
+      throw new Error("no access since landlord");
+    
+      const updatedReportData = {
+        report_id: uuid(),
+        userId: null, //user id of customer reporter_id/userId
+        reported_item_type: null, //property or landlord
+        report_reason: null, //report reason
+        report_description: null, //description of reporting
+        reported_at: null, // date of report raised
+        status: "pending", //status of the report which is managed by landlord
+        resolved_at: null, // Date when status is resolved.
+      };
+    
+    //Validation (cont.) and add to report object
     if (!userId || !validators.isValidUuid(userId)) {
-      throw new Error("Invalid user ID input");
+    throw new Error("Invalid user ID input");
     } else {
-      updatedReportData.userId = userId;
+        updatedReportData.userId = userId;
     }
-  
+    updatedReportData.reported_at = date;
+    updatedReportData.report_description=reportData;
+    updatedReportData.report_reason = reportReason;
+    updatedReportData.reported_item_type=reportedItemType;
     userData.reportsIds.push(updatedReportData);
-    // console.log(userData);
-    // const userReportUpdateStatus = await update(userId,userData);
   
   
     // complete the validation before using this method!
@@ -670,14 +685,28 @@ export const addLandLordReport = async (userId,landlordId, reported_item_type,re
   
     if (!userReportUpdateStatus)
       throw new Error("Failed to update user information with the report.");
-  
-    // const landlordReportUpdateStatus = await updateUser(landlordId, {
-    //   $push: { reports: updatedReportData },
-    // });
-    // console.log(landlordReportUpdateStatus);
-    // if (!landlordReportUpdateStatus)
-    //   throw "Failed to update landlord informaiton with new report.";
-  
-    return { reportAdded: true };
-  };
 
+    
+    // //Update User with report id
+    // const userUpdateStatus = await updateUser(
+    // { userId: userId },
+    // { $push: { reportsIds: updatedReportData.report_id } }
+    // );
+    
+    // if (!userUpdateStatus)
+    // throw "Failed to update user information with new review.";
+    
+    // //Update Landlord with report
+    // const landlordUpdateStatus = await updateUser(landlordId, {
+    // $push: { reviews: updatedReportData },
+    // });
+    
+    // if (!landlordUpdateStatus)
+    // throw "Failed to update landlord informaiton with new review.";
+    
+    //To Do: Recalculate Landlord's average ratings
+    // validators.updateRating(landlordId);
+    
+    //Return
+    return { reportAdded: true };
+    };
