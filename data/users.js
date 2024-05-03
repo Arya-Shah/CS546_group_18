@@ -125,7 +125,7 @@ throw "Invalid last name input";
     
     if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
         throw 'Invalid password input';
-
+a
 //Retrieve user collection
 const userCollection = await users();
 
@@ -137,8 +137,8 @@ firstName: firstName.trim(),
 lastName: lastName.trim(),
 username:username.trim().toLowerCase(),
 email: email.trim().toLowerCase(),
-isLandlord: false,
-isAdmin: false,
+isLandlord: isLandlord,
+isAdmin: isAdmin,
 properties: [],
 city: city.trim(),
 state: state.trim(),
@@ -267,7 +267,8 @@ const updateResponse = await userCollection.updateOne(
 { userId: userId },
 { $set: updatedUserData }
 );
-console.log("updateResponse: ",updatedUserData,updateResponse,updateResponse.acknowledged,updateResponse.modifiedCount);
+console.log(updateResponse);
+
 //Validation (cont.)
 if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
 throw "Error occurred while updating user";
@@ -558,59 +559,155 @@ result.push({
 return result;
 };
 
-//Function addLandLordReport (report created by user on landlord)
-export const addLandLordReport = async (userId, reportData,reportReason) => {
+export const getAllPendingReports = async (userId) => {
+  const adminData = await getUserById(userId);
+  if (!adminData.isAdmin) throw new Error("user doesn't have access");
+  const userData = await getAllUsers();
+  const usersWithReports = userData.filter(
+    (user) => user.reportsIds && user.reportsIds.length > 0
+  );
+  if (usersWithReports.length === 0) {
+    throw new Error("No reports found.");
+  }
+  //const reportsOnly = usersWithReports.map(user => user.reportsIds);
+  const pendingReports = userData.flatMap(user => 
+    (user.reportsIds || []).filter(report => report.status === 'pending')
+  );
+
+  // Check if any pending reports were found
+  if (pendingReports.length === 0) {
+    throw new Error("No pending reports found.");
+  }
+  return pendingReports;
+
+};
+
+export const getReportbyId = async(reportId) =>{
+    const adminData = await getUserById(userId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const userData = await getAllUsers();
+    const usersWithReports = userData.filter(
+        (user) => user.reportsIds && user.reportsIds.length > 0
+    );
+    if (usersWithReports.length === 0) {
+        throw new Error("No reports found.");
+    }
+    console.log("usersWithReports:",usersWithReports);
+
+    const reportWithId = userData.flatMap(user => 
+        (user.reportsIds || []).filter(report => report.report_id === reportId)
+      );
+      console.log("reportWithId:",reportWithId);
+
+    if(reportWithId == null){
+        throw new Error("Report with report id provided is not found");
+    }
+    return reportWithId;
+};
+
+export const updatePostReportStatus= async(userId,reportId) =>{
+    const adminData = await getUserById(userId);
+    console.log(adminData,reportId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const reportData = await getReportbyId(reportId);
+    console.log("reportData:",reportData);
+    if(reportData == null){
+        throw new Error("Report with report id provided is not found");
+    }
+
+    // const updatedReportData = reportData.status("Post Report");
+    reportData[0].status = "Accepted";
+    const updatedReportData = reportData[0].status;
+    const userData = await getUserById(reportData[0].userId);
+    if(!userData) throw new Error("no User Data found!")
+    const reportWithId = userData.flatMap(user => 
+    (user.reportsIds || []).filter(report => report.report_id === reportId));
+      console.log("reportWithId:",reportWithId);
+
+
+    return updatedReportData;
+  
+};
+
+export const updateDeleteReportStatus= async(userId,reportId) =>{
+    const adminData = await getUserById(userId);
+    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    const reportData = await getReportbyId(reportId);
+    if(reportData == null){
+        throw new Error("Report with report id provided is not found");
+    }
+
+    const updatedReportData = reportData.status("Delete");
+
+    return updatedReportData;
+  
+};
+
+
+export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
+    //Retrieve Landlord
+    // const landlord = await getUserById(landlordId);
     const userData = await getUserById(userId);
+    
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
       throw new Error("Invalid Report: Report content is required.");
-    // if (!userData.hasProperty)
-    //   throw new Error("Invalid landlord ID or landlord does not exist");
-    const updatedReportData = {
-      report_id: uuid(),
-      userId: null, //user id of customer reporter_id/userId
-      reported_item_type: null, //property or landlord
-      report_reason: null, //report reason
-      report_description: null, //description of reporting
-      reported_at: null, // date of report raised
-      status: "pending", //status of the report which is managed by landlord
-      resolved_at: null, // Date when status is resolved.
-    };
-  
+    if (userData.isLandlord === true)
+      throw new Error("no access since landlord");
+    
+      const updatedReportData = {
+        report_id: uuid(),
+        userId: null, //user id of customer reporter_id/userId
+        reported_item_type: null, //property or landlord
+        report_reason: null, //report reason
+        report_description: null, //description of reporting
+        reported_at: null, // date of report raised
+        status: "pending", //status of the report which is managed by landlord
+        resolved_at: null, // Date when status is resolved.
+      };
+    
+    //Validation (cont.) and add to report object
+    if (!userId || !validators.isValidUuid(userId)) {
+    throw new Error("Invalid user ID input");
+    } else {
+        updatedReportData.userId = userId;
+    }
     updatedReportData.reported_at = date;
     updatedReportData.report_description=reportData;
     updatedReportData.report_reason = reportReason;
-
-    if (!userId || !validators.isValidUuid(userId)) {
-      throw new Error("Invalid user ID input");
-    } else {
-      updatedReportData.userId = userId;
-    }
-
-  userData.reportsIds.push(updatedReportData);
+    updatedReportData.reported_item_type=reportedItemType;
+    userData.reportsIds.push(updatedReportData);
   
   
-  // complete the validation before using this method!
-  const userReportUpdateStatus = await updateUser(
-     userId ,userData
-  );
-
-  if (!userReportUpdateStatus)
-    throw new Error("Failed to update user information with the report.");
-//       const userReportUpdateStatus = await updateUser(userId, {
-//     $push: { reportsIds: updatedReportData },
-//   });
-//   console.log(userReportUpdateStatus);
-//   if (!userReportUpdateStatus)
-//     throw new Error("Failed to update user informaiton with new report.");
-
-  // const landlordReportUpdateStatus = await updateUser(landlordId, {
-  //   $push: { reports: updatedReportData },
-  // });
-  // console.log(landlordReportUpdateStatus);
-  // if (!landlordReportUpdateStatus)
-  //   throw "Failed to update landlord informaiton with new report.";
+    // complete the validation before using this method!
+    const userReportUpdateStatus = await updateUser(
+       userId ,userData
+    );
   
+    if (!userReportUpdateStatus)
+      throw new Error("Failed to update user information with the report.");
+
+    
+    // //Update User with report id
+    // const userUpdateStatus = await updateUser(
+    // { userId: userId },
+    // { $push: { reportsIds: updatedReportData.report_id } }
+    // );
+    
+    // if (!userUpdateStatus)
+    // throw "Failed to update user information with new review.";
+    
+    // //Update Landlord with report
+    // const landlordUpdateStatus = await updateUser(landlordId, {
+    // $push: { reviews: updatedReportData },
+    // });
+    
+    // if (!landlordUpdateStatus)
+    // throw "Failed to update landlord informaiton with new review.";
+    
+    //To Do: Recalculate Landlord's average ratings
+    // validators.updateRating(landlordId);
+    
+    //Return
     return { reportAdded: true };
-  };
-
+    };

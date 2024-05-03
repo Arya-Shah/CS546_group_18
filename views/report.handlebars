@@ -4,6 +4,12 @@
 {{#if error}}
 <p class="error">{{error}}</p>
 {{/if}}
+<label for="reportedItem_type">Report on:</label>
+    <select id="reportedItem_type" name="reportedItem_type" required>
+        <option value="">Select a reason</option>
+        <option value="property">Property</option>
+         <option value="landlord">Landlord</option>
+    </select>
     <label for="reportedItemId">Reason to report:</label>
     <select id="reportedItemId" name="reportedItemId" required>
         <option value="">Select a reason</option>
