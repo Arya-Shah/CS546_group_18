@@ -559,7 +559,7 @@ export const addLandLordReport = async (userId, reportData,reportReason) => {
     const userData = await getUserById(userId);
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
-      throw new Error("Invalid Report: Report content is required.");
+        throw new Error("Invalid Report: Report content is required.");
     if (!userData.hasProperty)
       throw new Error("Invalid landlord ID or landlord does not exist");
     const updatedReportData = {

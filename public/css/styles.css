@@ -1,5 +1,5 @@
 body {
-font-size: 120%;
+font-size: 190%;
 font-family: 'Montserrat', sans-serif;
 font-weight: 500;
 background-color: rgb(255, 255, 255);
@@ -49,7 +49,7 @@ background-color: #3334371b;
 }
 
 input[type="submit"] {
-    background-color: #333;
+    background-color: #ffffff;
     color: white;
     border: none;
     border-radius: 4px;
@@ -93,20 +93,6 @@ color: #000000;
 font-size: xx-large;
 text-decoration: none;
 font-weight: bold;
-}
-
-nav .search-container form {
-display: flex;
-}
-
-nav .search-container input[type="text"] {
-padding: 5px;
-margin-right: 10px;
-}
-
-nav .search-container button {
-padding: 5px 10px;
-cursor: pointer;
 }
 
 nav .user-container a {
@@ -191,3 +177,25 @@ font-weight: bold;
 .badge {
 font-size: 0.8rem; 
 }
+
+/* search bar style */
+
+.search-input {
+padding: 8px;
+width: 600px;
+border: 1px solid #ccc;
+border-radius: 5px;
+margin-top: 20px;
+border-radius: 20px;
+font-size: 90%;
+}
+
+.search-button {
+    padding: 5px;
+    margin-left: 217px;
+    margin-top: 5px;
+    width: 150px;
+    font-size: 80%;
+    }
+
+
