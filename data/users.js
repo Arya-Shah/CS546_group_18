@@ -124,16 +124,19 @@ export const getUserById = async (id) => {
 
 //Function: registerUser    
 export const registerUser = async (firstName, lastName, username, password, city, state, email, isLandlord, isAdmin) => {
-//Validation
+
+    //Validation
     if (!firstName || !validators.isValidString(firstName) || firstName.trim().length === 0)
         throw 'Invalid first name input';
 
-if (
-!lastName ||
-!validators.isValidString(lastName) ||
-lastName.trim().length === 0
-)
-throw "Invalid last name input";
+    if (!lastName || !validators.isValidString(lastName) || lastName.trim().length === 0)
+        throw 'Invalid last name input';
+    
+    if (!username || !validators.isValidString(username) || username.trim().length === 0)
+        throw 'Invalid user name input';
+
+    if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
+        throw 'Invalid password input';
 
     if (!email || !validators.isValidEmail(email) || email.trim().length === 0)
         throw 'Invalid email input';
@@ -143,64 +146,74 @@ throw "Invalid last name input";
     
     if (!state || !validators.isValidString(state) || state.trim().length === 0)
         throw 'Invalid state input';
+
+    //To Do: additional validation for isLandlord and isAdmin needed?
+    if (!isLandlord)
+        throw 'An indication whether the user is a landlord or not is required.';
+
+    if (!isAdmin)
+        throw 'An indication whether the user is a landlord or not is required.';
+
+    //Check if username exists
+    const userRow = await getUserByName(username);
     
-    if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
-        throw 'Invalid password input';
-//Retrieve user collection
-const userCollection = await users();
+    if(userRow && username === userRow.username){
+        throw "Username Already Exists."
+    }
 
-//Set hashed password
-const hashedPassword = await bcrypt.hash(password, saltRounds);
-//New User Object
-let newUser = {
-firstName: firstName.trim(),
-lastName: lastName.trim(),
-username:username.trim().toLowerCase(),
-email: email.trim().toLowerCase(),
-isLandlord: isLandlord,
-isAdmin: isAdmin,
-properties: [],
-city: city.trim(),
-state: state.trim(),
-hashedPassword: hashedPassword,
-reviews: [], 
-reviewIds: [],
-commentsIds: [],
-reportsIds: [],
-averageRatings: {},
-landlordReviews: [],
-};
+    //Retrieve user collection
+    const userCollection = await users();
 
-//Check if username exists
-const userRow = await getUserByName(username);
-if(username === userRow.username){
-    throw "Username Already Exists."
-}
-
-//Insert new user object into collection
-const insertInfo = await userCollection.insertOne(newUser);
-
-//Validation (cont.)
-if (!insertInfo.acknowledged || !insertInfo.insertedId)
-throw "Could not add new user";
-
-//Return
-return { userInserted: true, userId: newUser.userId };
+    //Set hashed password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    
+    //New User Object
+    let newUser = {
+        userId: uuid(),
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim().toLowerCase(),
+        hashedPassword: hashedPassword,
+        city: city.trim(),
+        state: state.trim(),
+        email: email.trim().toLowerCase(),
+        isLandlord: isLandlord,
+        isAdmin: isAdmin,
+        properties: [],
+        reviews: [], 
+        reviewIds: [],
+        commentsIds: [],
+        threadIds: [],
+        reportsIds: [],
+        averageRatings: {},
+        landlordReviews: [],
+    };
+    
+    //Insert new user object into collection
+    const insertInfo = await userCollection.insertOne(newUser);
+    
+    //Validation (cont.)
+    if (!insertInfo.acknowledged || !insertInfo.insertedId)
+        throw "Could not add new user";
+    
+    //Return
+    return { userInserted: true, userId: newUser.userId };
+    
 };
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
     console.log(userId,updatedUser);
-//Validation
 
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
-
-if (
-!updatedUser ||
-typeof updatedUser !== "object" ||
-Array.isArray(updatedUser)
-)
-throw new Error("Invalid updatedUser input");
+    //Validation
+    if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
+    
+    if (
+    !updatedUser ||
+    typeof updatedUser !== "object" ||
+    Array.isArray(updatedUser)
+    )
+    throw new Error("Invalid updatedUser input");
 
 //Retrieve user collection
 const userCollection = await users();
