@@ -10,95 +10,116 @@ const saltRounds = 16;
 
 //Function: getAllUsers
 export const getAllUsers = async () => {
-//Retreive User Collection
-const userCollection = await users();
+    
+    //Retreive User Collection
+    const userCollection = await users();
+    
+    //Return collection as array
+    return await userCollection.find({}).toArray();
+    };
 
-//Return collection as array
-return await userCollection.find({}).toArray();
-};
-
+//Function: loginUser
 export const loginUser = async (username, password) => {
-const errorObject = {
-status: 400,
-};
-if (!username && !password) {
-errorObject.error = "No input provided to create user.";
-throw errorObject;
-}
 
-if(username.length < 5 || username.length > 10){
-errorObject = 'username should be between 5 and 10.' ;
+    let errorObject = {
+    status: 400,
+    };
+    
+    if (!username && !password) {
+    errorObject.error = "No input provided to create user.";
+    throw errorObject;
+    }
 
-}
-if (!/^[a-zA-Z\s]+$/.test(username)) {
-errorObject = 'username must be characters and cannot contain numbers.' ;
-throw errorObject;
-}
+    if(username.length < 5 || username.length > 10){
+    errorObject.error = 'Username should be between 5 and 10.' ;
+    }
+    
+    if (!/^[a-zA-Z\s]+$/.test(username)) {
+    errorObject.error = 'Username must be characters and cannot contain numbers.' ;
+    throw errorObject;
+    }
+    
+    if(password.length < 8){
+    errorObject.error = 'Password should be greater than 8.' ;
+    throw errorObject;
+    }
+    
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+    errorObject.error = 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character' ;
+    throw errorObject;
+    }
+    
+    const userRow = await getUserByName(username);
+    
+    if (Object.keys(userRow).length === 0) {
+    errorObject.error = "Either the username or password is invalid";
+    throw errorObject;
+    }
+    
+    let compareResult = await bcrypt.compare(password, userRow.hashedPassword);
+    if (!compareResult) {
+    errorObject.error = "Either the username or password is invalid";
+    throw errorObject;
+    }
+    
+    return userRow;
+    
+    };
 
-if(password.length < 8){
-errorObject = 'password should be greater than 8.' ;
-throw errorObject;
-}
-if (!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-errorObject = 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character' ;
-throw errorObject;
-}
-const userRow = await getUserByName(username);
-if (Object.keys(userRow).length === 0) {
-errorObject.error = "Either the username or password is invalid";
-throw errorObject;
-}
-let compareResult = await bcrypt.compare(password, userRow.hashedPassword);
-if (!compareResult) {
-errorObject.error = "Either the username or password is invalid";
-throw errorObject;
-}
-''
-return userRow;
-};
-
+//Function: getUserByName
 const getUserByName = async (username) => {
-let result = {};
-const errorObject = {
-status: 400,
-};
-if (!username) {
-errorObject.error = "No input provided to search user.";
-throw errorObject;
-}
-if(username.length < 5 || username.length > 10){
-errorObject = 'username should be between 5 and 10.';
-throw errorObject;
-}
-if (!/^[a-zA-Z\s]+$/.test(username)) {
-errorObject = 'username must be characters and cannot contain numbers.';
-throw errorObject;
-}  
-username = username.trim().toLowerCase();
-const usersCollection = await users();
-const userRow = await usersCollection.findOne({ username: username });
-if (userRow === null) {
-return result;
-}
-return userRow;
+
+    let result = {};
+
+    const errorObject = {
+    status: 400,
+    };
+    
+    if (!username) {
+    errorObject.error = "No input provided to search user.";
+    throw errorObject;
+    }
+    
+    if(username.length < 5 || username.length > 10){
+    errorObject.error = 'Username should be between 5 and 10.';
+    throw errorObject;
+    }
+    
+    if (!/^[a-zA-Z\s]+$/.test(username)) {
+    errorObject.error = 'Username must be characters and cannot contain numbers.';
+    throw errorObject;
+    } 
+    
+    username = username.trim().toLowerCase();
+    const usersCollection = await users();
+    const userRow = await usersCollection.findOne({ username: username });
+    
+    if (userRow === null) {
+    return result;
+    }
+    
+    return userRow;
 };
 
 
 //Function: getUserById
 export const getUserById = async (id) => {
 
-//Validation
+    //Validation
     if (!validators.isValidUuid(id)) 
         throw 'Invalid ID input';
         
-//Retreive user collection and specific user
+    //Retreive user collection and specific user
     const userCollection = await users();
     const user = await userCollection.findOne({ _id: new ObjectId(id) });
-//Validation (cont.)
+
+    //Validation (cont.)
     if (!user) 
         throw 'User not found';
-//Return 
+
+    //Return 
     return user;    
+    
 };
 
 //Function: registerUser    
