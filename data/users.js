@@ -330,14 +330,15 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     if (!landlordId || !validators.isValidUuid(landlordId)) 
         throw "Invalid landlord ID input";
 
+    const landlord = await getUserById(landlordId);
+    if (!landlord)
+        throw 'No landlord found with specified id.';
+    
     if (!userId || !validators.isValidUuid(userId)) 
         throw "Invalid landlord ID input";
     
     if (!reviewData || Object.keys(reviewData).length === 0)
         throw "Invalid Review: Review data is required.";
-    
-    //Retrieve Landlord
-    const landlord = await getUserById(landlordId);
     
     //Create Review Object
     const updatedReviewData = {
@@ -398,70 +399,72 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
     
+   
+    //Retreive User Collection
+    const userCollection = await users();
+
     //Update User with review id
-    const userUpdateStatus = await updateUser(
+    const userUpdateStatus = await userCollection.updateOne(
         { userId: userId },
         { $push: { reviewIds: updatedReviewData.reviewId } }
     );
     
     if (!userUpdateStatus)
-        throw "Failed to update user information with new review.";
+        throw "Failed to update user information with new review id.";
     
     //Update Landlord with review
-    const landlordUpdateStatus = await updateUser(landlordId, {
-        $push: { reviews: updatedReviewData },
-    });
+    const landlordUpdateStatus = await userCollection.updateOne(
+        { userId: landlordId },
+        { $push: { reviews: updatedReviewData } }
+    );
     
     if (!landlordUpdateStatus)
         throw "Failed to update landlord informaiton with new review.";
     
-    //To Do: Recalculate Landlord's average ratings
+    //Recalculate Landlord's average ratings
     validators.updateRating(landlordId);
     
     //Return
     return { reviewAdded: true };
+    
 };
 
-// Function: removeCommentReply, removes comment from property or reply from comment
-export const removeLandlordReview = async (
-userId,
-landlordId,
-landlordReviewId
-) => {
-//Validations
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
-
-if (!landlordId || !validators.isValidUuid(landlordId))
-throw "Invalid landlord ID input";
-
-if (!landlordReviewId || !validators.isValidUuid(landlordReviewId))
-throw "Invalid user landlordReviewId input";
-
-//Pull property collection
-const userCollection = await users();
-
-//Try to pull comment from property
-let updateInfo = await userCollection.updateOne(
-{ userId: landlordId },
-{ $pull: { "reviews.reviewId": landlordReviewId } }
-);
-
-//Throw Error if Failed
-if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-throw "Failed to remove comment or reply.";
-
-//Remove reviewId from user's object
-
-const userUpdateStatus = await userCollection.updateOne(
-{ userId: userId },
-{ $pull: { reviewIds: landlordReviewId } }
-);
-
-if (!userUpdateStatus.acknowledged || userUpdateStatus.modifiedCount === 0)
-throw "Failed to update user information with removed review.";
-
-//Return
-return { commentOrReplyPulled: true };
+// Function: removeLandlordReview
+export const removeLandlordReview = async (userId, landlordId, landlordReviewId ) => {
+    
+    //Validations
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+    
+    if (!landlordId || !validators.isValidUuid(landlordId))
+        throw "Invalid landlord ID input";
+    
+    if (!landlordReviewId || !validators.isValidUuid(landlordReviewId))
+        throw "Invalid user landlordReviewId input";
+    
+    //Pull user collection
+    const userCollection = await users();
+    
+    //Try to pull review id from userid
+    let userUpdateStatus = await userCollection.updateOne(
+        { userId: userId },
+        { $pull: { "reviewIds": landlordReviewId } }
+    );
+    
+    //Throw Error if Failed
+    if (!userUpdateStatus.acknowledged || userUpdateStatus.modifiedCount === 0)
+        throw "Failed to remove landlord review id from user.";
+    
+    const landlordUpdateStatus = await userCollection.updateOne(
+        { userId: landlordId },
+        { $pull: { reviews: { reviewId: landlordReviewId } } }
+    );
+    
+    if (!landlordUpdateStatus.acknowledged || landlordUpdateStatus.modifiedCount === 0)
+    throw "Failed to update landlord information with removed review.";
+    
+    //Return
+    return { landlordReviewPulled: true };
 };
 
 // Function: Add a property to user's bookmarks
