@@ -533,44 +533,47 @@ export const getBookmarkedProperties = async (userId) => {
     
 };
 
+//1. Should be in properties? 2. No name field currently in properties.
 export const searchPropertiesByName = async (title) => {
-const result = [];
-const errorObject = { status: 400 };
 
-if (!title || typeof title !== "string" || !validators.isValidString(title)) {
-errorObject.error = "Provided input must be a valid string.";
-throw errorObject;
-}
+    const result = [];
 
-title = title.trim();
-if (title.length === 0) {
-errorObject.error = "No input provided to search.";
-throw errorObject;
-}
+    const errorObject = { status: 400 };
 
-const propertyCollection = await properties();
-await propertyCollection.createIndex({ name: "text" });
-const propertiesList = await propertyCollection
-.find({
-    $text: { $search: title },
-})
-.toArray();
+    if (!title || typeof title !== "string" || !validators.isValidString(title)) {
+        errorObject.error = "Provided input must be a valid string.";
+        throw errorObject;
+    }
 
-if (!propertiesList || propertiesList.length === 0) {
-errorObject.status = 404;
-errorObject.error = `No properties were found for "${title}".`;
-throw errorObject;
-}
+    title = title.trim();
 
-propertiesList.forEach((property) => {
-result.push({
-    propertyName: property.name,
-    location: property.location,
-    propertyId: property._id,
-});
-});
+    if (title.length === 0) {
+        errorObject.error = "No input provided to search.";
+        throw errorObject;
+    }
 
-return result;
+    const propertyCollection = await properties();
+
+    await propertyCollection.createIndex({ name: "text" });
+    
+    const propertiesList = await propertyCollection.find({$text: { $search: title }}).toArray();
+
+    if (!propertiesList || propertiesList.length === 0) {
+        errorObject.status = 404;
+        errorObject.error = `No properties were found for "${title}".`;
+        throw errorObject;
+    }
+
+    propertiesList.forEach((property) => {
+        result.push({
+            propertyName: property.name,
+            location: property.location,
+            propertyId: property._id,
+        });
+    });
+
+    return result;
+    
 };
 
 export const getAllPendingReports = async (userId) => {
