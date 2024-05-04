@@ -8,6 +8,7 @@ import {ObjectId} from 'mongodb';
 
 const saltRounds = 16;
 
+
 //Function: getAllUsers
 export const getAllUsers = async () => {
     
@@ -17,6 +18,7 @@ export const getAllUsers = async () => {
     //Return collection as array
     return await userCollection.find({}).toArray();
     };
+
 
 //Function: loginUser
 export const loginUser = async (username, password) => {
@@ -65,6 +67,7 @@ export const loginUser = async (username, password) => {
     return userRow;
     
     };
+
 
 //Function: getUserByName
 const getUserByName = async (username) => {
@@ -121,6 +124,7 @@ export const getUserById = async (id) => {
     return user;    
     
 };
+
 
 //Function: registerUser    
 export const registerUser = async (firstName, lastName, username, password, city, state, email, isLandlord, isAdmin) => {
@@ -199,6 +203,7 @@ export const registerUser = async (firstName, lastName, username, password, city
     return { userInserted: true, userId: newUser.userId };
     
 };
+
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
@@ -300,7 +305,8 @@ export const updateUser = async (userId, updatedUser) => {
     return { userUpdated: true };
     
 };
-    
+
+
 //Function: removeUser
 export const removeUser = async (userId) => {
     
@@ -322,6 +328,7 @@ export const removeUser = async (userId) => {
     //Return
     return { userDeleted: true };
 };
+
 
 //Function: addLandlordReview
 export const addLandlordReview = async (landlordId, reviewData, userId) => {
@@ -399,7 +406,6 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
     
-   
     //Retreive User Collection
     const userCollection = await users();
 
@@ -428,6 +434,7 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     return { reviewAdded: true };
     
 };
+
 
 // Function: removeLandlordReview
 export const removeLandlordReview = async (userId, landlordId, landlordReviewId ) => {
@@ -467,7 +474,8 @@ export const removeLandlordReview = async (userId, landlordId, landlordReviewId 
     return { landlordReviewPulled: true };
 };
 
-// Function: Add a property to user's bookmarks
+
+// Function: addBookmark
 export const addBookmark = async (userId, propertyId) => {
 
     if (!userId || !validators.isValidUuid(userId)) 
@@ -490,7 +498,8 @@ export const addBookmark = async (userId, propertyId) => {
     
 };
 
-// Function: Remove a property from user's bookmarks
+
+// Function: removeBookmark
 export const removeBookmark = async (userId, propertyId) => {
 
     if (!userId || !validators.isValidUuid(userId)) 
@@ -513,7 +522,8 @@ export const removeBookmark = async (userId, propertyId) => {
     
 };
 
-// Function: Get all bookmarked properties for a user
+
+// Function: getBookmarkedProperties
 export const getBookmarkedProperties = async (userId) => {
 
     if (!userId || !validators.isValidUuid(userId)) 
@@ -533,7 +543,9 @@ export const getBookmarkedProperties = async (userId) => {
     
 };
 
+
 //1. Should be in properties? 2. No name field currently in properties.
+//Function: searchPropertiesByName
 export const searchPropertiesByName = async (title) => {
 
     const result = [];
@@ -576,49 +588,77 @@ export const searchPropertiesByName = async (title) => {
     
 };
 
+
+//Function: getAllPendingReports
 export const getAllPendingReports = async (userId) => {
-  const adminData = await getUserById(userId);
-  if (!adminData.isAdmin) throw new Error("user doesn't have access");
-  const userData = await getAllUsers();
-  const usersWithReports = userData.filter(
-    (user) => user.reportsIds && user.reportsIds.length > 0
-  );
-  if (usersWithReports.length === 0) {
-    throw new Error("No reports found.");
-  }
-  //const reportsOnly = usersWithReports.map(user => user.reportsIds);
-  const pendingReports = userData.flatMap(user => 
-    (user.reportsIds || []).filter(report => report.status === 'pending')
-  );
 
-  // Check if any pending reports were found
-  if (pendingReports.length === 0) {
-    throw new Error("No pending reports found.");
-  }
-  return pendingReports;
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+    
+    const adminData = await getUserById(userId);
+  
+    if (!adminData.isAdmin) 
+        throw new Error("User does not have admin access.");
+  
+    const userData = await getAllUsers();
+  
+    const usersWithReports = userData.filter((user) => 
+        user.reportsIds && user.reportsIds.length > 0
+    );
+    
+    if (usersWithReports.length === 0)
+        throw new Error("No reports found.");
+  
+    //const reportsOnly = usersWithReports.map(user => user.reportsIds);
+    const pendingReports = userData.flatMap(user => 
+        (user.reportsIds || []).filter(report => report.status === 'pending')
+    );
 
+      // Check if any pending reports were found
+      if (pendingReports.length === 0)
+        throw new Error("No pending reports found.");
+
+      return pendingReports;
+    
 };
 
-export const getReportbyId = async(reportId) =>{
+
+//Function: getReportbyId
+export const getReportbyId = async(reportId, userId) =>{
+
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+
+    if (!reportId || !validators.isValidUuid(reportId)) 
+        throw "Invalid report ID input";
+
     const adminData = await getUserById(userId);
-    if (!adminData.isAdmin) throw new Error("user doesn't have access");
+    
+    if (!adminData.isAdmin) 
+        throw new Error("User does not have admin access.");
+    
     const userData = await getAllUsers();
-    const usersWithReports = userData.filter(
-        (user) => user.reportsIds && user.reportsIds.length > 0
+    
+    const usersWithReports = userData.filter((user) => 
+        user.reportsIds && user.reportsIds.length > 0
     );
+    
     if (usersWithReports.length === 0) {
         throw new Error("No reports found.");
     }
-    console.log("usersWithReports:",usersWithReports);
+    
+    //console.log("usersWithReports:",usersWithReports);
 
     const reportWithId = userData.flatMap(user => 
         (user.reportsIds || []).filter(report => report.report_id === reportId)
-      );
-      console.log("reportWithId:",reportWithId);
+    );
+    
+    //console.log("reportWithId:",reportWithId);
 
-    if(reportWithId == null){
+    if(!reportWithId){
         throw new Error("Report with report id provided is not found");
     }
+    
     return reportWithId;
 };
 
