@@ -469,53 +469,68 @@ export const removeLandlordReview = async (userId, landlordId, landlordReviewId 
 
 // Function: Add a property to user's bookmarks
 export const addBookmark = async (userId, propertyId) => {
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
-if (!propertyId || !validators.isValidUuid(propertyId))
-throw "Invalid property ID input";
 
-const userCollection = await users();
-const updateInfo = await userCollection.updateOne(
-{ userId: userId },
-{ $addToSet: { bookmarkedProperties: propertyId } }
-);
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
 
-if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-throw "Failed to add bookmark";
+    if (!propertyId || !validators.isValidUuid(propertyId))
+        throw "Invalid property ID input";
 
-return { bookmarkAdded: true };
+    const userCollection = await users();
+
+    const updateInfo = await userCollection.updateOne(
+        { userId: userId },
+        { $addToSet: { bookmarkedProperties: propertyId } }
+    );
+
+    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        throw "Failed to add bookmark";
+
+    return { bookmarkAdded: true };
+    
 };
 
 // Function: Remove a property from user's bookmarks
 export const removeBookmark = async (userId, propertyId) => {
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
-if (!propertyId || !validators.isValidUuid(propertyId))
-throw "Invalid property ID input";
 
-const userCollection = await users();
-const updateInfo = await userCollection.updateOne(
-{ userId: userId },
-{ $pull: { bookmarkedProperties: propertyId } }
-);
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
 
-if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-throw "Failed to remove bookmark";
+    if (!propertyId || !validators.isValidUuid(propertyId))
+        throw "Invalid property ID input";
 
-return { bookmarkRemoved: true };
+    const userCollection = await users();
+    
+    const updateInfo = await userCollection.updateOne(
+        { userId: userId },
+        { $pull: { bookmarkedProperties: propertyId } }
+    );
+
+    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        throw "Failed to remove bookmark";
+
+    return { bookmarkRemoved: true };
+    
 };
 
 // Function: Get all bookmarked properties for a user
 export const getBookmarkedProperties = async (userId) => {
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
 
-const userCollection = await users();
-const user = await userCollection.findOne(
-{ userId: userId },
-{ projection: { bookmarkedProperties: 1 } }
-);
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
 
-if (!user) throw "User not found";
+    const userCollection = await users();
 
-return user.bookmarkedProperties || [];
+    const user = await userCollection.findOne(
+        { userId: userId },
+        { projection: { bookmarkedProperties: 1 } }
+    );
+
+    if (!user) 
+        throw "User not found";
+
+    return user.bookmarkedProperties || [];
+    
 };
 
 export const searchPropertiesByName = async (title) => {
