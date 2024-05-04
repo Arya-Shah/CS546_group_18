@@ -125,7 +125,6 @@ throw "Invalid last name input";
     
     if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
         throw 'Invalid password input';
-a
 //Retrieve user collection
 const userCollection = await users();
 
@@ -259,12 +258,10 @@ updatedUserData.hashedPassword = await bcrypt.hash(
 }
 if(updatedUser.reportsIds){
     updatedUserData.reportsIds = updatedUser.reportsIds;
-    console.log("dude here!!");
 }
-
 //Update user with object
 const updateResponse = await userCollection.updateOne(
-{ userId: userId },
+{ _id:new ObjectId(userId) },
 { $set: updatedUserData }
 );
 console.log(updateResponse);
