@@ -169,7 +169,6 @@ export const registerUser = async (firstName, lastName, username, password, city
     
     //New User Object
     let newUser = {
-        userId: uuid(),
         firstName: firstName.trim(),
         lastName: lastName.trim(),
         username: username.trim().toLowerCase(),
@@ -203,129 +202,124 @@ export const registerUser = async (firstName, lastName, username, password, city
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
-    console.log(userId,updatedUser);
 
+    //Validation
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+    
+    if (!updatedUser || typeof updatedUser !== "object" || Array.isArray(updatedUser))
+        throw "Invalid updatedUser input";
+
+    //Retrieve user collection
+    const userCollection = await users();
+    
+    //Create object for updated user information
+    const updatedUserData = {};
+    
+    //Validate and add updated user information to object
+    if (updatedUser.firstName) {
+        if (!updatedUser.firstName || !validators.isValidString(updatedUser.firstName) || updatedUser.firstName.trim().length === 0)
+            throw new Error("Invalid first name input");
+    
+        updatedUserData.firstName = updatedUser.firstName.trim();
+    }
+    
+    if (updatedUser.lastName) {
+        if (!updatedUser.lastName || !validators.isValidString(updatedUser.lastName) || updatedUser.lastName.trim().length === 0)
+            throw new Error("Invalid last name input");
+        
+        updatedUserData.lastName = updatedUser.lastName.trim();       
+    }
+
+    if (updatedUser.username) {
+        
+        if (!updatedUser.username || !validators.isValidString(updatedUser.username) || updatedUser.username.trim().length === 0)
+            throw new Error("Invalid username input");
+
+        //Check if username exists
+        const userRow = await getUserByName(updatedUser.username);
+        
+        if(userRow && updatedUser.username === userRow.username)
+            throw "Username Already Exists."
+        
+        updatedUserData.username = updatedUser.username.trim();       
+    }
+
+    if (updatedUser.password) {
+        
+        if (!updatedUser.password || !validators.isValidPassword(updatedUser.password) || updatedUser.password.trim().length === 0)
+            throw new Error("Invalid password input");
+    
+        updatedUserData.hashedPassword = await bcrypt.hash(updatedUser.password, saltRounds);
+        
+    }
+
+    if (updatedUser.city) {
+        
+        if (!updatedUser.city || !validators.isValidString(updatedUser.city) || updatedUser.city.trim().length === 0)
+            throw new Error("Invalid city input");
+    
+        updatedUserData.city = updatedUser.city.trim();
+        
+    }
+    
+    if (updatedUser.state) {
+        
+        if (!updatedUser.state || !validators.isValidString(updatedUser.state) || updatedUser.state.trim().length === 0)
+            throw new Error("Invalid state input");
+    
+        updatedUserData.state = updatedUser.state.trim();
+        
+    }
+    
+    if (updatedUser.email) {
+        
+        if (!updatedUser.email || !validators.isValidEmail(updatedUser.email) || updatedUser.email.trim().length === 0)
+            throw new Error("Invalid email input");
+        
+        updatedUserData.email = updatedUser.email.trim().toLowerCase();
+        
+    }
+
+    if(updatedUser.reportsIds){
+
+        updatedUserData.reportsIds = updatedUser.reportsIds;
+        
+    }
+    
+    //Update user with object
+    const updateResponse = await userCollection.updateOne(
+        { _id: new ObjectId(userId) },
+        { $set: updatedUserData });
+    
+    //Validation (cont.)
+    if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
+        throw "Error occurred while updating user";
+    
+    //Return
+    return { userUpdated: true };
+    
+};
+    
+//Function: removeUser
+export const removeUser = async (userId) => {
+    
     //Validation
     if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
     
-    if (
-    !updatedUser ||
-    typeof updatedUser !== "object" ||
-    Array.isArray(updatedUser)
-    )
-    throw new Error("Invalid updatedUser input");
-
-//Retrieve user collection
-const userCollection = await users();
-
-//Create object for updated user information
-const updatedUserData = {};
-
-//Validate and add updated user information to object
-if (updatedUser.firstName) {
-if (
-    !updatedUser.firstName ||
-    !validators.isValidString(updatedUser.firstName) ||
-    updatedUser.firstName.trim().length === 0
-)
-    throw new Error("Invalid first name input");
-
-updatedUserData.firstName = updatedUser.firstName.trim();
-}
-
-if (updatedUser.lastName) {
-if (
-    !updatedUser.lastName ||
-    !validators.isValidString(updatedUser.lastName) ||
-    updatedUser.lastName.trim().length === 0
-)
-    throw new Error("Invalid first name input");
-
-updatedUserData.lastName = updatedUser.lastName.trim();
-}
-
-if (updatedUser.email) {
-if (
-    !updatedUser.email ||
-    !validators.isValidEmail(updatedUser.email) ||
-    updatedUser.email.trim().length === 0
-)
-    throw new Error("Invalid email input");
-
-updatedUserData.email = updatedUser.email.trim().toLowerCase();
-}
-
-if (updatedUser.city) {
-if (
-    !updatedUser.city ||
-    !validators.isValidString(updatedUser.city) ||
-    updatedUser.city.trim().length === 0
-)
-    throw new Error("Invalid city input");
-
-updatedUserData.city = updatedUser.city.trim();
-}
-
-if (updatedUser.state) {
-if (
-    !updatedUser.state ||
-    !validators.isValidString(updatedUser.state) ||
-    updatedUser.state.trim().length === 0
-)
-    throw new Error("Invalid state input");
-
-updatedUserData.state = updatedUser.state.trim();
-}
-
-if (updatedUser.password) {
-if (
-    !updatedUser.password ||
-    !validators.isValidPassword(updatedUser.password) ||
-    updatedUser.password.trim().length === 0
-)
-    throw new Error("Invalid password input");
-
-updatedUserData.hashedPassword = await bcrypt.hash(
-    updatedUser.password,
-    saltRounds
-);
-}
-if(updatedUser.reportsIds){
-    updatedUserData.reportsIds = updatedUser.reportsIds;
-}
-//Update user with object
-const updateResponse = await userCollection.updateOne(
-{ _id:new ObjectId(userId) },
-{ $set: updatedUserData }
-);
-console.log(updateResponse);
-
-//Validation (cont.)
-if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
-throw "Error occurred while updating user";
-
-//Return
-return { userUpdated: true };
-};
-
-//Function: removeUser
-export const removeUser = async (userId) => {
-//Validation
-if (!userId || !validators.isValidUuid(userId)) throw "Invalid user ID input";
-
-//Retreive User Collection
-const userCollection = await users();
-
-//Delete user
-const deletionInfo = await userCollection.deleteOne({ userId: userId });
-
-//Validation (cont.)
-if (deletionInfo.deletedCount === 0) {
-throw `Error occurred while deleting user with ID ${userId}`;
-}
-
-//Return
-return { userDeleted: true };
+    //Retreive User Collection
+    const userCollection = await users();
+    
+    //Delete user
+    const deletionInfo = await userCollection.deleteOne({ userId: userId });
+    
+    //Validation (cont.)
+    if (deletionInfo.deletedCount === 0) {
+    throw `Error occurred while deleting user with ID ${userId}`;
+    }
+    
+    //Return
+    return { userDeleted: true };
 };
 
 //Function: addLandlordReview
