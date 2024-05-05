@@ -16,3 +16,4 @@ const getCollectionFn = (collection) => {
 // Note: You will need to change the code below to have the collection required by the assignment!
 export const properties = getCollectionFn('properties');
 export const users = getCollectionFn('users');
+export const threads = getCollectionFn('threads');

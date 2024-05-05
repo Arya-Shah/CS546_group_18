@@ -54,23 +54,55 @@ const showSuccess = (input) => {
 }
 
 
-form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    let isUsernameValid = checkUsername(),
-        isPasswordValid = checkPassword()
-    let isFormValid = isUsernameValid &&
-        isPasswordValid
-    if (isFormValid) {
-        form.submit();
+// form.addEventListener('submit', function (e) {
+//     e.preventDefault();
+//     let isUsernameValid = checkUsername(),
+//         isPasswordValid = checkPassword()
+//     let isFormValid = isUsernameValid &&
+//         isPasswordValid
+//     if (isFormValid) {
+//         form.submit();
+//     }
+// });
+
+// form.addEventListener('input', function (e) {
+//     switch (e.target.id) {
+//         case 'username':
+//             checkUsername();
+//             break;
+//         case 'password':
+//             checkPassword();
+//     }
+// });
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the current URL pathname
+    const currentPath = window.location.pathname;
+    console.log(currentPath);
+
+    // Check if the current page is the '/report' page
+    if (currentPath === '/report') {
+        const reportForm = document.getElementById('reportForm');
+        if (reportForm) {
+            reportForm.addEventListener('submit', (event) => {
+                // Validate report form fields
+                const isValid = validateReportForm();
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission
+
+                    // Display error message to the user
+                    const errorElement = document.getElementById('reportedItemIdError');
+                    errorElement.style.color = 'red';
+                    errorElement.innerText = 'Please fill in all fields.';
+                }
+            });
+        }
     }
 });
 
-form.addEventListener('input', function (e) {
-    switch (e.target.id) {
-        case 'username':
-            checkUsername();
-            break;
-        case 'password':
-            checkPassword();
-    }
-});
+function validateReportForm() {
+    const reportedItemType = document.getElementById('reportedItem_type').value;
+    const reportedItemId = document.getElementById('reportedItemId').value;
+    const reportReason = document.getElementById('reportReason').value;
+    return (reportedItemType && reportedItemId && reportReason);
+}

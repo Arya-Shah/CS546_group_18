@@ -144,7 +144,6 @@ router.route('/report').get(async (req,res)=>{
     //   res.status(500).render('report', { layout: 'main',error: 'you cannot raise a report since you do not have an apartment!', });
     // }else{
       const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type);
-      console.log("is greater");
       res.status(200).render('report', { layout: 'main',
       success: 'successfully reported!', });
     // }
