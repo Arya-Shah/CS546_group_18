@@ -781,8 +781,70 @@ export const getReportbyId = async(reportId, userId) =>{
     return reportWithId;
 };
 
+export const updateReportStatus= async(userId, reportId,newStatus) =>{
+
+    const errorObject = {
+        status:400
+    }
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+
+    if (!reportId || !validators.isValidUuid(reportId)) 
+        throw "Invalid report ID input";
+    
+    const adminData = await getUserById(userId);
+    
+    if (!adminData.isAdmin) 
+{        errorObject.error="User does not have admin access.";
+        throw errorObject;
+}    
+    const reportData = await getReportbyId(reportId,userId);
+    
+    if(!reportData){
+        errorObject.error="Report with report id provided is not found";
+        throw errorObject;
+    }
+    
+    if( newStatus === "Accepted" || newStatus === "Rejected"){
+        reportData[0].status = newStatus;
+    }else {
+        errorObject.error="Invalid status update requested";
+        throw errorObject;
+    }
+    
+
+    const userData = await getUserById(reportData[0].userId);
+
+    if(!userData) 
+{        errorObject.error="No user data found.";
+        throw errorObject;
+}
+    // const reportWithId = userData.map(user =>
+    //     (user.reportsIds || []).filter(report => report.report_id === reportId));
+    
+
+    //const reportWithId = userData.reportsIds.find(report => report.report_id === reportId);
+    // const updatedReportsIds = userData.reportsIds.filter(report => report.report_id !== reportId);
+    const updatedReportsIds = userData.reportsIds.map(report => 
+        report.report_id === reportId ? { ...report, status: newStatus } : report
+    );
+
+    const updateResult = await updateUserReportIds(userId, updatedReportsIds);
+    if (!updateResult)
+{      errorObject.error="Failed to update user information with the report.";
+        throw errorObject;
+}
+
+    return reportData[0].status;
+  
+
+}
+
 export const updatePostReportStatus= async(userId, reportId) =>{
 
+    const errorObject = {
+        status:400
+    }
     if (!userId || !validators.isValidUuid(userId)) 
 {        errorObject.error= "Invalid user ID input";
     throw errorObject;
@@ -831,7 +893,10 @@ export const updatePostReportStatus= async(userId, reportId) =>{
 };
 
 export const updateDeleteReportStatus= async(userId,reportId) =>{
-
+    
+    const errorObject = {
+        status:400
+    }
     if (!userId || !validators.isValidUuid(userId)) 
 {        errorObject.error= "Invalid user ID input";
     throw errorObject;
@@ -860,10 +925,60 @@ return updatedReportData;
 };
 
 export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
-//Retrieve Landlord
-// const landlord = await getUserById(landlordId);
-const userData = await getUserById(userId);
+    //Retrieve Landlord
+    // const landlord = await getUserById(landlordId);
 
+    const errorObject = {
+        status:400
+    }
+    const userData = await getUserById(userId);
+    
+    const date = new Date().toISOString(); //date when report is raised.
+    if (!reportData || Object.keys(reportData).length === 0)
+{      errorObject.error="Invalid Report: Report content is required.";
+        throw errorObject;
+}    if (userData.isLandlord === true)
+{      errorObject.error="no access since landlord";
+        throw errorObject
+}    
+      const updatedReportData = {
+        report_id: uuid(),
+        userId: null, //user id of customer reporter_id/userId
+        reported_item_type: null, //property or landlord
+        report_reason: null, //report reason
+        report_description: null, //description of reporting
+        reported_at: null, // date of report raised
+        status: "pending", //status of the report which is managed by landlord
+        resolved_at: null, // Date when status is resolved.
+      };
+    
+    //Validation (cont.) and add to report object
+    if (!userId || !validators.isValidUuid(userId)) {
+    errorObject.error="Invalid user ID input";
+    throw errorObject;
+    } else {
+        updatedReportData.userId = userId;
+    }
+    updatedReportData.reported_at = date;
+    updatedReportData.report_description=reportData;
+    updatedReportData.report_reason = reportReason;
+    updatedReportData.reported_item_type=reportedItemType;
+    userData.reportsIds.push(updatedReportData);
+  
+  
+    // complete the validation before using this method!
+    // const userReportUpdateStatus = await updateUser(
+    //    userId ,userData
+    // );
+  
+    // if (!userReportUpdateStatus)
+    //   errorObject.error="Failed to update user information with the report.");
+    //const updatedReportsIds = userData.reportsIds ? [...userData.reportsIds] : [updatedReportData];
+    const updateResult = await updateUserReportIds(userId, userData.reportsIds);
+    if (!updateResult)
+{      errorObject.error="Failed to update user information with the report.";
+    throw errorObject;
+}
     // //Update User with report id
     // const userUpdateStatus = await updateUser(
     // { userId: userId },
@@ -887,3 +1002,10 @@ const userData = await getUserById(userId);
     //Return
     return { reportAdded: true };
     };
+
+const updateUserReportIds = async (userId, updatedReportsIds) => {
+    return await updateUser(
+        userId,
+        { reportsIds: updatedReportsIds } // Using $push to add the reportId to the reportsIds array
+    );
+};

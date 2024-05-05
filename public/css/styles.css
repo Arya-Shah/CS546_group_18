@@ -220,3 +220,27 @@ font-size: 90%;
     background-color: red;
     color: white;
 }
+#searchForm {
+    display: inline-block;
+    margin: 0;
+  }
+  
+  #searchForm label,
+  #searchForm select,
+  #searchForm input {
+    font-size: 14px;
+    padding: 5px;
+    margin-right: 5px;
+  }
+  
+  #searchForm button {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+  
+  /* Optional: Adjust width of select and input fields */
+  #searchType,
+  #searchQuery {
+    width: 150px;
+  }
+  

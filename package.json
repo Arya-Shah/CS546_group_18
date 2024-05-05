@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "debug": "nodemon --inspect app.js"
   },
   "author": "Arya Shah  20012884, Connor S. Durkin 10443573 , Jayanth Kanala 20020619 , Gnaneswar Koyalamoodi 20017853 ",
   "license": "ISC",

@@ -1,9 +1,9 @@
-import usersRoutes from './auth_routes.js';
+import authRoutes from './auth_routes.js';
 import userRoutes from './user_routes.js';
 
 
 const constructorMethod = (app) => {
-    app.use('/', usersRoutes);
+    app.use('/', authRoutes);
     app.use('/user', userRoutes)
 
 app.use('*', (req, res) => {
