@@ -671,6 +671,57 @@ export const getReportbyId = async(reportId, userId) =>{
     return reportWithId;
 };
 
+export const updateReportStatus= async(userId, reportId,newStatus) =>{
+
+    if (!userId || !validators.isValidUuid(userId)) 
+        throw "Invalid user ID input";
+
+    if (!reportId || !validators.isValidUuid(reportId)) 
+        throw "Invalid report ID input";
+    
+    const adminData = await getUserById(userId);
+    
+    if (!adminData.isAdmin) 
+        throw new Error("User does not have admin access.");
+    
+    const reportData = await getReportbyId(reportId,userId);
+    
+    if(!reportData){
+        throw new Error("Report with report id provided is not found");
+    }
+    
+    if( newStatus === "Accepted" || newStatus === "Rejected"){
+        reportData[0].status = newStatus;
+    }else {
+        throw new Error("Invalid status update requested");
+    }
+    
+
+    const userData = await getUserById(reportData[0].userId);
+
+    if(!userData) 
+        throw new Error("No user data found.");
+
+    // const reportWithId = userData.map(user =>
+    //     (user.reportsIds || []).filter(report => report.report_id === reportId));
+    
+
+    //const reportWithId = userData.reportsIds.find(report => report.report_id === reportId);
+    // const updatedReportsIds = userData.reportsIds.filter(report => report.report_id !== reportId);
+    const updatedReportsIds = userData.reportsIds.map(report => 
+        report.report_id === reportId ? { ...report, status: newStatus } : report
+    );
+
+    const updateResult = await updateUserReportIds(userId, updatedReportsIds);
+    if (!updateResult)
+      throw new Error("Failed to update user information with the report.");
+
+
+    return reportData[0].status;
+  
+
+}
+
 export const updatePostReportStatus= async(userId, reportId) =>{
 
     if (!userId || !validators.isValidUuid(userId)) 
@@ -777,11 +828,15 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
   
   
     // complete the validation before using this method!
-    const userReportUpdateStatus = await updateUser(
-       userId ,userData
-    );
+    // const userReportUpdateStatus = await updateUser(
+    //    userId ,userData
+    // );
   
-    if (!userReportUpdateStatus)
+    // if (!userReportUpdateStatus)
+    //   throw new Error("Failed to update user information with the report.");
+    //const updatedReportsIds = userData.reportsIds ? [...userData.reportsIds] : [updatedReportData];
+    const updateResult = await updateUserReportIds(userId, userData.reportsIds);
+    if (!updateResult)
       throw new Error("Failed to update user information with the report.");
 
     
@@ -808,3 +863,10 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     //Return
     return { reportAdded: true };
     };
+
+const updateUserReportIds = async (userId, updatedReportsIds) => {
+    return await updateUser(
+        userId,
+        { reportsIds: updatedReportsIds } // Using $push to add the reportId to the reportsIds array
+    );
+};

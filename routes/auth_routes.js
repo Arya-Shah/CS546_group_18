@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 
-import {registerUser,loginUser,addLandLordReport,getAllPendingReports,updatePostReportStatus} from '../data/users.js';
+import {registerUser,loginUser,addLandLordReport,getAllPendingReports,updateReportStatus} from '../data/users.js';
 
 router.route('/').get(async (req, res) => {
 //code here for GET THIS ROUTE SHOULD NEVER FIRE BECAUSE OF MIDDLEWARE #1 IN SPECS.
@@ -164,21 +164,22 @@ router.route('/moderator').get(async (req,res)=>{
   }
 });
 
-router.route('/moderator').get(async (req, res) => {
-    try {
-        const userId = req.session.user._id;
-        const pendingReports = await getAllPendingReports(userId);
-        return res.status(200).render('moderator', { layout: 'main', error: '', pendingReports });
-    } catch (e) {
-        res.status(500).render('moderator', { error: e, form: req.body });
-    }
-});
+// router.route('/moderator').get(async (req, res) => {
+//     try {
+//         const userId = req.session.user._id;
+//         const pendingReports = await getAllPendingReports(userId);
+//         return res.status(200).render('moderator', { layout: 'main', error: '', pendingReports });
+//     } catch (e) {
+//         res.status(500).render('moderator', { error: e, form: req.body });
+//     }
+// });
 
 router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
     try {
+        const status = "Accepted";
         const reportId = req.params.reportId;
         const userId = req.params.userId;
-        const result = await updatePostReportStatus(userId,reportId);
+        const result = await updateReportStatus(userId,reportId,status);
         console.log("updated result:",result);
         // updatePostReportStatus
 
@@ -194,13 +195,16 @@ router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
 
 router.route('/moderator/reject/:userId/:reportId').post(async (req, res) => {
     try {
+        const status = "Rejected";
         const reportId = req.params.reportId;
+        const userId = req.params.userId;
+        const result = await updateReportStatus(userId,reportId,status);
         // updatePostReportStatus
 
         // Implement logic to accept the report with the given reportId
         // For example, update the status of the report in the database
         // Once the report is accepted, you can redirect or respond accordingly
-        return res.status(200).json({ message: 'Report accepted successfully.' });
+        return res.status(200).json({ message: 'Report Rejected successfully.' });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
