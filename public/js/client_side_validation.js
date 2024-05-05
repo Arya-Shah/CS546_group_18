@@ -106,3 +106,21 @@ function validateReportForm() {
     const reportReason = document.getElementById('reportReason').value;
     return (reportedItemType && reportedItemId && reportReason);
 }
+
+$(document).ready(() => {
+    $('#searchForm').show();
+    $('#searchForm').submit((event) => {
+        event.preventDefault();
+        const searchType = $('#searchType').val().trim();
+        $('#searchResults').empty();
+        if (searchType === '') {
+            alert('Please select a search type to filter what exaclty are you searching for!');
+            return;
+        }
+        const searchTerm = $('#searchQuery').val().trim();
+        if (searchTerm === '') {
+            alert('Please enter text in search bar to get results.');
+            return;
+        }
+    })
+});
