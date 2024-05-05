@@ -6,7 +6,7 @@ import {
 getAllUsers,
 getUserById,
 updateUser,
-removeUser,
+// removeUser,
 addLandlordReview,
 removeLandlordReview,
 addBookmark,
@@ -34,13 +34,29 @@ addLandLordReport
 router.route('/')
 .get(async (req, res) => {
 try {
-let id = req.session.user._id;
+let id = req.session.user.userId;
     const user = await getUserById(id);
     return res.status(200).render("user", {
         user:user,
     });
-} catch (e) {
-    return res.status(404).json({ error: e.toString() });
+}catch (e) {
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 })
 // .put(async (req, res) => {
@@ -164,7 +180,23 @@ if (!user) {
 }
 res.render('user', { user, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -182,7 +214,23 @@ if (!landlord) {
 }
 res.render('landlordDetails', { landlord, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -200,7 +248,23 @@ if (!property) {
 }
 res.render('propertyDetails', { property, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -273,7 +337,23 @@ try {
 const reviews = await getReviewsByUserId(landlordId); // Assume this function exists
 res.render('landlordReview', { reviews, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -291,7 +371,23 @@ try {
 const reviews = await getReviewsByUserId(propertyId); // Assume this function exists
 res.render('propertyReview', { reviews, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -303,7 +399,23 @@ try {
 const threads = await getAllForumThreads();
 res.render('communityForum', { threads, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 
@@ -319,7 +431,23 @@ try {
 const results = await searchPropertiesByName(searchTerm);
 res.render('searchResults', { results, searchTerm, layout: 'main' });
 } catch (e) {
-res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    if (
+    typeof e === "object" &&
+    e !== null &&
+    !Array.isArray(e) &&
+    "status" in e &&
+    "error" in e
+    ) {
+    return res.status(e.status).render("error", {
+        title: "Error",
+        error: e.error,
+    });
+    } else {
+    return res.status(400).render("error", {
+        title: "Error",
+        error: e,
+    });
+    }
 }
 });
 

@@ -54,26 +54,26 @@ const showSuccess = (input) => {
 }
 
 
-// form.addEventListener('submit', function (e) {
-//     e.preventDefault();
-//     let isUsernameValid = checkUsername(),
-//         isPasswordValid = checkPassword()
-//     let isFormValid = isUsernameValid &&
-//         isPasswordValid
-//     if (isFormValid) {
-//         form.submit();
-//     }
-// });
+form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    let isUsernameValid = checkUsername(),
+        isPasswordValid = checkPassword()
+    let isFormValid = isUsernameValid &&
+        isPasswordValid
+    if (isFormValid) {
+        form.submit();
+    }
+});
 
-// form.addEventListener('input', function (e) {
-//     switch (e.target.id) {
-//         case 'username':
-//             checkUsername();
-//             break;
-//         case 'password':
-//             checkPassword();
-//     }
-// });
+form.addEventListener('input', function (e) {
+    switch (e.target.id) {
+        case 'username':
+            checkUsername();
+            break;
+        case 'password':
+            checkPassword();
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     // Get the current URL pathname
