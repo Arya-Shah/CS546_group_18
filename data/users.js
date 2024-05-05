@@ -23,7 +23,7 @@ export const getAllUsers = async () => {
 //Function: loginUser
 export const loginUser = async (username, password) => {
 
-    let errorObject = {
+    const errorObject = {
     status: 400,
     };
     
@@ -33,7 +33,8 @@ export const loginUser = async (username, password) => {
     }
 
     if(username.length < 5 || username.length > 10){
-    errorObject.error = 'Username should be between 5 and 10.' ;
+    errorObject.error = 'Username should be between 5 and 10 characters.';
+    throw errorObject;
     }
     
     if (!/^[a-zA-Z\s]+$/.test(username)) {
@@ -59,6 +60,7 @@ export const loginUser = async (username, password) => {
     }
     
     let compareResult = await bcrypt.compare(password, userRow.hashedPassword);
+
     if (!compareResult) {
     errorObject.error = "Either the username or password is invalid";
     throw errorObject;
@@ -139,6 +141,15 @@ export const registerUser = async (firstName, lastName, username, password, city
     if (!username || !validators.isValidString(username) || username.trim().length === 0)
         throw 'Invalid user name input';
 
+    //Check if username exists
+    const userRow = await getUserByName(username);
+    
+    if(userRow && username === userRow.username){
+        throw "Username Already Exists."
+    }
+
+    //Validations (cont.)
+
     if (!password || !validators.isValidPassword(password) || password.trim().length === 0)
         throw 'Invalid password input';
 
@@ -152,18 +163,11 @@ export const registerUser = async (firstName, lastName, username, password, city
         throw 'Invalid state input';
 
     //To Do: additional validation for isLandlord and isAdmin needed?
-    if (!isLandlord)
-        throw 'An indication whether the user is a landlord or not is required.';
+    //if (!isLandlord)
+        //throw 'An indication whether the user is a landlord or not is required.';
 
-    if (!isAdmin)
-        throw 'An indication whether the user is a landlord or not is required.';
-
-    //Check if username exists
-    const userRow = await getUserByName(username);
-    
-    if(userRow && username === userRow.username){
-        throw "Username Already Exists."
-    }
+    //if (!isAdmin)
+        //throw 'An indication whether the user is a landlord or not is required.';
 
     //Retrieve user collection
     const userCollection = await users();
@@ -208,6 +212,8 @@ export const registerUser = async (firstName, lastName, username, password, city
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
 
+    //console.log(userId,updatedUser);
+
     //Validation
     if (!userId || !validators.isValidUuid(userId)) 
         throw "Invalid user ID input";
@@ -245,7 +251,7 @@ export const updateUser = async (userId, updatedUser) => {
         const userRow = await getUserByName(updatedUser.username);
         
         if(userRow && updatedUser.username === userRow.username)
-            throw "Username Already Exists."
+            throw new Error("Username Already Exists.");
         
         updatedUserData.username = updatedUser.username.trim();       
     }
@@ -296,6 +302,8 @@ export const updateUser = async (userId, updatedUser) => {
     const updateResponse = await userCollection.updateOne(
         { _id: new ObjectId(userId) },
         { $set: updatedUserData });
+
+    //console.log(updateResponse);
     
     //Validation (cont.)
     if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
@@ -338,11 +346,12 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         throw "Invalid landlord ID input";
 
     const landlord = await getUserById(landlordId);
+
     if (!landlord)
         throw 'No landlord found with specified id.';
     
     if (!userId || !validators.isValidUuid(userId)) 
-        throw "Invalid landlord ID input";
+        throw "Invalid user ID input";
     
     if (!reviewData || Object.keys(reviewData).length === 0)
         throw "Invalid Review: Review data is required.";
@@ -351,7 +360,7 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     const updatedReviewData = {
         userId: userId,
         reviewId: uuid(),
-        date: new Date(),
+        date: new Date().toISOString(),
         reports: [],
         kindnessRating: null,
         maintenanceResponsivenessRating: null,
@@ -452,6 +461,15 @@ export const removeLandlordReview = async (userId, landlordId, landlordReviewId 
     //Pull user collection
     const userCollection = await users();
     
+    //Remove Review from Landlord
+    const landlordUpdateStatus = await userCollection.updateOne(
+        { userId: landlordId },
+        { $pull: { reviews: { reviewId: landlordReviewId } } }
+    );
+
+    if (!landlordUpdateStatus.acknowledged || landlordUpdateStatus.modifiedCount === 0)
+        throw "Failed to update landlord information with removed review.";
+
     //Try to pull review id from userid
     let userUpdateStatus = await userCollection.updateOne(
         { userId: userId },
@@ -462,18 +480,9 @@ export const removeLandlordReview = async (userId, landlordId, landlordReviewId 
     if (!userUpdateStatus.acknowledged || userUpdateStatus.modifiedCount === 0)
         throw "Failed to remove landlord review id from user.";
     
-    const landlordUpdateStatus = await userCollection.updateOne(
-        { userId: landlordId },
-        { $pull: { reviews: { reviewId: landlordReviewId } } }
-    );
-    
-    if (!landlordUpdateStatus.acknowledged || landlordUpdateStatus.modifiedCount === 0)
-    throw "Failed to update landlord information with removed review.";
-    
     //Return
     return { landlordReviewPulled: true };
 };
-
 
 // Function: addBookmark
 export const addBookmark = async (userId, propertyId) => {
@@ -593,7 +602,7 @@ export const searchPropertiesByName = async (title) => {
 export const getAllPendingReports = async (userId) => {
 
     if (!userId || !validators.isValidUuid(userId)) 
-        throw "Invalid user ID input";
+        throw new Error("Invalid user ID input");
     
     const adminData = await getUserById(userId);
   
@@ -672,11 +681,15 @@ export const updatePostReportStatus= async(userId, reportId) =>{
     
     const adminData = await getUserById(userId);
     
+    //console.log(adminData,reportId);
+
     if (!adminData.isAdmin) 
         throw new Error("User does not have admin access.");
     
     const reportData = await getReportbyId(reportId);
-        
+      
+    //console.log("reportData:",reportData);
+
     if(!reportData){
         throw new Error("Report with report id provided is not found.");
     }
@@ -695,8 +708,7 @@ export const updatePostReportStatus= async(userId, reportId) =>{
     
     //Check the report with report ID is in user's reports
     const reportWithId = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.report_id === reportId)
-    );
+        (user.reportsIds || []).filter(report => report.report_id === reportId));
         
     //console.log("reportWithId:",reportWithId);
     
@@ -715,7 +727,7 @@ export const updateDeleteReportStatus= async(userId,reportId) =>{
     const adminData = await getUserById(userId);
     
     if (!adminData.isAdmin) 
-        throw new Error("user doesn't have access");
+        throw new Error("User does not have admin access.");
     
     const reportData = await getReportbyId(reportId);
     
@@ -729,51 +741,50 @@ export const updateDeleteReportStatus= async(userId,reportId) =>{
   
 };
 
-
-export const addLandLordReport = async (userId, reportDescription, reportReason, reportedItemType) => {
-    
-    if (!userId || !validators.isValidUuid(userId)) 
-        throw "Invalid user ID input";
-
-    if (!reportDescription || !validators.isValidString(reportDescription) || reportDescription.trim().length === 0)
-      throw "Invalid Report: reportDescription content is required.";
-
-    if (!reportReason || !validators.isValidString(reportReason)|| reportReason.trim().length === 0)
-      throw "Invalid Report: reportReason content is required.";
-
-    if (!reportedItemType || !validators.isValidString(reportedItemType) || reportedItemType.trim().length === 0 || 
-        (reportedItemType.trim().toLowerCase() !== 'property' && reportedItemType.trim().toLowerCase() !== 'landlord' && reportedItemType.trim().toLowerCase() !== 'comment' && reportedItemType.trim().toLowerCase() !== 'thread')) {
-            throw "Invalid Report: reportedItemType is required and must be 'property', 'landlord', 'comment, or 'thread.'";
-    }
-    
-    //Retrieve User Data
+export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
+    //Retrieve Landlord
+    // const landlord = await getUserById(landlordId);
     const userData = await getUserById(userId);
     
+    const date = new Date().toISOString(); //date when report is raised.
+    if (!reportData || Object.keys(reportData).length === 0)
+      throw new Error("Invalid Report: Report content is required.");
     if (userData.isLandlord === true)
-      throw "Landlords may not add reports.";
+      throw new Error("no access since landlord");
     
-    //Create object to store report data    
       const updatedReportData = {
         report_id: uuid(),
-        userId: userId, //user id of customer reporter_id/userId
-        reported_item_type: reportedItemType, //property or landlord
-        report_reason: reportReason, //report reason
-        report_description: reportDescription, //description of reporting
-        reported_at: new Date(), // date of report raised
+        userId: null, //user id of customer reporter_id/userId
+        reported_item_type: null, //property or landlord
+        report_reason: null, //report reason
+        report_description: null, //description of reporting
+        reported_at: null, // date of report raised
         status: "pending", //status of the report which is managed by landlord
         resolved_at: null, // Date when status is resolved.
       };
-
-    //Update user with reportId
-    const userCollection = await users();
     
-    const updateUserStatus = await userCollection.updateOne(
-        { userId: userId},
-        { $push: { reportIds: updatedReviewData.reportId } }
+    //Validation (cont.) and add to report object
+    if (!userId || !validators.isValidUuid(userId)) {
+    throw new Error("Invalid user ID input");
+    } else {
+        updatedReportData.userId = userId;
+    }
+    updatedReportData.reported_at = date;
+    updatedReportData.report_description=reportData;
+    updatedReportData.report_reason = reportReason;
+    updatedReportData.reported_item_type=reportedItemType;
+    userData.reportsIds.push(updatedReportData);
   
-    if (!updateUserStatus)
+  
+    // complete the validation before using this method!
+    const userReportUpdateStatus = await updateUser(
+       userId ,userData
+    );
+  
+    if (!userReportUpdateStatus)
       throw new Error("Failed to update user information with the report.");
 
+    
     // //Update User with report id
     // const userUpdateStatus = await updateUser(
     // { userId: userId },
