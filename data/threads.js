@@ -241,16 +241,16 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
                     { $push: { comments: commentToAdd } }
                 );
 
-            } else {
+            } /*else {
                 updateInfo = await threadCollection.updateOne(
                     { 'comments.commentId': threadOrCommentId },
                     { $push: { 'comments.$.replies': commentToAdd } }
                 );
-            }
+            }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-                throw 'Failed to add comment or reply.';
+                throw 'Failed to add comment.';
 
     //Update User with comment id
 
@@ -287,18 +287,18 @@ export const removeCommentReply = async (userId, threadOrCommentId) => {
         { 'comments.commentId': threadOrCommentId },
         { $pull: { comments: { commentId: threadOrCommentId } } }
     );
-
+    /*
     //If failed, try to pull reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
         updateInfo = await threadCollection.updateOne(
             { 'comments.replies.commentId': threadOrCommentId },
             { $pull: { 'comments.$.replies': { commentId: threadOrCommentId } } }
         );
-    }
+    }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to remove comment or reply.';
+            throw 'Failed to remove comment.';
 
     //Remove commentId from user's object
         const userCollection = await users();
@@ -349,7 +349,7 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
         );
 
     };
-
+    /*
     //If failed, try to add like or dislike to reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
         
@@ -368,11 +368,11 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
             );
         }
 
-    }
+    }*/
 
     //Throw Error if Failed 
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-        throw 'Failed to increment likes on comment or reply.';
+        throw 'Failed to increment likes on comment.';
 
 //Return
     return { likeAdded: true };
@@ -413,7 +413,7 @@ export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
             );
     
         };
-    
+    /*
     //If failed, try to add like or dislike to reply
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
             
@@ -432,11 +432,11 @@ export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
                 );
             }
     
-        }
+        }*/
     
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to decrement likes on comment or reply.';
+            throw 'Failed to decrement likes on comment.';
     
     //Return
         return { likeRemoved: true };
