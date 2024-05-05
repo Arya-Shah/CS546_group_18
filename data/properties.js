@@ -20,7 +20,7 @@ export const getAllProperties = async () => {
 export const getPropertyById = async (id) => {
  
     //Validation
-    if (!validators.isValidUuid(id)) throw "Invalid ID input";
+    if (!id || !validators.isValidUuid(id)) throw "Invalid ID input";
 
     //Retreive property collection and specific property
     const propertyCollection = await properties();
@@ -32,6 +32,29 @@ export const getPropertyById = async (id) => {
     //Return
     return property;
 
+};
+
+
+// Function: getPropertyByName
+export const getPropertyByName = async (name) => {
+    
+    if (!name || 
+        !validators.isValidString(name) || 
+        name.trim().length === 0) {
+            throw "Invalid address input.";
+    }
+    
+    name = name.trim().toLowerCase();
+    
+    const propertyCollection = await properties();
+
+    //Regular expression to make search case insenstive and global
+    const regex = new RegExp(name, 'gi');
+
+    const propertiesMatchingName = await propertyCollection.find({ name: regex }).toArray();
+    
+    //Note: propertiesMatchingName is an array of objects
+    return propertiesMatchingName;
 };
 
 // Function: getPropertyByAddress

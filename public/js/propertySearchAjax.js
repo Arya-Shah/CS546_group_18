@@ -10,12 +10,11 @@ You will make client - side AJAX requests to the API and use jQuery to target an
   //References to form, input, ul, div, and a elements
   let searchPropertyForm = $('#searchForm'),
       searchType = $('#searchType'),
-      searchTerm = $('#searchQuery'),
+      searchQuery = $('#searchQuery'),
       errorDiv = $('#errorDiv'),
       searchResults = $('#searchResults'),
       propertyDetails = $('#propertyDetails'),
       rootLink = $('#rootLink');
-
 
   //Ensure rootLink is hidden
   rootLink.hide();
@@ -33,55 +32,49 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     rootLink.hide();
 
     //Handle empty input
-    let searchTerm = searchTerm.val().trim();
-    if(searchTerm === ''){
+    searchQuery = searchQuery.val().trim();
+    if(searchQuery === ''){
       errorDiv.text('Please provide a search term.').show();
       return;
     } 
 
-    //TO DO: USE SEARCH TERM HERE. CONSTRUCT URL PATHS ACCORDING TO ROUTES
-    //Check searchField. Construct configurations based on value.
+    //Check searchType. Construct configurations based on value.
 
     let requestConfig = {};
 
-    if (searchType === 'address'){
+    if (searchType.val() === 'address'){
 
       requestConfig = {
         method: 'GET',
-        //getPropertyByAddressRoute 
-        url: ``
+        url: `property/searchPropertyByAddress/${searchQuery}`
       }
 
-    } else if ((searchType === 'city')) {
+    } else if ((searchType.val() === 'city')) {
 
       requestConfig = {
         method: 'GET',
-        //getPropertyByCityRoute 
-        url: ``
+        url: `property/searchPropertyByCity/${searchQuery}`
       }
 
-    } else if ((searchType === 'state')) {
+    } else if ((searchType.val() === 'state')) {
 
       requestConfig = {
         method: 'GET',
-        //getPropertyByStateRoute 
-        url: ``
+        url: `property/searchPropertyByState/${searchQuery}`
       }
       
-    } else if ((searchType === 'zip')){
+    } else if ((searchType.val() === 'zip')){
 
       requestConfig = {
         method: 'GET',
-        //getPropertyByZipcodeRoute 
-        url: ``
+        url: `property/searchPropertyByZip/${searchQuery}`
       }
 
-    } else if ((searchType === 'name')){
+    } else if ((searchType.val() === 'name')){
 
       requestConfig = {
         method: 'GET',
-        //getPropertyByName
-        url: ``
+        url: `property/searchPropertyByName/${searchQuery}`
       }
 
     } 
@@ -140,8 +133,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     //Create  request configuration 
     requestConfig = {
       method: 'GET',
-      //ADD: Route for singleproperty
-      url: ``
+      url: `property/searchPropertyById/${searchQuery}`
     };
 
     //AJAX Call
