@@ -613,12 +613,12 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
                     { $push: { comments: commentToAdd } }
                 );
 
-            } else {
+            } /*else {
                 updateInfo = await propertyCollection.updateOne(
                     { 'comments.commentId': propertyOrCommentId },
                     { $push: { 'comments.$.replies': commentToAdd } }
                 );
-            }
+            }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
@@ -662,17 +662,17 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
         { $pull: { comments: { commentId: propertyOrCommentId } } }
     );
 
-    //If failed, try to pull reply
+    /* //If failed, try to pull reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
         updateInfo = await propertyCollection.updateOne(
             { 'comments.replies.commentId': propertyOrCommentId },
             { $pull: { 'comments.$.replies': { commentId: propertyOrCommentId } } }
         );
-    }
+    }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to remove comment or reply.';
+            throw 'Failed to remove comment.';
 
     //Remove commentId from user's object
         const userCollection = await users();
@@ -683,7 +683,7 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new review.';
+            throw 'Failed to update user information with new comment ID.';
 
     //Return
         return { commentOrReplyPulled: true };
@@ -725,7 +725,7 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
 
     };
 
-
+    /*
     //If failed, try to add like or dislike to reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
         
@@ -744,11 +744,11 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
             );
         }
 
-    }
+    }*/
 
     //Throw Error if Failed 
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-        throw 'Failed to increment likes on comment or reply.';
+        throw 'Failed to increment likes on comment.';
 
 //Return
     return { likeAdded: true };
@@ -790,6 +790,7 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
     
         };
     
+    /*
     //If failed, try to add like or dislike to reply
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
             
@@ -808,7 +809,7 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
                 );
             }
     
-        }
+        }*/
     
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
