@@ -8,9 +8,9 @@ You will make client - side AJAX requests to the API and use jQuery to target an
 (function ($){
 
   //References to form, input, ul, div, and a elements
-  let searchPropertyForm = $('#searchPropertyForm'),
+  let searchPropertyForm = $('#searchForm'),
       searchType = $('#searchType'),
-      searchTerm = $('#property_search_term'),
+      searchTerm = $('#searchQuery'),
       errorDiv = $('#errorDiv'),
       searchResults = $('#searchResults'),
       propertyDetails = $('#propertyDetails'),
@@ -68,7 +68,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
         url: ``
       }
       
-    } else if ((searchType === 'zipcode')){
+    } else if ((searchType === 'zip')){
 
       requestConfig = {
         method: 'GET',
