@@ -448,3 +448,4 @@ router.post('/propertyReview', async (req, res) => {
         }
     }
 });
+export default router;

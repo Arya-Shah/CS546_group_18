@@ -122,17 +122,9 @@ return res.status(200).render("logout", {
 });
 
 router.route('/report/:reportState/:id').get(async (req,res)=>{
-  if(!req.session.user || !req.session.user.isAdmin){
+  if(!req.session.user || req.session.user.isAdmin){
       return res.status(500).render('error', { error: 'Access Denied', layout: 'main' });
   }
-  console.log(req.params.reportState,req.params.id);
-  // if property
-  if(req.params.reportState === 'property'){
-    console.log("in property");
-  }
-  // if landlord
-// if comment
-// if review
   try{
     return res.status(200).render('report',{ layout: 'main',
     error: '', 
@@ -142,16 +134,10 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
   }
 })
 .post(async (req,res) =>{
-  console.log(req.body);
-  console.log(req.params.reportState,req.params.id);
   //if report on property
-  if(req.params.reportState === 'property'){
-    console.log("in property");
-  }
 
   let report_Reason = req.body.reportReason;
-  let reportedItem_type=req.body.reportedItem_type;
-  console.log(report_Reason.length);
+  let reportedItem_type=req.params.reportState;
   if(report_Reason.length < 5){
     return res.status(400).render('report', { error: 'Enter more Description!.' });
   }else{
@@ -161,12 +147,14 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
     // if(!landlordId || landlordId === undefined || landlordId === null || landlordId === ''){
     //   res.status(500).render('report', { layout: 'main',error: 'you cannot raise a report since you do not have an apartment!', });
     // }else{
+      console.log("get userData:",userData);
       const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type);
       res.status(200).render('report', { layout: 'main',
       success: 'successfully reported!', });
     // }
     }catch(e){
-      res.status(500).render('report', { error: e, form: req.body });
+      res.status(500).json({ error: e.message });
+      // res.status(500).render('report', { error: e, form: req.body });
     }
   }
 });

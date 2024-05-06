@@ -1,4 +1,4 @@
-import { users } from "../config/mongoCollections.js";
+import { users,reports } from "../config/mongoCollections.js";
 // import uuid from 'uuid';
 // import bcrypt from 'bcrypt';
 import bcrypt from "bcryptjs";
@@ -109,7 +109,6 @@ const getUserByName = async (username) => {
 
 //Function: getUserById
 export const getUserById = async (id) => {
-        
     const errorObject = {
         status: 400,
     };
@@ -121,6 +120,7 @@ export const getUserById = async (id) => {
     //Retreive user collection and specific user
     const userCollection = await users();
     const user = await userCollection.findOne({ userId: id });
+    console.log("user:",user);
     //Validation (cont.)
     if (!user){
         errorObject.error = 'User not found';
@@ -932,12 +932,11 @@ return updatedReportData;
 export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
     //Retrieve Landlord
     // const landlord = await getUserById(landlordId);
-
     const errorObject = {
         status:400
-    }
+    }
     const userData = await getUserById(userId);
-    
+    console.log("userdata:",userData);
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
 {      errorObject.error="Invalid Report: Report content is required.";
@@ -959,6 +958,7 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     
     //Validation (cont.) and add to report object
     if (!userId || !validators.isValidUuid(userId)) {
+        console.log("invalid userID");
     errorObject.error="Invalid user ID input";
     throw errorObject;
     } else {
@@ -969,7 +969,7 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     updatedReportData.report_reason = reportReason;
     updatedReportData.reported_item_type=reportedItemType;
     userData.reportsIds.push(updatedReportData);
-  
+  console.log("in reports:",updatedReportData);
   
     // complete the validation before using this method!
     // const userReportUpdateStatus = await updateUser(
@@ -979,11 +979,30 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     // if (!userReportUpdateStatus)
     //   errorObject.error="Failed to update user information with the report.");
     //const updatedReportsIds = userData.reportsIds ? [...userData.reportsIds] : [updatedReportData];
-    const updateResult = await updateUserReportIds(userId, userData.reportsIds);
+    const updateResult = await updateUserReportIds(userId, updatedReportData);
+    console.log("updateResult:",updateResult);
     if (!updateResult)
 {      errorObject.error="Failed to update user information with the report.";
     throw errorObject;
 }
+if (!updateResult.acknowledged || !updateResult.insertedId)
+{
+    errorObject.error= "Could not create report";
+    throw errorObject;
+}
+
+// Update User with thread id
+const userCollection = await users();
+
+const userUpdateStatus = await userCollection.updateOne(
+    { userId: userId },
+    { $push: { reportsIds: updatedReportsIds.report_id } } 
+);
+
+if (!userUpdateStatus)
+{            errorObject.error= 'Failed to update user information with new report.';
+    throw errorObject
+}    
     // //Update User with report id
     // const userUpdateStatus = await updateUser(
     // { userId: userId },
@@ -1009,8 +1028,12 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     };
 
 const updateUserReportIds = async (userId, updatedReportsIds) => {
-    return await updateUser(
-        userId,
-        { reportsIds: updatedReportsIds } // Using $push to add the reportId to the reportsIds array
-    );
+    const reportsCollection = await reports();
+    const insertInfo = await reportsCollection.insertOne(updatedReportsIds);
+    // const result = await reportsCollection.updateOne({ _id: userId },{$set: updatedReportsIds})
+    return insertInfo;
+    // return await updateUser(
+    //     userId,
+    //     {$push: { reportsIds: updatedReportsIds }} // Using $push to add the reportId to the reportsIds array
+    // );
 };
