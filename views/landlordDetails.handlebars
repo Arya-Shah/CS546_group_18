@@ -1,4 +1,61 @@
 {{!-- Landlord Details --}}
+
+<!-- CHECK THAT THIS WORKS Author: {{this.author}} -->
+<!-- CORRECT BUTTON to go to path to add review -->
+
+<h2>Landlord Details</h2>
+
+<!-- Button to add a review -->
+<button onclick="addReview()">Add Review</button>
+
+<div class="landlord-details">
+ 
+<h3>Contant Information</h3>
+  <p>First Name: {{landlord.firstName}}</p>
+  <p>Last Name: {{landlord.lastName}}</p>
+  <p>City: {{landlord.city}}</p>
+  <p>State: {{landlord.state}}</p>
+  <p>Email: {{landlord.email}}</p>
+
+  <h3>Properties:</h3>
+  <ul>
+    {{#each landlord.properties}}
+    <li>{{this.name}}</li>
+    {{/each}}
+  </ul>
+
+  <h3>Average Ratings</h3>
+  <ul>
+    <li>Kindness Rating: {{landlord.averageRatings.averageKindnessRating}}</li>
+    <li>Maintenance Responsiveness Rating: {{landlord.averageRatings.averageMaintenanceResponsivenessRating}}</li>
+    <li>Overall Communication Rating: {{landlord.averageRatings.averageOverallCommunicationRating}}</li>
+    <li>Professionalism Rating: {{landlord.averageRatings.averageProfessionalismRating}}</li>
+    <li>Handiness Rating: {{landlord.averageRatings.averageHandinessRating}}</li>
+    <li>Deposit Handling Rating: {{landlord.averageRatings.averageDepositHandlingRating}}</li>
+  </ul>
+
+  <h3>All Landlord Reviews</h3>
+  <ul>
+    {{#each landlord.reviews}}
+    <li>
+      Author: {{this.author}}<br>
+      Date: {{this.date}}<br>
+      Kindness Rating: {{this.kindnessRating}}<br>
+      Maintenance Responsiveness Rating: {{this.maintenanceResponsivenessRating}}<br>
+      Overall Communication Rating: {{this.overallCommunicationRating}}<br>
+      Professionalism Rating: {{this.professionalismRating}}<br>
+      Handiness Rating: {{this.handinessRating}}<br>
+      Deposit Handling Rating: {{this.depositHandlingRating}}<br>
+      Review Text: {{this.reviewText}}
+    </li>
+    {{/each}}
+  </ul>
+  
+</div>
+
+
+<!-- Landlord Details -->
+<!--
 <h2>{{landlord.name}}</h2>
 <div class="landlord-details">
 <p>Total Properties: {{landlord.propertiesCount}}</p>
@@ -10,3 +67,4 @@
 </div>
 {{/each}}
 </div>
+-->
