@@ -1,26 +1,31 @@
 {{!-- Property Review Form --}}
 <h2>Review for {{property.name}}</h2>
+
+{{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
+
+<div id="errorDiv" class="error-message" style="color: red;"></div>
+
 <form id="propertyReviewForm">
-    <label for="rating">Rating:</label>
-    <input type="number" id="rating" name="rating" min="1" max="5" required>
-    
+
     <label for="maintenanceRating">Maintenance Rating:</label>
-    <input type="number" id="maintenanceRating" name="maintenanceRating" min="1" max="5" required>
+    <input type="range" id="maintenanceRating" name="maintenanceRating" min="1" max="5" required>
     
     <label for="locationDesirabilityRating">Location Desirability Rating:</label>
-    <input type="number" id="locationDesirabilityRating" name="locationDesirabilityRating" min="1" max="5" required>
+    <input type="range" id="locationDesirabilityRating" name="locationDesirabilityRating" min="1" max="5" required>
     
     <label for="ownerResponsivenessRating">Owner Responsiveness Rating:</label>
-    <input type="number" id="ownerResponsivenessRating" name="ownerResponsivenessRating" min="1" max="5" required>
+    <input type="range" id="ownerResponsivenessRating" name="ownerResponsivenessRating" min="1" max="5" required>
     
     <label for="propertyConditionRating">Property Condition Rating:</label>
-    <input type="number" id="propertyConditionRating" name="propertyConditionRating" min="1" max="5" required>
+    <input type="range" id="propertyConditionRating" name="propertyConditionRating" min="1" max="5" required>
     
     <label for="communityRating">Community Rating:</label>
-    <input type="number" id="communityRating" name="communityRating" min="1" max="5" required>
+    <input type="range" id="communityRating" name="communityRating" min="1" max="5" required>
     
     <label for="amenitiesRating">Amenities Rating:</label>
-    <input type="number" id="amenitiesRating" name="amenitiesRating" min="1" max="5" required>
+    <input type="range" id="amenitiesRating" name="amenitiesRating" min="1" max="5" required>
     
     <label for="reviewText">Review:</label>
     <textarea id="reviewText" name="reviewText" required></textarea>

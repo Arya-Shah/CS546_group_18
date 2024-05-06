@@ -13,7 +13,8 @@ addBookmark,
 removeBookmark,
 getBookmarkedProperties,
 searchPropertiesByName,
-addLandLordReport
+addLandLordReport,
+addLandlordReview
 } from '../data/users.js'; 
 
 // const router = express.Router();
@@ -322,133 +323,176 @@ try {
 }
 });
 
+/*
+
+NOTE FROM CONNOR: the render('landlordReview) and ('propertyReview) handle bars are now used
+for the intake forms to submit these reviews. Sorry - I thought that was their purpose.
+Below I've added redirects, which will render the individual landlord's and properties's ids. 
 
 // Landlord review page
 router.route('/review/landlord/:landlordId')
-.get(async (req, res) => {
-// The implementation depends on whether you want to display all reviews for a landlord
-// or just render a form for submitting a new review. 
-// For now, let's assume it's for displaying all reviews for a landlord.
-const landlordId = req.params.landlordId;
-if (!helpers.isValidUuid(landlordId)) {
-return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
-}
-try {
-const reviews = await getReviewsByUserId(landlordId); // Assume this function exists
-res.render('landlordReview', { reviews, layout: 'main' });
-} catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
+    .get(async (req, res) => {
+ 
+    const landlordId = req.params.landlordId;
+    if (!helpers.isValidUuid(landlordId)) {
+    return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
     }
-}
-});
+    try {
+    const reviews = await getReviewsByUserId(landlordId); // Assume this function exists
+    res.render('landlordReview', { reviews, layout: 'main' });
+    } catch (e) {
+    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    }
+    });
 
 // Property review page
 router.route('/review/property/:propertyId')
-.get(async (req, res) => {
-// The implementation depends on whether you want to display all reviews for a property
-// or just render a form for submitting a new review. 
-// For now, let's assume it's for displaying all reviews for a property.
-const propertyId = req.params.propertyId;
-if (!helpers.isValidUuid(propertyId)) {
-return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
-}
-try {
-const reviews = await getReviewsByUserId(propertyId); // Assume this function exists
-res.render('propertyReview', { reviews, layout: 'main' });
-} catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
+    .get(async (req, res) => {
+  
+    const propertyId = req.params.propertyId;
+    if (!helpers.isValidUuid(propertyId)) {
+    return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
     }
-}
-});
+    try {
+    const reviews = await getReviewsByUserId(propertyId); // Assume this function exists
+    res.render('propertyReview', { reviews, layout: 'main' });
+    } catch (e) {
+    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    }
+    });
+*/
+
+// Redirection the url below to landlord page
+router.route('/review/landlord/:landlordId')
+    .get(async (req, res) => {
+        const landlordId = req.params.landlordId;
+        if (!landlordId || !helpers.isValidUuid(landlordId)) {
+            return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
+        }
+        try {
+            res.redirect(`/landlord/${landlordId}`);
+        } catch (e) {
+            res.status(500).render('error', { error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
+        }
+    });
+
+// Redirection the url below to property page
+router.route('/review/property/:propertyId')
+    .get(async (req, res) => {
+    const propertyId = req.params.propertyId;
+    
+    if (!propertyId || !helpers.isValidUuid(propertyId)) {
+        return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
+    }
+
+    try {
+        res.redirect(`/property/${propertyId}`);
+    } catch (e) {
+        res.status(500).render('error', { error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
+    }
+
+    });
 
 // Community Forum page
-router.route('/communityForum')
-.get(async (req, res) => {
-try {
-// Replace 'getAllForumThreads' with the actual data function that retrieves forum threads
-const threads = await getAllForumThreads();
-res.render('communityForum', { threads, layout: 'main' });
-} catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
+    router.route('/communityForum')
+    .get(async (req, res) => {
+    try {
+    // Replace 'getAllForumThreads' with the actual data function that retrieves forum threads
+    const threads = await getAllForumThreads();
+    res.render('communityForum', { threads, layout: 'main' });
+    } catch (e) {
+    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
     }
-}
-});
+    });
 
 // Search Results page
-router.route('/searchResults')
-.get(async (req, res) => {
-const searchTerm = req.query.searchTerm;
-if (!helpers.isValidString(searchTerm)) {
-return res.status(400).render('error', { error: 'Invalid search term.', layout: 'main' });
-}
-try {
-// Replace 'searchPropertiesByName' with the actual function
-const results = await searchPropertiesByName(searchTerm);
-res.render('searchResults', { results, searchTerm, layout: 'main' });
-} catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
+    router.route('/searchResults')
+    .get(async (req, res) => {
+    const searchTerm = req.query.searchTerm;
+    if (!helpers.isValidString(searchTerm)) {
+    return res.status(400).render('error', { error: 'Invalid search term.', layout: 'main' });
     }
-}
+    try {
+    // Replace 'searchPropertiesByName' with the actual function
+    const results = await searchPropertiesByName(searchTerm);
+    res.render('searchResults', { results, searchTerm, layout: 'main' });
+    } catch (e) {
+    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    }
+    });
+
+//LandlordReview
+router.get('/landlordReview', (req, res) => {
+    res.render('addLandlordReview', { layout: 'main' });
 });
+router.post('/landlordReview', async (req, res) => {
+    const { 
+        kindnessRating, 
+        maintenanceResponsivenessRating, 
+        overallCommunicationRating, 
+        professionalismRating, 
+        handinessRating, 
+        depositHandlingRating, 
+        reviewText 
+    } = req.body;
+
+    const validRatings = [1, 2, 3, 4, 5];
+    const errors = [];
+
+    if (!kindnessRating || !validRatings.includes(parseInt(kindnessRating))) {
+        errors.push("Invalid kindness rating input");
+    }
+    if (!maintenanceResponsivenessRating || !validRatings.includes(parseInt(maintenanceResponsivenessRating))) {
+        errors.push("Invalid maintenance responsiveness rating input");
+    }
+    if (!overallCommunicationRating || !validRatings.includes(parseInt(overallCommunicationRating))) {
+        errors.push("Invalid overall communication rating input");
+    }
+    if (!professionalismRating || !validRatings.includes(parseInt(professionalismRating))) {
+        errors.push("Invalid professionalism rating input");
+    }
+
+    if (!handinessRating || !validRatings.includes(parseInt(handinessRating))) {
+        errors.push("Invalid handiness rating input");
+    }
+
+    if (!depositHandlingRating || !validRatings.includes(parseInt(depositHandlingRating))) {
+        errors.push("Invalid deposit handling rating input");
+    }
+
+    if (!reviewText || !validators.isValidString(reviewText.trim())) {
+        errors.push("Review text is required");
+    }
+
+    //Render landlordReview Page with any caught errors
+    if (errors.length > 0) {
+        return res.status(400).render('landlordReview', { errors });
+    } else {
+
+        try {
+
+            const result = await addLandlordReview(
+                landlordId,
+                {
+                    kindnessRating: parseInt(kindnessRating),
+                    maintenanceResponsivenessRating: parseInt(maintenanceResponsivenessRating),
+                    overallCommunicationRating: parseInt(overallCommunicationRating),
+                    professionalismRating: parseInt(professionalismRating),
+                    handinessRating: parseInt(handinessRating),
+                    depositHandlingRating: parseInt(depositHandlingRating),
+                    reviewText: reviewText.trim()
+                },
+                userId
+            );
+
+            // Render the landlord details page after successfully adding the review
+            return res.redirect(`/landlord/${landlordId}`);
+        } catch (error) {
+            console.error('Error adding landlord review:', error);
+            return res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+        }
+    }
+});
+    
 
 export default router;
