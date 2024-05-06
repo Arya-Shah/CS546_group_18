@@ -206,8 +206,14 @@ export const removeThread = async (userId, threadId) => {
         status: 400,
         };
     // Validation
-    if (!threadId || !validators.isValidUuid(threadId)) throw "Invalid thread ID input";
-    if (!userId || !validators.isValidString(userId)) throw "Invalid userId input";
+    if (!threadId || !validators.isValidUuid(threadId)) {
+        errorObject.error= "Invalid thread ID input";
+        throw errorObject
+    }
+    if (!userId || !validators.isValidString(userId)) {
+        errorObject.error= "Invalid userId input";
+    throw errorObject
+    }
     
     // Retrieve thread collection
     const threadCollection = await threads();
@@ -284,12 +290,12 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
                     { $push: { comments: commentToAdd } }
                 );
 
-            } else {
+            } /*else {
                 updateInfo = await threadCollection.updateOne(
                     { 'comments.commentId': threadOrCommentId },
                     { $push: { 'comments.$.replies': commentToAdd } }
                 );
-            }
+            }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
@@ -317,12 +323,17 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
 // Function: removeCommentReply, removes comment from property or reply from comment
 export const removeCommentReply = async (userId, threadOrCommentId) => {
     
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
         if (!userId || !validators.isValidUuid(userId))
-            throw 'Invalid user ID input';
+            {errorObject.error= 'Invalid user ID input';
+            throw errorObject}
     
         if (!threadOrCommentId || !validators.isValidUuid(threadOrCommentId))
-            throw 'Invalid threadOrCommentId ID input';   
+            {errorObject.error= 'Invalid threadOrCommentId ID input';   
+            throw errorObject}
 
     //Pull property collection
         const threadCollection = await threads();
@@ -332,19 +343,20 @@ export const removeCommentReply = async (userId, threadOrCommentId) => {
         { 'comments.commentId': threadOrCommentId },
         { $pull: { comments: { commentId: threadOrCommentId } } }
     );
-
+    /*
     //If failed, try to pull reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
         updateInfo = await threadCollection.updateOne(
             { 'comments.replies.commentId': threadOrCommentId },
             { $pull: { 'comments.$.replies': { commentId: threadOrCommentId } } }
         );
-    }
+    }*/
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to remove comment or reply.';
-
+            {errorObject.error= 'Failed to remove comment.';
+        throw errorObject
+}
     //Remove commentId from user's object
         const userCollection = await users();
 
@@ -354,7 +366,8 @@ export const removeCommentReply = async (userId, threadOrCommentId) => {
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new review.';
+            {errorObject.error= 'Failed to update user information with new review.';
+            throw errorObject}
 
     //Return
         return { commentOrReplyPulled: true };
@@ -364,13 +377,18 @@ export const removeCommentReply = async (userId, threadOrCommentId) => {
 //Function: addLikeDislike, adds like or dislike to comment or reply
 export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
     
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
     if (!threadOrCommentId || !validators.isValidUuid(threadOrCommentId))
-        throw 'Invalid threadOrCommentId input';   
+    {errorObject.error=   'Invalid threadOrCommentId input';   
+    throw errorObject}
 
     //Validations    
     if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
-        throw 'Invalid indicidation if like or dislike should be added';   
+        {errorObject.error= 'Invalid indicidation if like or dislike should be added';
+        throw errorObject}
 
     //Pull property collection
     const threadCollection = await threads();
@@ -394,7 +412,7 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
         );
 
     };
-
+    /*
     //If failed, try to add like or dislike to reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
         
@@ -413,11 +431,12 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
             );
         }
 
-    }
+    }*/
 
     //Throw Error if Failed 
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-        throw 'Failed to increment likes on comment or reply.';
+        {errorObject.error= 'Failed to increment likes on comment.';
+    throw errorObject}
 
 //Return
     return { likeAdded: true };
@@ -428,14 +447,19 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
 //Function: removeLikeDislike, removes like or dislike to comment or reply
 export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
     
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
         if (!threadOrCommentId || !validators.isValidUuid(threadOrCommentId))
-            throw 'Invalid property ID input';   
+            {errorObject.error= 'Invalid property ID input';
+        throw errorObject }  
     
     //Validations    
         if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
-            throw 'Invalid indication if like or dislike should be added';   
-    
+{            errorObject.error= 'Invalid indication if like or dislike should be added';   
+        throw errorObject   
+    }    
     //Pull property collection
         const threadCollection = await threads();
     
@@ -458,7 +482,7 @@ export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
             );
     
         };
-    
+    /*
     //If failed, try to add like or dislike to reply
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
             
@@ -477,12 +501,14 @@ export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
                 );
             }
     
-        }
+        }*/
     
-    //Throw Error if Failed 
+    //Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to decrement likes on comment or reply.';
-    
+{            errorObject.error= 'Failed to decrement likes on comment.';
+        throw errorObject   
+
+}    
     //Return
         return { likeRemoved: true };
         

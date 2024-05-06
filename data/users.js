@@ -110,10 +110,13 @@ const getUserByName = async (username) => {
 //Function: getUserById
 export const getUserById = async (id) => {
         
-    if (!validators.isValidUuid(id)) throw "Invalid ID input";
     const errorObject = {
         status: 400,
     };
+    if (!validators.isValidUuid(id)) {
+        errorObject.error= "Invalid ID input";
+        throw errorObject;
+    }
 
     //Retreive user collection and specific user
     const userCollection = await users();
@@ -787,10 +790,12 @@ export const updateReportStatus= async(userId, reportId,newStatus) =>{
         status:400
     }
     if (!userId || !validators.isValidUuid(userId)) 
-        throw "Invalid user ID input";
+        {errorObject.error= "Invalid user ID input";
+        throw errorObject}
 
     if (!reportId || !validators.isValidUuid(reportId)) 
-        throw "Invalid report ID input";
+        {errorObject.error= "Invalid report ID input";
+    throw errorObject}
     
     const adminData = await getUserById(userId);
     

@@ -146,6 +146,8 @@ You will make client - side AJAX requests to the API and use jQuery to target an
 
               <h1>${responseMessage.propertyName || 'ResponseMessage Name Not Available'}</h1>
 
+              <a href="/property/${responseMessage.propertyId}">See property's individual listing.</a>
+
               <section>
                   <h2>Location</h2>
                   <p>${responseMessage.address ? responseMessage.address : 'Address Not Available'}, ${responseMessage.city ? responseMessage.city : 'City Not Available'}, ${responseMessage.state ? responseMessage.state : 'State Not Available'}, ${responseMessage.zipcode ? responseMessage.zipcode : 'ZIP Code Not Available'}</p>

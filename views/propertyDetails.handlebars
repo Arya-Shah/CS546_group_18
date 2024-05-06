@@ -1,13 +1,94 @@
 {{!-- Property Details --}}
+{{!-- CHANGE USER ID TO SHOW USER NAME --}}
+<!-- CORRECT BUTTON to go to path to add review -->
+<h2>Property Details</h2>
+
+<!-- Button to add a review -->
+<button onclick="addReview()">Add Review</button>
+
+<div class="property-details">
+    
+    <h3>Property Information</h3>
+    <p>Name: {{property.name}}</p>
+    <p>Address: {{property.address}}, {{property.city}}, {{property.state}} {{property.zip}}</p>
+    <p>Category: {{property.Category}}</p>
+    <p>Bedrooms: {{property.Bedrooms}}</p>
+    <p>Bathrooms: {{property.bathrooms}}</p>
+    <p>Coordinates: Latitude: {{property.latitude}}, Longitude: {{property.longitude}}</p>
+
+    <div id="map"></div> <!-- Placeholder for map integration -->
+
+    <h3>Average Ratings</h3>
+    <ul>
+        <li>Location Desirability Rating: {{property.averageRatings.averageLocationDesirabilityRating}}</li>
+        <li>Owner Responsiveness Rating: {{property.averageRatings.averageOwnerResponsivenessRating}}</li>
+        <li>Property Condition Rating: {{property.averageRatings.averagePropertyConditionRating}}</li>
+        <li>Community Rating: {{property.averageRatings.averageCommunityRating}}</li>
+        <li>Amenities Rating: {{property.averageRatings.averageAmenitiesRating}}</li>
+    </ul>
+
+    <h3>Reviews</h3>
+    <ul>
+        {{#each property.reviews}}
+        <li>
+            User ID: {{this.userId}}<br>
+            Location Desirability Rating: {{this.locationDesirabilityRating}}<br>
+            Owner Responsiveness Rating: {{this.ownerResponsivenessRating}}<br>
+            Property Condition Rating: {{this.propertyConditionRating}}<br>
+            Community Rating: {{this.communityRating}}<br>
+            Amenities Rating: {{this.amenitiesRating}}
+        </li>
+        {{/each}}
+    </ul>
+
+    <h3>Comments</h3>
+    <ul>
+        {{#each property.comments}}
+        <li>
+            User ID: {{this.userId}}<br>
+            Comment Text: {{this.commentText}}<br>
+            Date Created: {{this.dateCreated}}<br>
+            Likes: {{this.likes}}<br>
+            Dislikes: {{this.dislikes}}
+        </li>
+        {{/each}}
+    </ul>
+</div>
+<div style="hide" id="long_val">{{property.longitude}}</div>
+<div style="hide" id="lat_val">{{property.latitude}}</div>
+<script type="text/javascript">
+var long_val = jQuery("long_val").val();
+var lat_val = jQuery("lat_val").val();
+
+function initMap() {
+const mapCenter = { lat: lat_val, lng: long_val }; // Center of the map
+const map = new google.maps.Map(document.getElementById("map"), {
+center: mapCenter,
+zoom: 8,
+});
+
+const marker = new google.maps.Marker({
+position: mapCenter, 
+map: map, 
+title: {{property.name}}, 
+});
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDvaS1aQfxqdosmuu2gUJk-uE-pQeTKBI&callback=initMap" async defer></script>
+
+
+
+<!--
+{{! Property Details }}
 <h2>{{property.name}}</h2>
 <div class="property-details">
 <p>Address: {{property.address}}</p>
 <p>Rating: {{property.rating}}</p>
-<div id="propertyMap"></div> <!-- Placeholder for map integration -->
+<div id="propertyMap"></div> <! Placeholder for map integration 
 <h3>Reviews</h3>
 {{#each property.reviews}}
 <div class="review">
 <p>{{this.user}}: {{this.content}}</p>
 </div>
 {{/each}}
-</div>
+</div>-->

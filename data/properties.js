@@ -19,15 +19,22 @@ export const getAllProperties = async () => {
 //Function: getPropertyById
 export const getPropertyById = async (id) => {
  
+    const errorObject = {
+        status: 400,
+        };
     //Validation
-    if (!id || !validators.isValidUuid(id)) throw "Invalid ID input";
+    if (!id || !validators.isValidUuid(id)) {errorObject.error= "Invalid ID input";
+        throw errorObject;
+    }
 
     //Retreive property collection and specific property
     const propertyCollection = await properties();
     const property = await propertyCollection.findOne({ propertyId: id });
 
     //Validation (cont.)
-    if (!property) throw "Property not found";
+    if (!property) {errorObject.error= "Property not found";
+    throw errorObject
+    }
 
     //Return
     return property;
@@ -38,10 +45,14 @@ export const getPropertyById = async (id) => {
 // Function: getPropertyByName
 export const getPropertyByName = async (name) => {
     
+    const errorObject = {
+        status: 400,
+        };
     if (!name || 
         !validators.isValidString(name) || 
         name.trim().length === 0) {
-            throw "Invalid address input.";
+            errorObject.error = "Invalid address input.";
+            throw errorObject
     }
     
     name = name.trim().toLowerCase();
@@ -60,14 +71,19 @@ export const getPropertyByName = async (name) => {
 // Function: getPropertyByAddress
 export const getPropertyByAddress = async (address) => {
     
+    const errorObject = {
+        status: 400,
+        };
     if (!address || 
         !validators.isValidString(address) || 
         address.trim().length === 0) {
-            throw "Invalid address input.";
+            errorObject.error= "Invalid address input.";
+            throw errorObject
     }
 
     if (address.length < 5 || address.length > 100) {
-        throw "Address should be between 5 and 100 characters.";
+        errorObject.error= "Address should be between 5 and 100 characters.";
+        throw errorObject
     }
     
     address = address.trim().toLowerCase();
@@ -85,10 +101,14 @@ export const getPropertyByAddress = async (address) => {
 
 // Function: getPropertyByCity
 export const getPropertyByCity = async (city) => {
+    const errorObject = {
+        status: 400,
+        };
     if (!city || 
         !validators.isValidString(city) || 
         city.trim().length === 0) {
-            throw "Invalid city input.";
+            errorObject.error= "Invalid city input.";
+            throw errorObject;
     }
     
     city = city.trim().toLowerCase();
@@ -107,10 +127,14 @@ export const getPropertyByCity = async (city) => {
 
 // Function: getPropertyByState
 export const getPropertyByState = async (state) => {
+    const errorObject = {
+        status: 400,
+        };
     if (!state || 
         !validators.isValidString(state) || 
         state.trim().length === 0) {
-            throw "Invalid state input.";
+            errorObject.error= "Invalid state input.";
+            throw errorObject
     }
 
     state = state.trim().toLowerCase();
@@ -128,11 +152,15 @@ export const getPropertyByState = async (state) => {
 
 // Function: getPropertyByZipcode
 export const getPropertyByZipcode = async (zipcode) => {
+    const errorObject = {
+        status: 400,
+        };
     if (!zipcode || 
         !validators.isValidString(zipcode) || 
         !validators.isValidZipcode(zipcode) ||
         zipcode.trim().length === 0) {
-            throw "Invalid zipcode input.";
+            errorObject.error= "Invalid zipcode input.";
+            throw errorObject
     }
 
     zipcode = zipcode.trim();
@@ -162,70 +190,84 @@ export const addProperty = async (
   bathrooms
 ) => {
   
+    const errorObject = {
+        status: 400,
+        };
     //Validation
     if (
       !propertyName ||
       !validators.isValidString(propertyName) ||
       propertyName.trim().length === 0
     )
-      throw "Invalid property name input";
+      {errorObject.error= "Invalid property name input";
+      throw errorObject}
 
     if (
       !address ||
       !validators.isValidString(address) ||
       address.trim().length === 0
     )
-      throw "Invalid address input";
+      {errorObject.error= "Invalid address input";
+      throw errorObject}
 
     if (address.trim().length < 5 || 
         address.trim().length > 100)
-        throw "The provided address needs to be between 5 and 100 characters.";
+        {errorObject.error= "The provided address needs to be between 5 and 100 characters.";
+        throw errorObject}
 
     if (!city || 
         !validators.isValidString(city) || 
         city.trim().length === 0)
-      throw "Invalid city input";
+      {errorObject.error= "Invalid city input";
+      throw errorObject}
 
     if (!state || 
         !validators.isValidString(state) || 
         state.trim().length === 0)
-      throw "Invalid state input";
+      {errorObject.error= "Invalid state input";
+      throw errorObject}
 
     if (!zipcode || 
         !validators.isValidString(zipcode) || 
         !validators.isValidZipcode(zipcode) ||
         zipcode.trim().length === 0)
-      throw "Invalid zipcode input";
+      {errorObject.error= "Invalid zipcode input";
+      throw errorObject}
 
     if (!longitude || 
         !validators.isValidString(longitude) || 
         !validators.isValidLongitude(longitude) ||
         longitude.trim().length === 0)
-      throw "Invalid longitude input";
+      {errorObject.error= "Invalid longitude input";
+      throw errorObject}
 
     if (!latitude || 
         !validators.isValidString(latitude) || 
         !validators.isValidLatitude(latitude) ||
         latitude.trim().length === 0)
-      throw "Invalid latitude input";
+      {errorObject.error= "Invalid latitude input";
+      throw errorObject}
     
     if (!propertyCategory || 
         !validators.isValidString(propertyCategory) || 
         propertyCategory.trim().length === 0 || 
         !validators.isValidPropertyCategory(propertyCategory))
-      throw "Invalid propertyCategory input";
+      {errorObject.error= "Invalid propertyCategory input";
+      throw errorObject}
 
     if (!bedrooms || 
         !validators.isValidString(bedrooms) || 
         bedrooms.trim().length === 0 ||
         isNaN(parseFloat(bedrooms)))
-    throw "Invalid bedrooms input";
+    {errorObject.error= "Invalid bedrooms input";
+    throw errorObject}
 
     if (!bathrooms || 
         !validators.isValidString(bathrooms) || 
         bathrooms.trim().length === 0 ||
         isNaN(parseFloat(bathrooms)))
-    throw "Invalid bathrooms input";
+    {errorObject.error= "Invalid bathrooms input";
+    throw errorObject}
 
     //Retrieve property collection
     const propertyCollection = await properties();
@@ -253,7 +295,8 @@ export const addProperty = async (
 
     //Validation (cont.)
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
-      throw "Could not add new property";
+    {  errorObject.error= "Could not add new property";
+    throw errorObject}
 
     //Return
     return { propertyInserted: true, propertyId: newProperty.propertyId};
@@ -262,13 +305,17 @@ export const addProperty = async (
 //Function: updateProperty
 export const updateProperty = async (propertyId, updatedProperty) => {
     
+    const errorObject = {
+        status: 400,
+        };
     //Validation
-    if (!propertyId || !validators.isValidUuid(propertyId)) throw "Invalid property ID input";
+    if (!propertyId || !validators.isValidUuid(propertyId)) errorObject.error= "Invalid property ID input";
     
     if ( !updatedProperty || 
         typeof updatedProperty !== "object" ||
         Array.isArray(updatedProperty))
-        throw "Invalid updatedProperty input";
+        {errorObject.error= "Invalid updatedProperty input";
+        throw errorObject}
     
     //Retrieve user collection
     const propertyCollection = await properties();
@@ -282,7 +329,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.propertyName) ||
             updatedProperty.propertyName.trim().length === 0
         )
-            throw "Invalid property name input";
+            {errorObject.error= "Invalid property name input";
+            throw errorObject}
         
         updatedPropertyData.propertyName = updatedProperty.propertyName.trim();
     }
@@ -292,7 +340,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.address) ||
             updatedProperty.address.trim().length === 0
         )
-            throw "Invalid address input";
+            {errorObject.error= "Invalid address input";
+            throw errorObject}
     
         updatedPropertyData.address = updatedProperty.address.trim();
     }
@@ -301,7 +350,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
         if ( !updatedProperty.city ||
             !validators.isValidString(updatedProperty.city) ||
             updatedProperty.city.trim().length === 0)
-            throw "Invalid city input";
+            {errorObject.error= "Invalid city input";
+            throw errorObject}
         
         updatedPropertyData.city = updatedProperty.city.trim();
     }
@@ -310,7 +360,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
         if (!updatedProperty.state ||
             !validators.isValidString(updatedProperty.state) ||
             updatedProperty.state.trim().length === 0)
-                throw "Invalid state input";
+                {errorObject.error= "Invalid state input";
+                throw errorObject}
     
         updatedPropertyData.state = updatedProperty.state.trim();
     }
@@ -321,7 +372,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.zipcode) || 
             !validators.isValidZipcode(updatedProperty.zipcode) || 
             updatedProperty.zipcode.trim().length === 0)
-                throw "Invalid zipcode input";
+                {errorObject.error= "Invalid zipcode input";
+                throw errorObject}
     
         updatedPropertyData.zipcode = updatedProperty.zipcode.trim();
     }
@@ -331,7 +383,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.longitude) || 
             !validators.isValidLongitude(updatedProperty.longitude) || 
             updatedProperty.longitude.trim().length === 0 ) 
-                throw "Invalid longitude input"; 
+                {errorObject.error= "Invalid longitude input";
+                throw errorObject} 
         
         updatedPropertyData.longitude = updatedProperty.longitude.trim(); 
     
@@ -342,7 +395,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.latitude) || 
             !validators.isValidLatitude(updatedProperty.latitude) || 
             updatedProperty.latitude.trim().length === 0 ) 
-                throw "Invalid latitude input"; 
+                {errorObject.error= "Invalid latitude input"; 
+                throw errorObject}
         
         updatedPropertyData.latitude = updatedProperty.latitude.trim(); 
     
@@ -353,7 +407,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.propertyCategory) || 
             updatedProperty.propertyCategory.trim().length === 0 || 
             !validators.isValidPropertyCategory(updatedProperty.propertyCategory) ) 
-                throw "Invalid propertyCategory input"; 
+                {errorObject.error= "Invalid propertyCategory input"; 
+                throw errorObject}
         
         updatedPropertyData.propertyCategory = updatedProperty.propertyCategory.trim(); 
     
@@ -364,7 +419,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.bedrooms) || 
             updatedProperty.bedrooms.trim().length === 0 || 
             isNaN(parseFloat(updatedProperty.bedrooms)) ) 
-                throw "Invalid bedrooms input"; 
+                {errorObject.error= "Invalid bedrooms input"; 
+                throw errorObject}
                 
         updatedPropertyData.bedrooms = updatedProperty.bedrooms.trim(); 
     
@@ -375,7 +431,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
             !validators.isValidString(updatedProperty.bathrooms) || 
             updatedProperty.bathrooms.trim().length === 0 || 
             isNaN(parseFloat(updatedProperty.bathrooms)) ) 
-                throw "Invalid bathrooms input"; 
+                {errorObject.error= "Invalid bathrooms input";
+                throw errorObject} 
                 
         updatedPropertyData.bathrooms = updatedProperty.bathrooms.trim(); }
 
@@ -388,7 +445,8 @@ export const updateProperty = async (propertyId, updatedProperty) => {
     
     //Validation (cont.)
     if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
-    throw "Error occurred while updating property";
+    {errorObject.error= "Error occurred while updating property";
+    throw errorObject;}
     
     //Return
     return { propertyUpdated: true };
@@ -397,8 +455,13 @@ export const updateProperty = async (propertyId, updatedProperty) => {
 
 //Function: removeProperty
 export const removeProperty = async (propertyId) => {
+    const errorObject = {
+        status: 400,
+        };
     //Validation
-    if (!propertyId || !validators.isValidUuid(propertyId)) throw "Invalid property ID input";
+    if (!propertyId || !validators.isValidUuid(propertyId)) {errorObject.error= "Invalid property ID input";
+        throw errorObject;
+    }
     
     //Retreive Property Collection
     const propertyCollection = await properties();
@@ -408,7 +471,8 @@ export const removeProperty = async (propertyId) => {
     
     //Validation (cont.)
     if (deletionInfo.deletedCount === 0) {
-    throw `Error occurred while deleting user with ID ${propertyId}`;
+    errorObject.error= `Error occurred while deleting user with ID ${propertyId}`;
+    throw errorObject
     }
     
     //Return
@@ -418,10 +482,13 @@ export const removeProperty = async (propertyId) => {
 
 //Function: addPropertyReview
 export const addPropertyReview = async (propertyId, reviewData, userId) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     //Validation
         if (!reviewData || Object.keys(reviewData).length === 0)
-            throw "Invalid Review: Review data is required.";
+            {errorObject.error= "Invalid Review: Review data is required.";
+        throw errorObject}
     
     //Create Review Object
     const updatedReviewData = {
@@ -439,7 +506,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     
     //Validation (cont.) and add to review object
     if (!userId || !validators.isValidUuid(userId)) {
-        throw new Error("Invalid user ID input");
+        errorObject.error="Invalid user ID input";
+        throw errorObject
     } else {
         updatedReviewData.userId = userId;
     }
@@ -451,7 +519,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         typeof reviewData.locationDesirabilityRating !== "number" ||
         !validRatings.includes(reviewData.locationDesirabilityRating)
     ) {
-        throw new Error("Invalid locationDesirabilityRating input");
+        errorObject.error="Invalid locationDesirabilityRating input";
+        throw errorObject
     } else {
         updatedReviewData.locationDesirabilityRating = reviewData.locationDesirabilityRating;
     }
@@ -461,7 +530,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         typeof reviewData.ownerResponsivenessRating !== "number" ||
         !validRatings.includes(reviewData.ownerResponsivenessRating)
     ) {
-        throw new Error("Invalid ownerResponsivenessRating input");
+        errorObject.error="Invalid ownerResponsivenessRating input";
+        throw errorObject
     } else {
         updatedReviewData.ownerResponsivenessRating = reviewData.ownerResponsivenessRating;
     }
@@ -471,7 +541,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         typeof reviewData.propertyConditionRating !== "number" ||
         !validRatings.includes(reviewData.propertyConditionRating)
         ) {
-        throw new Error("Invalid propertyConditionRating input");
+        errorObject.error="Invalid propertyConditionRating input";
+        throw errorObject
 
     } else {
         updatedReviewData.propertyConditionRating = reviewData.propertyConditionRating;
@@ -482,7 +553,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         typeof reviewData.communityRating !== "number" ||
         !validRatings.includes(reviewData.communityRating)
         ) {
-        throw new Error("Invalid communityRating input");
+        errorObject.error="Invalid communityRating input";
+        throw errorObject
     } else {
         updatedReviewData.communityRating = reviewData.communityRating;
     }
@@ -492,7 +564,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         typeof reviewData.amenitiesRating !== "number" ||
         !validRatings.includes(reviewData.amenitiesRating)
     ) {
-        throw new Error("Invalid amenitiesRating input");
+        errorObject.error="Invalid amenitiesRating input";
+        throw errorObject
     } else {
         updatedReviewData.amenitiesRating = reviewData.amenitiesRating;
     }
@@ -502,7 +575,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         !validators.isValidString(reviewData.reviewText) ||
         reviewData.reviewText.trim().length === 0
     ) {
-        throw new Error("Invalid reviewText input");
+        errorObject.error="Invalid reviewText input";
+        throw errorObject
     } else {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
@@ -514,7 +588,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     );
     
     if (!userUpdateStatus)
-        throw "Failed to update user information with new property review.";
+        {errorObject.error= "Failed to update user information with new property review.";
+        throw errorObject}
     
     //Update property with review
     const propertyUpdateStatus = await updateProperty(propertyId, {
@@ -522,7 +597,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     });
     
     if (!propertyUpdateStatus)
-        throw "Failed to update property informatino with new review.";
+        {errorObject.error= "Failed to update property informatino with new review.";
+    throw errorObject}
     
     //To Do: Recalculate Property's average ratings
     validators.updateRatingProperty(propertyId);
@@ -533,20 +609,26 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
 
 //Function: removePropertyReview
  export const removePropertyReview = async (propertyId, reviewId) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     // Validations
     if (!propertyId || !validators.isValidUuid(propertyId))
-        throw "Invalid property ID input";
+        {errorObject.error= "Invalid property ID input";
+    throw errorObject}
 
     if (!reviewId || !validators.isValidUuid(reviewId))
-        throw "Invalid review ID input";
+    {    errorObject.error= "Invalid review ID input";
+    throw errorObject}
 
     // Retrieve Property
     const propertyCollection = await properties();
     const property = await propertyCollection.findOne({ propertyId });
 
     // Check if property exists
-    if (!property) throw "Property not found";
+    if (!property) 
+    {    errorObject.error= "Property not found";
+    throw errorObject}
 
     // Try to pull the review from the property
     const updateInfo = await propertyCollection.updateOne(
@@ -554,9 +636,10 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         { $pull: { reviews: { reviewId } } }
     );
 
-    // Throw Error if Failed
+    // errorObject.error= Error if Failed
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-        throw "Failed to remove review from property.";
+    {    errorObject.error= "Failed to remove review from property.";
+    throw errorObject}
 
     // Remove reviewId from user's object
     const userCollection = await users();
@@ -567,7 +650,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     );
 
     if (!updateUserStatus.acknowledged || updateUserStatus.modifiedCount === 0)
-         throw "Failed to update user information with removed review.";
+    {     errorObject.error= "Failed to update user information with removed review.";
+    throw errorObject}
 
     // Return
     return { reviewRemoved: true };
@@ -575,16 +659,21 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
 
 // Function: addCommentReply, adds comment to property or reply to comment
 export const addCommentReply = async (userId, propertyOrCommentId, commentText) => {
-        
+    const errorObject = {
+        status: 400,
+        };
     //Validations
         if (!userId || !validators.isValidUuid(userId))
-            throw 'Invalid user ID input';
+        {    errorObject.error= 'Invalid user ID input';
+        throw errorObject}
         
         if (!propertyOrCommentId || !validators.isValidUuid(propertyOrCommentId))
-            throw 'Invalid property ID input';
+        {    errorObject.error= 'Invalid property ID input';
+        throw errorObject}
 
         if(!commentText || typeof commentText !== 'string'){
-            throw 'Invalid comment provided. Comment needs to be a string.'
+            errorObject.error= 'Invalid comment provided. Comment needs to be a string.'
+            throw errorObject
         }
 
     //Create Comment Object    
@@ -613,16 +702,17 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
                     { $push: { comments: commentToAdd } }
                 );
 
-            } else {
+            } /*else {
                 updateInfo = await propertyCollection.updateOne(
                     { 'comments.commentId': propertyOrCommentId },
                     { $push: { 'comments.$.replies': commentToAdd } }
                 );
-            }
+            }*/
 
-    //Throw Error if Failed 
+    //errorObject.error= Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-                throw 'Failed to add comment or reply.';
+        {        errorObject.error= 'Failed to add comment or reply.';
+        throw errorObject}
 
     //Update User with comment id
 
@@ -634,7 +724,8 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new review.';
+        {    errorObject.error= 'Failed to update user information with new review.';
+        throw errorObject}
 
     //Return
         return { commentOrReplyAdded: true };
@@ -644,13 +735,17 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
 
 // Function: removeCommentReply, removes comment from property or reply from comment
 export const removeCommentReply = async (userId, propertyOrCommentId) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
         if (!userId || !validators.isValidUuid(userId))
-            throw 'Invalid user ID input';
+        {    errorObject.error= 'Invalid user ID input';
+        throw errorObject}
     
         if (!propertyOrCommentId || !validators.isValidUuid(propertyOrCommentId))
-            throw 'Invalid property ID input';   
+        {    errorObject.error= 'Invalid property ID input';   
+        throw errorObject}
 
     //Pull property collection
         const propertyCollection = await properties();
@@ -662,17 +757,18 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
         { $pull: { comments: { commentId: propertyOrCommentId } } }
     );
 
-    //If failed, try to pull reply
+    /* //If failed, try to pull reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0) {
         updateInfo = await propertyCollection.updateOne(
             { 'comments.replies.commentId': propertyOrCommentId },
             { $pull: { 'comments.$.replies': { commentId: propertyOrCommentId } } }
         );
-    }
+    }*/
 
-    //Throw Error if Failed 
+    //errorObject.error= Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to remove comment or reply.';
+        {    errorObject.error= 'Failed to remove comment.';
+        throw errorObject}
 
     //Remove commentId from user's object
         const userCollection = await users();
@@ -683,7 +779,8 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new review.';
+        {    errorObject.error= 'Failed to update user information with new comment ID.';
+        throw errorObject}
 
     //Return
         return { commentOrReplyPulled: true };
@@ -693,15 +790,18 @@ export const removeCommentReply = async (userId, propertyOrCommentId) => {
 
 //Function: addLikeDislike, adds like or dislike to comment or reply
 export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
     if (!propertyOrCommentId || !validators.isValidUuid(propertyOrCommentId))
-        throw 'Invalid property ID input';   
+    {    errorObject.error= 'Invalid property ID input';   
+    throw errorObject}
 
     //Validations    
     if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
-        throw 'Invalid indication if like or dislike should be added';   
-
+    {    errorObject.error= 'Invalid indication if like or dislike should be added';   
+    throw errorObject}
     //Pull property collection
     const propertyCollection = await properties();
 
@@ -725,7 +825,7 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
 
     };
 
-
+    /*
     //If failed, try to add like or dislike to reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
         
@@ -744,12 +844,12 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
             );
         }
 
-    }
+    }*/
 
-    //Throw Error if Failed 
+    //errorObject.error= Error if Failed 
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-        throw 'Failed to increment likes on comment or reply.';
-
+    {    errorObject.error= 'Failed to increment likes on comment.';
+    throw errorObject}
 //Return
     return { likeAdded: true };
     
@@ -758,14 +858,18 @@ export const addLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
 
 //Function: removeLikeDislike, removes like or dislike to comment or reply
 export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     //Validations    
         if (!propertyOrCommentId || !validators.isValidUuid(propertyOrCommentId))
-            throw 'Invalid property ID input';   
+             {errorObject.error= 'Invalid property ID input';   
+        throw errorObject}
     
     //Validations    
         if (!likeOrDislike || typeof likeOrDislike !== 'string' || (likeOrDislike !== 'like' && likeOrDislike !== 'dislike'))
-            throw 'Invalid indication if like or dislike should be added';   
+             {errorObject.error= 'Invalid indication if like or dislike should be added';   
+        throw errorObject}
     
     //Pull property collection
         const propertyCollection = await properties();
@@ -790,6 +894,7 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
     
         };
     
+    /*
     //If failed, try to add like or dislike to reply
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
             
@@ -808,11 +913,12 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
                 );
             }
     
-        }
+        }*/
     
-    //Throw Error if Failed 
+    // errorObject.error= Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-            throw 'Failed to decrement likes on comment or reply.';
+             {errorObject.error= 'Failed to decrement likes on comment or reply.';
+            throw errorObject}
     
     //Return
         return { likeRemoved: true };
@@ -821,21 +927,26 @@ export const removeLikeDislike = async (propertyOrCommentId, likeOrDislike) => {
     
 // Function: addPropertyReport (report created by user on property)
 export const addPropertyReport = async (userId, propertyId, reportData, reportReason) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     if (!userId || !validators.isValidUuid(userId)) {
-        throw new Error("Invalid user ID input");
+        {errorObject.error= new Error("Invalid user ID input");
+        throw errorObject;}
     }
 
     const property = await getPropertyById(propertyId);
 
     if (!property)
-        throw new Error("Invalid property ID or property does not exist");
+        {errorObject.error= new Error("Invalid property ID or property does not exist");
+    throw errorObject}
 
     if (!reportData || Object.keys(reportData).length === 0)
-        throw new Error("Invalid Report: Report content is required.");
+        {errorObject.error= new Error("Invalid Report: Report content is required.");
+    throw errorObject}
 
     if (!reportReason || typeof reportReason !== 'string' || reportReason.trim().length === 0)
-        throw new Error("Invalid Report Reason: Report reason is required and must be a non-empty string.");
+        errorObject.error= new Error("Invalid Report Reason: Report reason is required and must be a non-empty string.");
 
     const updatedReportData = {
         report_id: uuid(),
@@ -855,7 +966,8 @@ export const addPropertyReport = async (userId, propertyId, reportData, reportRe
     });
 
     if (!propertyReportUpdateStatus)
-        throw new Error("Failed to update property information with the report.");
+        {errorObject.error= new Error("Failed to update property information with the report.");
+    throw errorObject}
 
     return { reportAdded: true };
 };
