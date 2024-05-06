@@ -78,7 +78,7 @@ form.addEventListener('input', function (e) {
 document.addEventListener('DOMContentLoaded', function() {
     // Get the current URL pathname
     const currentPath = window.location.pathname;
-    console.log(currentPath);
+
 
     // Check if the current page is the '/report' page
     if (currentPath === '/report') {
