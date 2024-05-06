@@ -178,3 +178,5 @@ try {
     }
     
 });
+
+export default router;
