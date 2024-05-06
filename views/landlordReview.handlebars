@@ -1,25 +1,31 @@
 {{!-- Landlord Review Form --}}
 <h2>Review for {{landlord.name}}</h2>
 
+{{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
+
+<div id="errorDiv" class="error-message" style="color: red;"></div>
+
 <form id="landlordReviewForm">
     
     <label for="kindnessRating">Kindness Rating:</label>
-    <input type="number" id="kindnessRating" name="kindnessRating" min="1" max="5" required>
+    <input type="range" id="kindnessRating" name="kindnessRating" min="1" max="5" required>
     
     <label for="maintenanceResponsivenessRating">Maintenance Responsiveness Rating:</label>
-    <input type="number" id="maintenanceResponsivenessRating" name="maintenanceResponsivenessRating" min="1" max="5" required>
+    <input type="range" id="maintenanceResponsivenessRating" name="maintenanceResponsivenessRating" min="1" max="5" required>
     
     <label for="overallCommunicationRating">Overall Communication Rating:</label>
-    <input type="number" id="overallCommunicationRating" name="overallCommunicationRating" min="1" max="5" required>
+    <input type="range" id="overallCommunicationRating" name="overallCommunicationRating" min="1" max="5" required>
     
     <label for="professionalismRating">Professionalism Rating:</label>
-    <input type="number" id="professionalismRating" name="professionalismRating" min="1" max="5" required>
+    <input type="range" id="professionalismRating" name="professionalismRating" min="1" max="5" required>
     
     <label for="handinessRating">Handiness Rating:</label>
-    <input type="number" id="handinessRating" name="handinessRating" min="1" max="5" required>
+    <input type="range" id="handinessRating" name="handinessRating" min="1" max="5" required>
     
     <label for="depositHandlingRating">Deposit Handling Rating:</label>
-    <input type="number" id="depositHandlingRating" name="depositHandlingRating" min="1" max="5" required>
+    <input type="range" id="depositHandlingRating" name="depositHandlingRating" min="1" max="5" required>
     
     <label for="reviewText">Review:</label>
     <textarea id="reviewText" name="reviewText" required></textarea>

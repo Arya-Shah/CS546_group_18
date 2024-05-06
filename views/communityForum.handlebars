@@ -1,7 +1,10 @@
-{{!-- ADD ROUTES. UPVOTE/DOWNVOTE THREADS AND COMMENTS --}}
+{{!-- CORRECT BUTTON TO ADD REVIEW PATH--}}
 
 {{!-- Community Forum --}}
 <h2>Community Forum</h2>
+
+<!-- Button to add a thread -->
+<button onclick="addThread()">Add Thread</button>
 
 <div class="forum-threads">
 
@@ -18,42 +21,12 @@
     <p>Likes: {{this.likes}}</p>
     <p>Dislikes: {{this.dislikes}}</p>
 
-    <p><a href="/threads_routes/upvoteThread/{{this.threadId}}">Upvote Thread</a> / <a href="/threads_routes/downvoteThread/{{this.threadId}}">Downvote Thread</a></p>
-
-    <p>Comments:</p>
-
-    <ul>
-      
-      {{#each this.comments}}
-      <li>
-        <p>User ID: {{this.userId}}</p>
-        <p>Comment Text: {{this.commentText}}</p>
-        <p>Date Created: {{this.dateCreated}}</p>
-        <p>Likes: {{this.likes}}</p>
-        <p>Dislikes: {{this.dislikes}}</p>
-        <p><a href="/threads_routes/upvoteComment/{{this.threadId}}">Upvote Comment</a> / <a href="/threads_routes/downvoteComment/{{this.threadId}}">Downvote Comment</a></p>
-        
-        <!-- Replies 
-        
-        {{#if this.replies}}
-        <ul>
-          {{#each this.replies}}
-          <li>
-            <p>User ID: {{this.userId}}</p>
-            <p>Comment Text: {{this.commentText}}</p>
-            <p>Date Created: {{this.dateCreated}}</p>
-            <p>Likes: {{this.likes}}</p>
-            <p>Dislikes: {{this.dislikes}}</p>
-            <p><a href="/upvote/comment/{{this.commentId}}">Upvote Comment</a> / <a href="/downvote/comment/{{this.commentId}}">Downvote Comment</a></p>
-          </li>
-          {{/each}}
-        </ul>
-        {{/if}}-->
-      </li>
-      {{/each}}
-    </ul>
+    <p><a href="/threads_routes/upvote/{{this.threadId}}">Upvote Thread</a> / <a href="/threads_routes/downvote/{{this.threadId}}">Downvote Thread</a></p>
+    <p><a href="/threads_routes/thread/{{this.threadId}}">See the full thread.</a></p> 
+    
   </div>
   {{/each}}
+
 </div>
 
 <!--{{! Community Forum }}

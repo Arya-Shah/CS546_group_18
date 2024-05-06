@@ -1,5 +1,4 @@
 {{!-- Property Details --}}
-{{!-- CHANGE USER ID TO SHOW USER NAME --}}
 <!-- CORRECT BUTTON to go to path to add review -->
 <h2>Property Details</h2>
 
@@ -48,12 +47,22 @@
             User ID: {{this.userId}}<br>
             Comment Text: {{this.commentText}}<br>
             Date Created: {{this.dateCreated}}<br>
-            Likes: {{this.likes}}<br>
-            Dislikes: {{this.dislikes}}
+            Likes: {{this.likes}} <a href="/thread_routes/upvote/{{this.commentId}}">Like</a><br>
+            Dislikes: {{this.dislikes}} <a href="/thread_routes/downvote/{{this.commentId}}">Dislike</a>
         </li>
         {{/each}}
     </ul>
 </div>
+
+<!-- Add Comment Form -->
+    <form action="/property_routes/addComment/{{property.propertyId}}" method="post">
+      <label for="comment">Add a comment:</label><br>
+      <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+      <input type="submit" value="Submit">
+    </form>
+
+<!-- Map --> 
+
 <div style="hide" id="long_val">{{property.longitude}}</div>
 <div style="hide" id="lat_val">{{property.latitude}}</div>
 <script type="text/javascript">
@@ -75,7 +84,6 @@ title: {{property.name}},
 }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDvaS1aQfxqdosmuu2gUJk-uE-pQeTKBI&callback=initMap" async defer></script>
-
 
 
 <!--

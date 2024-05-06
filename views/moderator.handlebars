@@ -17,10 +17,16 @@
                     <button class="btn btn-accept" type="submit">Accept</button>
                 </form>
                 <!-- Button to reject the report -->
-                <form action="/moderator/reject//{{this.userId}}/{{this.report_id}}" method="POST">
+                <form action="/moderator/reject/{{this.userId}}/{{this.report_id}}" method="POST">
                     <button class="btn btn-reject" type="submit">Reject</button>
                 </form>
             </div>
             </div>
         {{/each}}
+    </div>
+
+    <div id="addProperty">
+        <form id="addProperty" method="GET" action="/property/addProperty">
+            <button type="submit">Add Property</button>
+        </form>
     </div>

@@ -1,4 +1,4 @@
-import { users } from "../config/mongoCollections.js";
+import { users,reports } from "../config/mongoCollections.js";
 // import uuid from 'uuid';
 // import bcrypt from 'bcrypt';
 import bcrypt from "bcryptjs";
@@ -106,10 +106,32 @@ const getUserByName = async (username) => {
     return userRow;
 };
 
+const getUserByEmail = async (email) => {
+
+    let result = {};
+
+    const errorObject = {
+    status: 400,
+    };
+    
+    if (!email || !validators.isValidEmail(email) || email.trim().length === 0){
+        errorObject.error  = 'Invalid email input';
+        throw errorObject;
+    }
+    
+    email = email.trim().toLowerCase();
+    const usersCollection = await users();
+    const userRow = await usersCollection.findOne({ email: email });
+    if (userRow === null) {
+    return result;
+    }
+    
+    return userRow;
+};
+
 
 //Function: getUserById
 export const getUserById = async (id) => {
-        
     const errorObject = {
         status: 400,
     };
@@ -121,6 +143,7 @@ export const getUserById = async (id) => {
     //Retreive user collection and specific user
     const userCollection = await users();
     const user = await userCollection.findOne({ userId: id });
+    console.log("user:",user,typeof(id));
     //Validation (cont.)
     if (!user){
         errorObject.error = 'User not found';
@@ -133,6 +156,111 @@ export const getUserById = async (id) => {
     
 };
 
+//Function: getLandlordById
+export const getLandlordById = async (id) => {
+    const errorObject = {
+        status: 400,
+    };
+    if (!validators.isValidUuid(id)) {
+        errorObject.error= "Invalid ID input";
+        throw errorObject;
+    }
+
+    // Retrieve user collection and specific landlord
+    const userCollection = await users();
+    const landlord = await userCollection.findOne({ userId: id, isLandlord: true });
+
+    // Validation
+    if (!landlord) {
+        errorObject.error = 'Landlord not found';
+        errorObject.status = 404;
+        throw errorObject; 
+    }
+
+    // Return 
+    return landlord;    
+};
+
+//Function: getAllLandlords
+export const getAllLandlords = async () => {
+    const errorObject = {
+        status: 400,
+    };
+
+    // Retrieve user collection
+    const userCollection = await users();
+
+    // Find all users where isLandlord is true
+    const landlords = await userCollection.find({ isLandlord: true }).toArray();
+
+    // Validation
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = 'No landlords found';
+        errorObject.status = 404;
+        throw errorObject; 
+    }
+
+    // Return landlords
+    return landlords;    
+};
+
+// Function: getAllLandlordsByState
+export const getAllLandlordsByState = async (state) => {
+    
+    const errorObject = {
+        status: 400,
+    };
+
+    // Validation
+    if (!state || !validators.isValidString(state) || state.trim().length === 0) {
+        errorObject.error = "Invalid state input.";
+        throw errorObject;
+    }
+
+    state = state.trim().toLowerCase();
+
+    const userCollection = await users();
+
+    const landlords = await userCollection.find({ isLandlord: true, state: state }).toArray();
+
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = "No landlords found for the provided state.";
+        throw errorObject;
+    }
+
+    return landlords;
+
+};
+
+// Function: getAllLandlordsByCity
+export const getAllLandlordsByCity = async (city) => {
+    const errorObject = {
+        status: 400,
+    };
+
+    // Validation
+    if (!city || !validators.isValidString(city) || city.trim().length === 0) {
+        errorObject.error = "Invalid city input.";
+        throw errorObject;
+    }
+
+    city = city.trim().toLowerCase();
+
+    // Retrieve user collection
+    const userCollection = await users();
+
+    // Find all users where isLandlord is true and city matches
+    const landlords = await userCollection.find({ isLandlord: true, city: city }).toArray();
+
+    // Validation
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = "No landlords found for the provided city.";
+        throw errorObject;
+    }
+
+    // Return landlords
+    return landlords;
+}
 
 //Function: registerUser    
 export const registerUser = async (firstName, lastName, username, password, city, state, email, isLandlord, isAdmin) => {
@@ -173,6 +301,13 @@ export const registerUser = async (firstName, lastName, username, password, city
 
 if (!email || !validators.isValidEmail(email) || email.trim().length === 0){
     errorObject.error  = 'Invalid email input';
+    throw errorObject;
+}
+//Check if email exists
+const useremailRow = await getUserByEmail(email);
+    
+if(useremailRow && email === useremailRow.email){
+    errorObject.error = "email Already Exists."
     throw errorObject;
 }
 
@@ -930,14 +1065,11 @@ return updatedReportData;
 };
 
 export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
-    //Retrieve Landlord
-    // const landlord = await getUserById(landlordId);
-
     const errorObject = {
         status:400
-    }
+    }
     const userData = await getUserById(userId);
-    
+    console.log("userdata:",userData);
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
 {      errorObject.error="Invalid Report: Report content is required.";
@@ -959,6 +1091,7 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     
     //Validation (cont.) and add to report object
     if (!userId || !validators.isValidUuid(userId)) {
+        console.log("invalid userID");
     errorObject.error="Invalid user ID input";
     throw errorObject;
     } else {
@@ -969,7 +1102,7 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     updatedReportData.report_reason = reportReason;
     updatedReportData.reported_item_type=reportedItemType;
     userData.reportsIds.push(updatedReportData);
-  
+  console.log("in reports:",updatedReportData);
   
     // complete the validation before using this method!
     // const userReportUpdateStatus = await updateUser(
@@ -979,11 +1112,30 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     // if (!userReportUpdateStatus)
     //   errorObject.error="Failed to update user information with the report.");
     //const updatedReportsIds = userData.reportsIds ? [...userData.reportsIds] : [updatedReportData];
-    const updateResult = await updateUserReportIds(userId, userData.reportsIds);
+    const updateResult = await updateUserReportIds(userId, updatedReportData);
+    console.log("updateResult:",updateResult);
     if (!updateResult)
 {      errorObject.error="Failed to update user information with the report.";
     throw errorObject;
 }
+if (!updateResult.acknowledged || !updateResult.insertedId)
+{
+    errorObject.error= "Could not create report";
+    throw errorObject;
+}
+
+// Update User with thread id
+const userCollection = await users();
+
+const userUpdateStatus = await userCollection.updateOne(
+    { userId: userId },
+    { $push: { reportsIds: updatedReportsIds.report_id } } 
+);
+
+if (!userUpdateStatus)
+{            errorObject.error= 'Failed to update user information with new report.';
+    throw errorObject
+}    
     // //Update User with report id
     // const userUpdateStatus = await updateUser(
     // { userId: userId },
@@ -1009,8 +1161,12 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     };
 
 const updateUserReportIds = async (userId, updatedReportsIds) => {
-    return await updateUser(
-        userId,
-        { reportsIds: updatedReportsIds } // Using $push to add the reportId to the reportsIds array
-    );
+    const reportsCollection = await reports();
+    const insertInfo = await reportsCollection.insertOne(updatedReportsIds);
+    // const result = await reportsCollection.updateOne({ _id: userId },{$set: updatedReportsIds})
+    return insertInfo;
+    // return await updateUser(
+    //     userId,
+    //     {$push: { reportsIds: updatedReportsIds }} // Using $push to add the reportId to the reportsIds array
+    // );
 };

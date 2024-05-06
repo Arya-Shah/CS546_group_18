@@ -64,8 +64,7 @@ layout: 'main',
 success: 'User Created successfully', 
 });
 }catch(e){
-      res.status(e.status?e.status:500).render('register', { error: e.error?e.error:e, form: req.body });
-      console.log(e)
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 });
 
@@ -106,7 +105,7 @@ router
     req.session.user = userData;
     res.redirect("/");
   } catch(e){
-        res.status(e.status?e.status:500).render('login', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -122,36 +121,22 @@ return res.status(200).render("logout", {
 });
 
 router.route('/report/:reportState/:id').get(async (req,res)=>{
-  if(!req.session.user || !req.session.user.isAdmin){
+  if(!req.session.user || req.session.user.isAdmin){
       return res.status(500).render('error', { error: 'Access Denied', layout: 'main' });
   }
-  console.log(req.params.reportState,req.params.id);
-  // if property
-  if(req.params.reportState === 'property'){
-    console.log("in property");
-  }
-  // if landlord
-// if comment
-// if review
   try{
     return res.status(200).render('report',{ layout: 'main',
     error: '', 
     reportState: req.params.reportState,id:req.params.id})
   }catch(e){
-    res.status(500).render('report',{error:e, form:req.body});
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 })
 .post(async (req,res) =>{
-  console.log(req.body);
-  console.log(req.params.reportState,req.params.id);
   //if report on property
-  if(req.params.reportState === 'property'){
-    console.log("in property");
-  }
 
   let report_Reason = req.body.reportReason;
-  let reportedItem_type=req.body.reportedItem_type;
-  console.log(report_Reason.length);
+  let reportedItem_type=req.params.reportState;
   if(report_Reason.length < 5){
     return res.status(400).render('report', { error: 'Enter more Description!.' });
   }else{
@@ -166,7 +151,8 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
       success: 'successfully reported!', });
     // }
     }catch(e){
-      res.status(500).render('report', { error: e, form: req.body });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+      // res.status(500).render('report', { error: e, form: req.body });
     }
   }
 });
@@ -178,7 +164,7 @@ router.route('/moderator').get(async (req,res)=>{
     return res.status(200).render('moderator',{ layout: 'main',
     error: '', pendingReports })
   }catch(e){
-    res.status(500).render('moderator',{error:e, form:req.body});
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 });
 
@@ -207,7 +193,7 @@ router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
         return res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' });
         // return res.status(200).json({ message: 'Report accepted successfully.' });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -224,7 +210,7 @@ router.route('/moderator/reject/:userId/:reportId').post(async (req, res) => {
         // Once the report is accepted, you can redirect or respond accordingly
         return res.status(200).json({ message: 'Report Rejected successfully.' });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 

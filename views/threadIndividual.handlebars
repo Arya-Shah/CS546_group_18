@@ -1,0 +1,73 @@
+{{!-- ADD ROUTES. UPVOTE/DOWNVOTE THREADS AND COMMENTS --}}
+
+{{!-- Community Forum --}}
+<h2>{{this.title}}</h2>
+
+<div class="forum-threads">
+
+  <div class="thread">
+
+    <p>Category: {{this.category}}</p>
+    <p>Created by: {{this.userId}}</p>
+    <p>Created Date: {{this.createdDate}}</p>
+    <p>Last Updated: {{this.lastUpdated}}</p>
+    <p>Likes: {{this.likes}} <a href="/threads_routes/upvoteThread/{{this.threadId}}">Like Thread</a></p>
+    <p>Dislikes: {{this.dislikes}} <a href="/threads_routes/downvoteThread/{{this.threadId}}">Downvote Thread</a></p>
+
+    <p>Comments:</p>
+
+    <p><a href="/threads_routes/addComment/{{this.threadId}}"></a>Add a comment to this thread.</p>
+
+    <ul>
+      
+      {{#each this.comments}}
+      <li>
+        <p>User ID: {{this.userId}}</p>
+        <p>Comment Text: {{this.commentText}}</p>
+        <p>Date Created: {{this.dateCreated}}</p>
+        <p>Likes: {{this.likes}} <a href="/threads_routes/upvoteComment/{{this.commentId}}">Like Comment</a></p>
+        <p>Dislikes: {{this.dislikes}} <a href="/threads_routes/downvoteComment/{{this.commentId}}">Dislike Comment</a></p>
+        
+        <!-- Replies 
+        
+        {{#if this.replies}}
+        <ul>
+          {{#each this.replies}}
+          <li>
+            <p>User ID: {{this.userId}}</p>
+            <p>Comment Text: {{this.commentText}}</p>
+            <p>Date Created: {{this.dateCreated}}</p>
+            <p>Likes: {{this.likes}}</p>
+            <p>Dislikes: {{this.dislikes}}</p>
+            <p><a href="/upvote/comment/{{this.commentId}}">Upvote Comment</a> / <a href="/downvote/comment/{{this.commentId}}">Downvote Comment</a></p>
+          </li>
+          {{/each}}
+        </ul>
+        
+      </li>
+      {{/each}}{{/if}}-->
+    </ul>
+  </div>
+
+  <!-- Add Comment Form -->
+    <form action="/threads_routes/addComment/{{this.threadId}}" method="post">
+      <label for="comment">Add a comment:</label><br>
+      <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+      <input type="submit" value="Submit">
+    </form>
+  {{/each}}
+
+</div>
+
+<!--{{! Community Forum }}
+<h2>Community Forum</h2>
+<div class="forum-threads">
+{{#each threads}}
+<div class="thread">
+<h3>{{this.title}}</h3>
+<p>{{this.summary}}</p>
+<! Add link to full thread discussion >
+</div>
+{{/each}}
+</div>-->
+
