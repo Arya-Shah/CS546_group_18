@@ -106,6 +106,29 @@ const getUserByName = async (username) => {
     return userRow;
 };
 
+const getUserByEmail = async (email) => {
+
+    let result = {};
+
+    const errorObject = {
+    status: 400,
+    };
+    
+    if (!email || !validators.isValidEmail(email) || email.trim().length === 0){
+        errorObject.error  = 'Invalid email input';
+        throw errorObject;
+    }
+    
+    email = email.trim().toLowerCase();
+    const usersCollection = await users();
+    const userRow = await usersCollection.findOne({ email: email });
+    if (userRow === null) {
+    return result;
+    }
+    
+    return userRow;
+};
+
 
 //Function: getUserById
 export const getUserById = async (id) => {
@@ -278,6 +301,13 @@ export const registerUser = async (firstName, lastName, username, password, city
 
 if (!email || !validators.isValidEmail(email) || email.trim().length === 0){
     errorObject.error  = 'Invalid email input';
+    throw errorObject;
+}
+//Check if email exists
+const useremailRow = await getUserByEmail(email);
+    
+if(useremailRow && email === useremailRow.email){
+    errorObject.error = "email Already Exists."
     throw errorObject;
 }
 

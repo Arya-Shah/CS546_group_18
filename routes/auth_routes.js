@@ -64,8 +64,7 @@ layout: 'main',
 success: 'User Created successfully', 
 });
 }catch(e){
-      res.status(e.status?e.status:500).render('register', { error: e.error?e.error:e, form: req.body });
-      console.log(e)
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 });
 
@@ -106,7 +105,7 @@ router
     req.session.user = userData;
     res.redirect("/");
   } catch(e){
-        res.status(e.status?e.status:500).render('login', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -130,7 +129,7 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
     error: '', 
     reportState: req.params.reportState,id:req.params.id})
   }catch(e){
-    res.status(500).render('report',{error:e, form:req.body});
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 })
 .post(async (req,res) =>{
@@ -152,7 +151,7 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
       success: 'successfully reported!', });
     // }
     }catch(e){
-      res.status(500).json({ error: e.message });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
       // res.status(500).render('report', { error: e, form: req.body });
     }
   }
@@ -165,7 +164,7 @@ router.route('/moderator').get(async (req,res)=>{
     return res.status(200).render('moderator',{ layout: 'main',
     error: '', pendingReports })
   }catch(e){
-    res.status(500).render('moderator',{error:e, form:req.body});
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
   }
 });
 
@@ -194,7 +193,7 @@ router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
         return res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' });
         // return res.status(200).json({ message: 'Report accepted successfully.' });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -211,7 +210,7 @@ router.route('/moderator/reject/:userId/:reportId').post(async (req, res) => {
         // Once the report is accepted, you can redirect or respond accordingly
         return res.status(200).json({ message: 'Report Rejected successfully.' });
     } catch (e) {
-        res.status(500).json({ error: e.message });
+      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 

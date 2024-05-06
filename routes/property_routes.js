@@ -28,7 +28,7 @@ router.route('/property/:propertyId')
 
     } catch (e) {
 
-        res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 
     }
 
@@ -106,11 +106,7 @@ router.route('/property/:propertyId')
         res.redirect(`/property/${propertyId}`)
 
        } catch (e) {
-
-            res.status(500).render('error', { 
-                title: "Error Updating Property to Database.",
-                error: e.toString()
-            });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
        }
 
     }
@@ -477,8 +473,8 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
         // Redirect to the property page after successful deletion
         res.redirect(`/property/${propertyId}`);
 
-    } catch (error) {
-        res.status(error.status || 500).json({ error: error.message });
+    } catch (e) {
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -552,9 +548,9 @@ router.post('/propertyReview', async (req, res) => {
             // Render the property details page after successfully adding the review
             return res.redirect(`/property/${propertyId}`);
 
-        } catch (error) {
+        } catch (e) {
             console.error('Error adding property review:', error);
-            return res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+            res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
         }
     }
 });
@@ -576,8 +572,8 @@ router.post('/deletePropertyReview/:reviewId', async (req, res) => {
         // Redirect to the property page after successful review deletion
         res.redirect(`/property/${propertyId}`);
 
-    } catch (error) {
-        res.status(error.status || 500).json({ error: error.message });
+    } catch (e) {
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -597,9 +593,9 @@ router.post('/property_routes/addComment/:propertyId', async (req, res) => {
 
         res.redirect(`'/property/${propertyId}'`);
 
-    } catch (error) {
+    } catch (e) {
        
-        res.status(500).render('error', { error: 'Internal Server Error when adding comment to thread.', layout: 'main' });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -618,9 +614,9 @@ router.post('/property_routes/removeComment/:propertyId/:commentId', async (req,
 
         res.redirect(`'/property/${propertyId}'`);
 
-    } catch (error) {
+    } catch (e) {
         // Handle errors
-        res.status(500).render('error', { error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
     }
 });
 

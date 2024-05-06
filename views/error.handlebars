@@ -6,8 +6,10 @@
 </head>
 <body class="{{themePreference}}">
     <div class="error">
+        {{#if error}}
         <h1>Oops! Something went wrong.</h1>
-        <p>{{errorMessage}}</p>
+                <p>{{errorMessage}}</p>
+        {{/if}}
         <a href="/login">Return to Login</a>
     </div>
 </body>
