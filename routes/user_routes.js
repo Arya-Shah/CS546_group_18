@@ -25,7 +25,7 @@ router.route('/')
 try {
 let id = req.session.user.userId;
     const user = await getUserById(id);
-    return res.status(200).render("user", {
+    return res.status(200).render("user", {title:'user',
         user:user,
     });
 }catch (e) {
@@ -51,12 +51,12 @@ router.route('/profile')
 .get(async (req, res) => {
 const userId = req.session.user.userId;
 if (!helpers.isValidUuid(userId)) {
-return res.status(400).render('error', { error: 'Invalid user ID format.', layout: 'main' });
+return res.status(400).render('error', {title:'error', error: 'Invalid user ID format.', layout: 'main' });
 }
 try {
 const user = await getUserById(userId);
 if (!user) {
-    return res.status(404).render('error', { error: 'User not found.', layout: 'main' });
+    return res.status(404).render('error', { title:'error',error: 'User not found.', layout: 'main' });
 }
 res.render('user', { user:user, layout: 'main' });
 } catch (e) {
@@ -69,14 +69,14 @@ router.route('/landlord/:landlordId')
 .get(async (req, res) => {
 const landlordId = req.params.landlordId;
 if (!helpers.isValidUuid(landlordId)) {
-return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
+return res.status(400).render('error', { title:'error',error: 'Invalid landlord ID format.', layout: 'main' });
 }
 try {
 const landlord = await getLandlordById(landlordId);
 if (!landlord) {
-    return res.status(404).render('error', { error: 'Landlord not found.', layout: 'main' });
+    return res.status(404).render('error', {title:'error', error: 'Landlord not found.', layout: 'main' });
 }
-res.render('landlordDetails', { landlord, layout: 'main' });
+res.render('landlordDetails', {title:'landlord', landlord, layout: 'main' });
 } catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
@@ -87,12 +87,12 @@ router.route('/review/landlord/:landlordId')
     .get(async (req, res) => {
         const landlordId = req.params.landlordId;
         if (!landlordId || !helpers.isValidUuid(landlordId)) {
-            return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
+            return res.status(400).render('error', { title:'error',error: 'Invalid landlord ID format.', layout: 'main' });
         }
         try {
             res.redirect(`/landlord/${landlordId}`);
         } catch (e) {
-            res.status(500).render('error', { error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
+            res.status(500).render('error', { title:'error',error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
         }
     });
 
@@ -102,20 +102,20 @@ router.route('/review/property/:propertyId')
     const propertyId = req.params.propertyId;
     
     if (!propertyId || !helpers.isValidUuid(propertyId)) {
-        return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
+        return res.status(400).render('error', { title:'error',error: 'Invalid property ID format.', layout: 'main' });
     }
 
     try {
         res.redirect(`/property/${propertyId}`);
     } catch (e) {
-        res.status(500).render('error', { error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
+        res.status(500).render('error', { title:'error',error: 'Internal Server Error when redirecting to landlord\'s page.', layout: 'main' });
     }
 
     });
 
 //LandlordReview
 router.get('/landlordReview', (req, res) => {
-    res.render('addLandlordReview', { layout: 'main' });
+    res.render('addLandlordReview', { title:'review',layout: 'main' });
 });
 router.post('/landlordReview', async (req, res) => {
     const { 
@@ -158,7 +158,7 @@ router.post('/landlordReview', async (req, res) => {
 
     //Render landlordReview Page with any caught errors
     if (errors.length > 0) {
-        return res.status(400).render('landlordReview', { errors });
+        return res.status(400).render('landlordReview', {title:'review', errors });
     } else {
 
         try {
@@ -181,7 +181,7 @@ router.post('/landlordReview', async (req, res) => {
             return res.redirect(`/landlord/${landlordId}`);
         } catch (error) {
             console.error('Error adding landlord review:', error);
-            return res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+            return res.status(500).render('error', {title:'error', error: 'Internal Server Error.', layout: 'main' });
         }
     }
 });

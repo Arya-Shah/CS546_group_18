@@ -49,18 +49,18 @@ router.post('/addThread', async (req, res) => {
             const { threadInserted, threadId } = await thread.addThread(userId, title, content, category);
 
             if (!threadInserted) {
-                return res.status(500).render('error', { error: 'Failed to add thread.', layout: 'main' });
+                return res.status(500).render('error', { title:'error',error: 'Failed to add thread.', layout: 'main' });
             }
 
             res.redirect(`/thread/${threadId}`);
 
         } catch (error) {
-            res.status(500).render('error', { error: 'Internal Server Error when trying to add thread.', layout: 'main' });
+            res.status(500).render('error', { title:'error',error: 'Internal Server Error when trying to add thread.', layout: 'main' });
         }
 
         
     } catch (error) {
-        res.render('addThreadForm', { error: error.message });
+        res.render('addThreadForm', {title:'error', error: error.message });
     }
 });
 
@@ -100,7 +100,7 @@ router.route('/thread/:threadId')
     const threadId = req.params.threadId;
 
     if (!threadId || !validators.isValidUuid(threadId)) {
-        return res.status(400).render('error', { error: 'Invalid thread ID format.', layout: 'main' });
+        return res.status(400).render('error', { title:'error',error: 'Invalid thread ID format.', layout: 'main' });
     }
 
     try {
@@ -109,14 +109,14 @@ router.route('/thread/:threadId')
         const thread = await threads.getThreadById(threadId);
     
         if (!thread) {
-            return res.status(404).render('error', { error: 'Thread not found.', layout: 'main' });
+            return res.status(404).render('error', {title:'error', error: 'Thread not found.', layout: 'main' });
         }
 
-        res.render('threadIndividual', { thread, layout: 'main' });
+        res.render('threadIndividual', { title:'threads',thread, layout: 'main' });
 
     } catch (error) {
 
-        res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+        res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
 
     }
 
@@ -140,7 +140,7 @@ router.post('/threads_routes/addComment/:threadId', async (req, res) => {
 
     } catch (error) {
        
-        res.status(500).render('error', { error: 'Internal Server Error when adding comment to thread.', layout: 'main' });
+        res.status(500).render('error', { title:'error',error: 'Internal Server Error when adding comment to thread.', layout: 'main' });
     }
 });
 
@@ -161,7 +161,7 @@ router.post('/threads_routes/removeComment/:threadId/:commentId', async (req, re
 
     } catch (error) {
         // Handle errors
-        res.status(500).render('error', { error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
+        res.status(500).render('error', { title:'error',error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
     }
 });
 
@@ -171,10 +171,10 @@ router.route('/communityForum')
 try {
     
     const threads = await thread.getAllThreads();
-    res.render('communityForum', { threads, layout: 'main' });
+    res.render('communityForum', { title:'Forums',threads, layout: 'main' });
 
     } catch (e) {
-    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
     }
     
 });

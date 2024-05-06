@@ -73,6 +73,7 @@ router
 .get(async (req, res) => {
   //code here for GET
   return res.status(200).render('login', {
+    title:'login',
     layout: 'main',
     error: '', 
 });
@@ -119,7 +120,6 @@ return res.status(200).render("logout", {
   title: "Logout",
 });
 });
-
 
 
 

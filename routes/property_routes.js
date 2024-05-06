@@ -28,7 +28,7 @@ router.route('/id/:propertyId')
     const propertyId = req.params.propertyId;
 
     if (!propertyId || !validators.isValidUuid(propertyId)) {
-        return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
+        return res.status(400).render('error', { title:'error',error: 'Invalid property ID format.', layout: 'main' });
     }
 
     try {
@@ -36,14 +36,14 @@ router.route('/id/:propertyId')
         const property = await properties.getPropertyById(propertyId);
     
         if (!property) {
-            return res.status(404).render('error', { error: 'Property not found.', layout: 'main' });
+            return res.status(404).render('error', { title:'error',error: 'Property not found.', layout: 'main' });
         }
 
-        res.render('propertyDetails', {property, layout: 'main'});
+        res.render('propertyDetails', {property, title:'propertyDetails',layout: 'main'});
 
     } catch (e) {
 
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
 
     }
 
@@ -100,7 +100,7 @@ router.route('/id/:propertyId')
 
     //Render addProperty Page with any caught errors
     if (errors.length > 0) {
-        res.status(400).render('addProperty', { errors }); 
+        res.status(400).render('addProperty', {title:'addProperty', errors }); 
     } else {
        
         try{
@@ -384,7 +384,7 @@ router.route('/searchPropertyById/:searchQuery').post(async (req, res) => {
 
 // GET route to display the addProperty form
 router.get('/addProperty', (req, res) => {
-    res.render('addProperty', { error: null }); 
+    res.render('addProperty', { title:'addProperty',error: null }); 
 });
 
 
@@ -491,13 +491,13 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
         res.redirect(`/property/${propertyId}`);
 
     } catch (e) {
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
     }
 });
 
 // PropertyReview
 router.get('/propertyReview', (req, res) => {
-    res.render('addPropertyReview', { layout: 'main' });
+    res.render('addPropertyReview', {title:'addPropertyReview', layout: 'main' });
 });
 
 router.post('/propertyReview', async (req, res) => {
@@ -544,7 +544,7 @@ router.post('/propertyReview', async (req, res) => {
 
     // Render propertyReview Page with any caught errors
     if (errors.length > 0) {
-        return res.status(400).render('propertyReview', { errors });
+        return res.status(400).render('propertyReview', {title:'propertyReview', errors });
     } else {
         try {
             // Assuming functions like addPropertyReview exist to handle database operations
@@ -567,7 +567,7 @@ router.post('/propertyReview', async (req, res) => {
 
         } catch (e) {
             console.error('Error adding property review:', error);
-            res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+            res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
         }
     }
 });
@@ -590,7 +590,7 @@ router.post('/deletePropertyReview/:reviewId', async (req, res) => {
         res.redirect(`/property/${propertyId}`);
 
     } catch (e) {
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -612,7 +612,7 @@ router.post('/property_routes/addComment/:propertyId', async (req, res) => {
 
     } catch (e) {
        
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', {title:'error', error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -633,7 +633,7 @@ router.post('/property_routes/removeComment/:propertyId/:commentId', async (req,
 
     } catch (e) {
         // Handle errors
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
     }
 });
 
