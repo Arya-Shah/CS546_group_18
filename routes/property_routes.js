@@ -106,7 +106,7 @@ router.route('/property/:propertyId')
         res.redirect(`/property/${propertyId}`)
 
        } catch (e) {
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('property', { error: e.error?e.error:e, form: req.body });
        }
 
     }

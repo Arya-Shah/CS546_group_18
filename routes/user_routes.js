@@ -19,18 +19,6 @@ getAllLandlordsByState,
 getAllLandlordsByCity
 } from '../data/users.js'; 
 
-        // const router = express.Router();
-        // router.use(bodyParser.urlencoded({ extended: true }));
-        // router.use(bodyParser.json());
-        // router.route('/users')
-        // .get(async (req, res) => {
-        // try {
-        //     const users = await getAllUsers();
-        //     return res.json(users);
-        // } catch (e) {
-        //     return res.status(500).json({ error: e.toString() });
-        // }
-        // });
 
 router.route('/')
 .get(async (req, res) => {
@@ -41,30 +29,14 @@ let id = req.session.user.userId;
         user:user,
     });
 }catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
-    }
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 })
 
 // User profile page
-router.route('/profile/:userId')
+router.route('/profile')
 .get(async (req, res) => {
-const userId = req.params.userId;
+const userId = req.session.user.userId;
 if (!helpers.isValidUuid(userId)) {
 return res.status(400).render('error', { error: 'Invalid user ID format.', layout: 'main' });
 }
@@ -73,25 +45,9 @@ const user = await getUserById(userId);
 if (!user) {
     return res.status(404).render('error', { error: 'User not found.', layout: 'main' });
 }
-res.render('user', { user, layout: 'main' });
+res.render('user', { user:user, layout: 'main' });
 } catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
-    }
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 });
 
@@ -109,23 +65,7 @@ if (!landlord) {
 }
 res.render('landlordDetails', { landlord, layout: 'main' });
 } catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
-    }
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 });
 
@@ -357,23 +297,7 @@ if (!property) {
 }
 res.render('propertyDetails', { property, layout: 'main' });
 } catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
-    }
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 });*/
 
@@ -411,23 +335,7 @@ try {
     });
     }
 } catch (e) {
-    if (
-    typeof e === "object" &&
-    e !== null &&
-    !Array.isArray(e) &&
-    "status" in e &&
-    "error" in e
-    ) {
-    return res.status(e.status).render("error", {
-        title: "Error",
-        error: e.error,
-    });
-    } else {
-    return res.status(400).render("error", {
-        title: "Error",
-        error: e,
-    });
-    }
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 });*/
 

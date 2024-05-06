@@ -56,7 +56,7 @@ if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
 }
 // Validate city and state if required
 if (!/^[a-zA-Z\s]+$/.test(city) || !/^[a-zA-Z\s]+$/.test(state)) {
-  return res.status(400).render('register', { error: 'City and state must contain only alphabetic characters and spaces.' });
+  return res.status(400).render('error', { error: 'City and state must contain only alphabetic characters and spaces.' });
 }
 await registerUser(firstName, lastName, username, password, city, state, email);
 return res.status(200).render('login', {
@@ -64,7 +64,7 @@ layout: 'main',
 success: 'User Created successfully', 
 });
 }catch(e){
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+      res.status(e.status?e.status:500).render('register', { error: e.error?e.error:e, form: req.body });
   }
 });
 
@@ -105,7 +105,7 @@ router
     req.session.user = userData;
     res.redirect("/");
   } catch(e){
-        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('login', { error: e.error?e.error:e, form: req.body });
     }
 });
 
@@ -120,99 +120,9 @@ return res.status(200).render("logout", {
 });
 });
 
-router.route('/report/:reportState/:id').get(async (req,res)=>{
-  if(!req.session.user || req.session.user.isAdmin){
-      return res.status(500).render('error', { error: 'Access Denied', layout: 'main' });
-  }
-  try{
-    return res.status(200).render('report',{ layout: 'main',
-    error: '', 
-    reportState: req.params.reportState,id:req.params.id})
-  }catch(e){
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-  }
-})
-.post(async (req,res) =>{
-  //if report on property
 
-  let report_Reason = req.body.reportReason;
-  let reportedItem_type=req.params.reportState;
-  if(report_Reason.length < 5){
-    return res.status(400).render('report', { error: 'Enter more Description!.' });
-  }else{
-    try {
-    const userId = req.session.user._id;
-    // const landlordId=req.session.user.landlord_id;
-    // if(!landlordId || landlordId === undefined || landlordId === null || landlordId === ''){
-    //   res.status(500).render('report', { layout: 'main',error: 'you cannot raise a report since you do not have an apartment!', });
-    // }else{
-      const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type);
-      res.status(200).render('report', { layout: 'main',
-      success: 'successfully reported!', });
-    // }
-    }catch(e){
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-      // res.status(500).render('report', { error: e, form: req.body });
-    }
-  }
-});
 
-router.route('/moderator').get(async (req,res)=>{
-  try{
-    const userId = req.session.user._id;
-    const pendingReports = await getAllPendingReports(userId);
-    return res.status(200).render('moderator',{ layout: 'main',
-    error: '', pendingReports })
-  }catch(e){
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-  }
-});
 
-// router.route('/moderator').get(async (req, res) => {
-//     try {
-//         const userId = req.session.user._id;
-//         const pendingReports = await getAllPendingReports(userId);
-//         return res.status(200).render('moderator', { layout: 'main', error: '', pendingReports });
-//     } catch (e) {
-//         res.status(500).render('moderator', { error: e, form: req.body });
-//     }
-// });
-
-router.route('/moderator/accept/:userId/:reportId').post(async (req, res) => {
-    try {
-        const status = "Accepted";
-        const reportId = req.params.reportId;
-        const userId = req.params.userId;
-        const result = await updateReportStatus(userId,reportId,status);
-        console.log("updated result:",result);
-        // updatePostReportStatus
-
-        // Implement logic to accept the report with the given reportId
-        // For example, update the status of the report in the database
-        // Once the report is accepted, you can redirect or respond accordingly
-        return res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' });
-        // return res.status(200).json({ message: 'Report accepted successfully.' });
-    } catch (e) {
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-    }
-});
-
-router.route('/moderator/reject/:userId/:reportId').post(async (req, res) => {
-    try {
-        const status = "Rejected";
-        const reportId = req.params.reportId;
-        const userId = req.params.userId;
-        const result = await updateReportStatus(userId,reportId,status);
-        // updatePostReportStatus
-
-        // Implement logic to accept the report with the given reportId
-        // For example, update the status of the report in the database
-        // Once the report is accepted, you can redirect or respond accordingly
-        return res.status(200).json({ message: 'Report Rejected successfully.' });
-    } catch (e) {
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-    }
-});
 
   export default router;
 
