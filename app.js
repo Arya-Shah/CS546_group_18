@@ -20,6 +20,9 @@ const handlebarsInstance = exphbs.create({
           return new Handlebars.SafeString(JSON.stringify(obj, null, spacing));
   
         return new Handlebars.SafeString(JSON.stringify(obj));
+      },
+      ifEquals: function (arg1, arg2, options) {
+        return arg1 == arg2 ? options.fn(this) : options.inverse(this);
       }
     },
     // partialsDir: ['views/partials/']
