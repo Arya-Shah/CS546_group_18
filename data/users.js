@@ -143,7 +143,6 @@ export const getUserById = async (id) => {
     //Retreive user collection and specific user
     const userCollection = await users();
     const user = await userCollection.findOne({ userId: id });
-    console.log("user:",user,typeof(id));
     //Validation (cont.)
     if (!user){
         errorObject.error = 'User not found';
@@ -374,8 +373,6 @@ if(useremailRow && email === useremailRow.email){
 
 //Function: updateUser
 export const updateUser = async (userId, updatedUser) => {
-
-    //console.log(userId,updatedUser);
     const errorObject = {
         status:400
     }
@@ -488,7 +485,6 @@ export const updateUser = async (userId, updatedUser) => {
         { userId: userId },
         { $set: updatedUserData });
 
-    //console.log(updateResponse);
     
     //Validation (cont.)
     if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0){
@@ -833,7 +829,6 @@ export const searchPropertiesByName = async (title) => {
 
 //Function: getAllPendingReports
 export const getAllPendingReports = async (userId) => {
-
     const errorObject = {
         status:400
     }
@@ -847,80 +842,117 @@ export const getAllPendingReports = async (userId) => {
 {        errorObject.error="User does not have admin access.";
         throw errorObject;
 }  
-    const userData = await getAllUsers();
-  
-    const usersWithReports = userData.filter((user) => 
-        user.reportsIds && user.reportsIds.length > 0
-    );
-    
-    if (usersWithReports.length === 0)
-{       errorObject.error="No reports found.";
-        throw errorObject;
-}  
-    //const reportsOnly = usersWithReports.map(user => user.reportsIds);
-    const pendingReports = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.status === 'pending')
-    );
+const reportsData = await reports();
+const pendingReports = await reportsData.find({ status: 'pending' }).toArray();
 
-      // Check if any pending reports were found
-      if (pendingReports.length === 0)
-{        errorObject.error="No pending reports found.";
-        throw errorObject;
+// Check if any pending reports were found
+if (pendingReports.length === 0) {
+    errorObject.error = "No pending reports found.";
+    throw errorObject;
 }
-      return pendingReports;
+
+return pendingReports;
+//     const reportsData = await reports();
+  
+//     const usersWithReports = userData.filter((user) => 
+//         user && user.reportsIds.length > 0
+//     );
+    
+//     if (usersWithReports.length === 0)
+// {       errorObject.error="No reports found.";
+//         throw errorObject;
+// }  
+    // //const reportsOnly = usersWithReports.map(user => user.reportsIds);
+    // const pendingReports = userData.flatMap(user => 
+    //     (user.reportsIds || []).filter(report => report.status === 'pending')
+    // );
+
+//       // Check if any pending reports were found
+//       if (pendingReports.length === 0)
+// {        errorObject.error="No pending reports found.";
+//         throw errorObject;
+// }
+//       return pendingReports;
     
 };
 
 
 //Function: getReportbyId
 export const getReportbyId = async(reportId, userId) =>{
-
     const errorObject = {
-        status:400
+        status: 400
+    };
+
+    if (!userId || !validators.isValidUuid(userId)) {
+        errorObject.error = "Invalid user ID input";
+        throw errorObject;
     }
-    if (!userId || !validators.isValidUuid(userId)) 
-{        errorObject.error= "Invalid user ID input";
-    throw errorObject;
-}
-    if (!reportId || !validators.isValidUuid(reportId)) 
-{        errorObject.error= "Invalid report ID input";
-    throw errorObject;
-}
+
+    if (!reportId || !validators.isValidUuid(reportId)) {
+        errorObject.error = "Invalid report ID input";
+        throw errorObject;
+    }
+
     const adminData = await getUserById(userId);
-    
-    if (!adminData.isAdmin) 
-{        errorObject.error="User does not have admin access.";
-        throw errorObject;
-}    
-    const userData = await getAllUsers();
-    
-    const usersWithReports = userData.filter((user) => 
-        user.reportsIds && user.reportsIds.length > 0
-    );
-    
-    if (usersWithReports.length === 0) {
-        errorObject.error="No reports found.";
+
+    if (!adminData.isAdmin) {
+        errorObject.error = "User does not have admin access.";
         throw errorObject;
     }
-    
-    //console.log("usersWithReports:",usersWithReports);
 
-    const reportWithId = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.report_id === reportId)
-    );
-    
-    //console.log("reportWithId:",reportWithId);
+    const reportsData = await reports();
 
-    if(!reportWithId){
-        errorObject.error="Report with report id provided is not found";
+    const report = await reportsData.findOne({ "report_id": reportId });
+
+    if (!report) {
+        errorObject.error = "Report with the provided report ID is not found";
         throw errorObject;
     }
+
+    return report;
+//     const errorObject = {
+//         status:400
+//     }
+//     if (!userId || !validators.isValidUuid(userId)) 
+// {        errorObject.error= "Invalid user ID input";
+//     throw errorObject;
+// }
+//     if (!reportId || !validators.isValidUuid(reportId)) 
+// {        errorObject.error= "Invalid report ID input";
+//     throw errorObject;
+// }
+//     const adminData = await getUserById(userId);
     
-    return reportWithId;
+//     if (!adminData.isAdmin) 
+// {        errorObject.error="User does not have admin access.";
+//         throw errorObject;
+// }    
+//     const userData = await reports();
+    
+//     const usersWithReports = userData.filter((user) => 
+//         reports.length >0
+//     );
+    
+//     if (usersWithReports.length === 0) {
+//         errorObject.error="No reports found.";
+//         throw errorObject;
+//     }
+    
+
+//     const reportWithId = userData.flatMap(user => 
+//         (user.reportsIds || []).filter(report => report.report_id === reportId)
+//     );
+    
+
+//     if(!reportWithId){
+//         errorObject.error="Report with report id provided is not found";
+//         throw errorObject;
+//     }
+    
+//     return reportWithId;
 };
 
-export const updateReportStatus= async(userId, reportId,newStatus) =>{
-
+export const updateReportStatus= async(userId, reportId,newStatus,property_id) =>{
     const errorObject = {
         status:400
     }
@@ -939,21 +971,21 @@ export const updateReportStatus= async(userId, reportId,newStatus) =>{
         throw errorObject;
 }    
     const reportData = await getReportbyId(reportId,userId);
-    
+    console.log(reportData);
     if(!reportData){
         errorObject.error="Report with report id provided is not found";
         throw errorObject;
     }
     
     if( newStatus === "Accepted" || newStatus === "Rejected"){
-        reportData[0].status = newStatus;
+        reportData.status = newStatus;
     }else {
         errorObject.error="Invalid status update requested";
         throw errorObject;
     }
     
 
-    const userData = await getUserById(reportData[0].userId);
+    const userData = await getUserById(reportData.userId);
 
     if(!userData) 
 {        errorObject.error="No user data found.";
@@ -980,8 +1012,8 @@ export const updateReportStatus= async(userId, reportId,newStatus) =>{
 
 }
 
-export const updatePostReportStatus= async(userId, reportId) =>{
-
+export const updatePostReportStatus= async(userId, reportId,status) =>{
+console.log(userId, reportId,status);
     const errorObject = {
         status:400
     }
@@ -995,14 +1027,12 @@ export const updatePostReportStatus= async(userId, reportId) =>{
 }    
     const adminData = await getUserById(userId);
     
-    //console.log(adminData,reportId);
 
     if (!adminData.isAdmin) 
 {        errorObject.error="User does not have admin access.";
     throw errorObject;
 }    
     const reportData = await getReportbyId(reportId);
-    //console.log("reportData:",reportData);
 
     if(!reportData){
         errorObject.error="Report with report id provided is not found.";
@@ -1026,7 +1056,6 @@ export const updatePostReportStatus= async(userId, reportId) =>{
     const reportWithId = userData.flatMap(user => 
         (user.reportsIds || []).filter(report => report.report_id === reportId));
         
-    //console.log("reportWithId:",reportWithId);
 
     return updatedReportData;
 
@@ -1064,12 +1093,11 @@ return updatedReportData;
 
 };
 
-export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
+export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType,propertyId) => {
     const errorObject = {
         status:400
     }
     const userData = await getUserById(userId);
-    console.log("userdata:",userData);
     const date = new Date().toISOString(); //date when report is raised.
     if (!reportData || Object.keys(reportData).length === 0)
 {      errorObject.error="Invalid Report: Report content is required.";
@@ -1087,33 +1115,23 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
         reported_at: null, // date of report raised
         status: "pending", //status of the report which is managed by landlord
         resolved_at: null, // Date when status is resolved.
+        property_id:null
       };
     
     //Validation (cont.) and add to report object
     if (!userId || !validators.isValidUuid(userId)) {
-        console.log("invalid userID");
     errorObject.error="Invalid user ID input";
     throw errorObject;
     } else {
         updatedReportData.userId = userId;
     }
+    updatedReportData.property_id=propertyId;
     updatedReportData.reported_at = date;
     updatedReportData.report_description=reportData;
     updatedReportData.report_reason = reportReason;
     updatedReportData.reported_item_type=reportedItemType;
     userData.reportsIds.push(updatedReportData);
-  console.log("in reports:",updatedReportData);
-  
-    // complete the validation before using this method!
-    // const userReportUpdateStatus = await updateUser(
-    //    userId ,userData
-    // );
-  
-    // if (!userReportUpdateStatus)
-    //   errorObject.error="Failed to update user information with the report.");
-    //const updatedReportsIds = userData.reportsIds ? [...userData.reportsIds] : [updatedReportData];
     const updateResult = await updateUserReportIds(userId, updatedReportData);
-    console.log("updateResult:",updateResult);
     if (!updateResult)
 {      errorObject.error="Failed to update user information with the report.";
     throw errorObject;
@@ -1123,38 +1141,6 @@ if (!updateResult.acknowledged || !updateResult.insertedId)
     errorObject.error= "Could not create report";
     throw errorObject;
 }
-
-// Update User with thread id
-const userCollection = await users();
-
-const userUpdateStatus = await userCollection.updateOne(
-    { userId: userId },
-    { $push: { reportsIds: updatedReportsIds.report_id } } 
-);
-
-if (!userUpdateStatus)
-{            errorObject.error= 'Failed to update user information with new report.';
-    throw errorObject
-}    
-    // //Update User with report id
-    // const userUpdateStatus = await updateUser(
-    // { userId: userId },
-    // { $push: { reportsIds: updatedReportData.report_id } }
-    // );
-    
-    // if (!userUpdateStatus)
-    // throw "Failed to update user information with new review.";
-    
-    // //Update Landlord with report
-    // const landlordUpdateStatus = await updateUser(landlordId, {
-    // $push: { reviews: updatedReportData },
-    // });
-    
-    // if (!landlordUpdateStatus)
-    // throw "Failed to update landlord informaiton with new review.";
-    
-    //To Do: Recalculate Landlord's average ratings
-    // validators.updateRating(landlordId);
     
     //Return
     return { reportAdded: true };
@@ -1163,10 +1149,5 @@ if (!userUpdateStatus)
 const updateUserReportIds = async (userId, updatedReportsIds) => {
     const reportsCollection = await reports();
     const insertInfo = await reportsCollection.insertOne(updatedReportsIds);
-    // const result = await reportsCollection.updateOne({ _id: userId },{$set: updatedReportsIds})
     return insertInfo;
-    // return await updateUser(
-    //     userId,
-    //     {$push: { reportsIds: updatedReportsIds }} // Using $push to add the reportId to the reportsIds array
-    // );
 };

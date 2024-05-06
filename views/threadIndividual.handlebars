@@ -3,9 +3,9 @@
 {{!-- Community Forum --}}
 <h2>{{this.title}}</h2>
 
-<div class="forum-threads">
+<a href="/thread}}">Want to see all threads? Click here.</a>
 
-  <div class="thread">
+<div class="forum-threads">
 
     <p>Category: {{this.category}}</p>
     <p>Created by: {{this.userId}}</p>
@@ -18,36 +18,19 @@
 
     <p><a href="/threads_routes/addComment/{{this.threadId}}"></a>Add a comment to this thread.</p>
 
-    <ul>
-      
-      {{#each this.comments}}
-      <li>
+    <div class="comments">
+    {{#each this.comments}}
+    <div class="comment">
         <p>User ID: {{this.userId}}</p>
         <p>Comment Text: {{this.commentText}}</p>
         <p>Date Created: {{this.dateCreated}}</p>
         <p>Likes: {{this.likes}} <a href="/threads_routes/upvoteComment/{{this.commentId}}">Like Comment</a></p>
         <p>Dislikes: {{this.dislikes}} <a href="/threads_routes/downvoteComment/{{this.commentId}}">Dislike Comment</a></p>
-        
-        <!-- Replies 
-        
-        {{#if this.replies}}
-        <ul>
-          {{#each this.replies}}
-          <li>
-            <p>User ID: {{this.userId}}</p>
-            <p>Comment Text: {{this.commentText}}</p>
-            <p>Date Created: {{this.dateCreated}}</p>
-            <p>Likes: {{this.likes}}</p>
-            <p>Dislikes: {{this.dislikes}}</p>
-            <p><a href="/upvote/comment/{{this.commentId}}">Upvote Comment</a> / <a href="/downvote/comment/{{this.commentId}}">Downvote Comment</a></p>
-          </li>
-          {{/each}}
-        </ul>
-        
-      </li>
-      {{/each}}{{/if}}-->
-    </ul>
+    </div>
+    {{/each}}
+
   </div>
+
 
   <!-- Add Comment Form -->
     <form action="/threads_routes/addComment/{{this.threadId}}" method="post">

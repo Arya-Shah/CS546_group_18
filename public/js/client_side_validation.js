@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
     // Check if the current page is the '/report' page
-    if (currentPath === '/report') {
+    if (currentPath === '/report/:reportState/:id') {
         const reportForm = document.getElementById('reportForm');
         if (reportForm) {
             reportForm.addEventListener('submit', (event) => {

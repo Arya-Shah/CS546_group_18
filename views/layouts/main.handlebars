@@ -33,7 +33,7 @@
 
   {{#if userData}}
 
-  <form id="searchForm" method="GET">
+  <!--<form id="searchForm" method="GET">
     
     <label for="searchType">Search Type:</label>
       <select id="searchType" name="type">
@@ -51,15 +51,20 @@
 
     <div id='errorDiv' hidden></div>
 
-  </form>
+  </form>-->
 
   {{/if}}
 
   <div class="user-container">
   {{!-- to show/hide based on user session --}}
     {{#if userData}}
-      <a href="/user/profile">Profile</a>
+
+      <a href="/property">Property Search</a>
+      <a href="/landlord">Landlord Search</a>
+      <a href="/thread">Community Forum</a>
+      <a href="/user/profile">User Profile</a>
       <a href="/logout">Logout</a>
+
     {{/if}}
   </div>
 
@@ -67,10 +72,13 @@
 </header>
 
 <main>
+  {{{body}}}
+    <!--
     <ul id="searchResults" hidden></ul>
     <div id="propertyDetails" hidden></div>
     <a id="rootLink" href="/" hidden>New Search</a>
-    {{{body}}}
+    -->
+
 </main>
 
 {{#if success}}
