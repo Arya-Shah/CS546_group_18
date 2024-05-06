@@ -32,7 +32,92 @@ router.route('/property/:propertyId')
 
     }
 
-});
+}
+
+)
+.post(
+    async (req, res) => {
+
+        const { propertyName, address, city, state, zipcode, latitude, longitude, category, bedrooms, bathrooms } = req.body;
+
+    //Validation
+    const errors = [];
+
+    if (!propertyName || !validators.isValidString(propertyName.trim())) {
+        errors.push("Invalid property name input");
+    }
+
+    if (!address || address.trim().length < 5 || address.trim().length > 100) {
+        errors.push("The provided address needs to be between 5 and 100 characters.");
+    }
+
+    if (!city || !validators.isValidString(city.trim())) {
+        errors.push("Invalid city input");
+    }
+
+    if (!state || !validators.isValidString(state.trim())) {
+        errors.push("Invalid state input");
+    }
+
+    if (!zipcode || !validators.isValidString(zipcode.trim()) || !validators.isValidZipcode(zipcode.trim())) {
+        errors.push("Invalid zipcode input");
+    }
+
+    if (!longitude || !validators.isValidString(longitude.trim()) || !validators.isValidLongitude(longitude.trim())) {
+        errors.push("Invalid longitude input");
+    }
+
+    if (!latitude || !validators.isValidString(latitude.trim()) || !validators.isValidLatitude(latitude.trim())) {
+        errors.push("Invalid latitude input");
+    }
+
+    if (!category || !validators.isValidString(category.trim()) || !validators.isValidPropertyCategory(category.trim())) {
+        errors.push("Invalid property category input");
+    }
+
+    if (!bedrooms || !Number.isInteger(parseInt(bedrooms.trim()))) {
+        errors.push("Invalid bedrooms input");
+    }
+
+    if (!bathrooms || !Number.isInteger(parseInt(bathrooms.trim()))) {
+        errors.push("Invalid bathrooms input");
+    }
+
+    //Render addProperty Page with any caught errors
+    if (errors.length > 0) {
+        res.status(400).render('addProperty', { errors }); 
+    } else {
+       
+        try{
+        
+        const { propertyInserted, propertyId } = await properties.updateProperty(
+            propertyName.trim(),
+            address.trim(),
+            city.trim(),
+            state.trim(),
+            zipcode.trim(),
+            longitude.trim(),
+            latitude.trim(),
+            category.trim(),
+            bedrooms.trim(),
+            bathrooms.trim()
+        );
+
+        res.redirect(`/property/${propertyId}`)
+
+       } catch (e) {
+
+            res.status(500).render('error', { 
+                title: "Error Updating Property to Database.",
+                error: e.toString()
+            });
+       }
+
+    }
+
+    }
+)
+;
 
 //searchPropertyByName
 router.route('/property/searchPropertyByName/:searchQuery').post(async (req, res) => {
@@ -290,6 +375,7 @@ router.route('/property/searchPropertyById/:searchQuery').post(async (req, res) 
 router.get('/addProperty', (req, res) => {
     res.render('addProperty', { error: null }); 
 });
+
 
 // POST route to handle form submission and add a property
 router.post('/addProperty', async (req, res) => {
