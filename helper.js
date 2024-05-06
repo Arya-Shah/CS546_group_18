@@ -74,6 +74,15 @@ export const isValidPropertyCategory = (propertyCategory) => {
     
 };
 
+// Valid Thread Category
+export const isValidThreadCategory = (threadCategory) => {
+    
+    const threadCategories = ['Properties', 'Landlords', 'Neighborhoods', 'General'];
+
+    return threadCategories.includes(threadCategory);
+    
+};
+
 
 //Function: updateRating
 //Update Landlord Review
@@ -135,5 +144,6 @@ export default {
   isValidLongitude,
   isValidLatitude,
   isValidPropertyCategory,
-  updateRating
+  updateRating,
+  isValidThreadCategory
 };
