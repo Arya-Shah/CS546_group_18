@@ -17,3 +17,4 @@ const getCollectionFn = (collection) => {
 export const properties = getCollectionFn('properties');
 export const users = getCollectionFn('users');
 export const threads = getCollectionFn('threads');
+export const reports = getCollectionFn('reports');

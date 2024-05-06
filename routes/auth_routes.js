@@ -121,16 +121,31 @@ return res.status(200).render("logout", {
 });
 });
 
-router.route('/report').get(async (req,res)=>{
+router.route('/report/:reportState/:id').get(async (req,res)=>{
+  console.log(req.params.reportState,req.params.id);
+  // if property
+  if(req.params.reportState === 'property'){
+    console.log("in property");
+  }
+  // if landlord
+// if comment
+// if review
   try{
     return res.status(200).render('report',{ layout: 'main',
-    error: '', })
+    error: '', 
+    reportState: req.params.reportState,id:req.params.id})
   }catch(e){
     res.status(500).render('report',{error:e, form:req.body});
   }
 })
 .post(async (req,res) =>{
   console.log(req.body);
+  console.log(req.params.reportState,req.params.id);
+  //if report on property
+  if(req.params.reportState === 'property'){
+    console.log("in property");
+  }
+
   let report_Reason = req.body.reportReason;
   let reportedItem_type=req.body.reportedItem_type;
   console.log(report_Reason.length);
