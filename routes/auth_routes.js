@@ -122,6 +122,9 @@ return res.status(200).render("logout", {
 });
 
 router.route('/report/:reportState/:id').get(async (req,res)=>{
+  if(!req.session.user || !req.session.user.isAdmin){
+      return res.status(500).render('error', { error: 'Access Denied', layout: 'main' });
+  }
   console.log(req.params.reportState,req.params.id);
   // if property
   if(req.params.reportState === 'property'){
