@@ -33,6 +33,19 @@ let id = req.session.user.userId;
 }
 })
 
+
+router.route('/landlord')
+.get(async (req, res) => {
+try {
+
+    return res.status(200).render("allLandlords", {
+        layout:"main"
+    });
+}catch (e) {
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+}
+})
+
 // User profile page
 router.route('/profile')
 .get(async (req, res) => {

@@ -9,12 +9,11 @@
 <div class="property-details">
     
     <h3>Property Information</h3>
-    <p>Name: {{property.name}}</p>
+    <p>Name: {{property.propertyName}}</p>
     <p>Address: {{property.address}}, {{property.city}}, {{property.state}} {{property.zip}}</p>
-    <p>Category: {{property.Category}}</p>
-    <p>Bedrooms: {{property.Bedrooms}}</p>
+    <p>Category: {{property.propertyCategory}}</p>
+    <p>Bedrooms: {{property.bedrooms}}</p>
     <p>Bathrooms: {{property.bathrooms}}</p>
-    <p>Coordinates: Latitude: {{property.latitude}}, Longitude: {{property.longitude}}</p>
 
     <div id="map"></div> <!-- Placeholder for map integration -->
 
@@ -64,14 +63,10 @@
 
 <!-- Map --> 
 
-<div style="hide" id="long_val">{{property.longitude}}</div>
-<div style="hide" id="lat_val">{{property.latitude}}</div>
 <script type="text/javascript">
-var long_val = jQuery("long_val").val();
-var lat_val = jQuery("lat_val").val();
 
 function initMap() {
-const mapCenter = { lat: lat_val, lng: long_val }; // Center of the map
+const mapCenter = { lat: {{property.longitude}}, lng: {{property.latitude}} }; // Center of the map
 const map = new google.maps.Map(document.getElementById("map"), {
 center: mapCenter,
 zoom: 8,
@@ -80,24 +75,9 @@ zoom: 8,
 const marker = new google.maps.Marker({
 position: mapCenter, 
 map: map, 
-title: {{property.name}}, 
+title: "{{property.propertyName}}", 
 });
 }
 </script>
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDvaS1aQfxqdosmuu2gUJk-uE-pQeTKBI&callback=initMap" async defer></script>
 
-
-<!--
-{{! Property Details }}
-<h2>{{property.name}}</h2>
-<div class="property-details">
-<p>Address: {{property.address}}</p>
-<p>Rating: {{property.rating}}</p>
-<div id="propertyMap"></div> <! Placeholder for map integration 
-<h3>Reviews</h3>
-{{#each property.reviews}}
-<div class="review">
-<p>{{this.user}}: {{this.content}}</p>
-</div>
-{{/each}}
-</div>-->

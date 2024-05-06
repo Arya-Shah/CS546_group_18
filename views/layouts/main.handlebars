@@ -31,36 +31,13 @@
     <h1><a href="/">Apartment Hunt Helper</a></h1>
   </div>
 
-  {{#if userData}}
-
-  <!--<form id="searchForm" method="GET">
-    
-    <label for="searchType">Search Type:</label>
-      <select id="searchType" name="type">
-        <option value="">Select filter</option>
-        <option value="name">Name</option>
-        <option value="address">Address</option>
-        <option value="city">City</option>
-        <option value="state">State</option>
-        <option value="zip">Zip Code</option>
-      </select>
-
-    <label for="searchQuery">Search Query:</label>
-      <input class="search-input" type="text" id="searchQuery" name="query" placeholder="Search here...">
-      <button class="search-button" type="submit">Search</button>
-
-    <div id='errorDiv' hidden></div>
-
-  </form>-->
-
-  {{/if}}
 
   <div class="user-container">
   {{!-- to show/hide based on user session --}}
     {{#if userData}}
 
       <a href="/property">Property Search</a>
-      <a href="/landlord">Landlord Search</a>
+      <a href="/user/landlord">Landlord Search</a>
       <a href="/thread">Community Forum</a>
       <a href="/user/profile">User Profile</a>
       <a href="/logout">Logout</a>

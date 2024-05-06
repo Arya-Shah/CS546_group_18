@@ -120,88 +120,9 @@ return res.status(200).render("logout", {
 });
 });
 
-router.route('/report/:reportState/:id/:propertyId').get(async (req,res)=>{
-  if(!req.session.user || req.session.user.isAdmin){
-      return res.status(500).render('error', { error: 'Access Denied', layout: 'main' });
-  }
-  try{
-    return res.status(200).render('report',{ layout: 'main',
-    error: '', 
-    reportState: req.params.reportState,id:req.params.id,propertyId:req.params.propertyId})
-  }catch(e){
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-  }
-})
-.post(async (req,res) =>{
-  //if report on property
 
-  let report_Reason = req.body.reportReason;
-  let reportedItem_type=req.params.reportState;
-  if(report_Reason.length < 5){
-    return res.status(400).render('report', { error: 'Enter more Description!.' ,reportState: req.params.reportState,id:req.params.id,propertyId: req.params.propertyId});
-  }else{
-    try {
-    const userId = req.session.user.userId;
-      const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type,req.params.propertyId);
-      return res.status(200).render('report', { layout: 'main',
-      success: 'successfully reported!', });
-    }catch(e){
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-      // res.status(500).render('report', { error: e, form: req.body });
-    }
-  }
-});
 
-router.route('/moderator').get(async (req,res)=>{
-  try{
-    const userId = req.session.user.userId;
-    const pendingReports = await getAllPendingReports(userId);
-    return res.status(200).render('moderator',{ layout: 'main',
-    error: '', pendingReports })
-  }catch(e){
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-  }
-});
 
-router.route('/moderator/accept/:userId/:reportId/:propertyId').post(async (req, res) => {
-    try {
-        const status = "Accepted";
-        const reportId = req.params.reportId;
-        const userId = req.params.userId;
-        const propertyId=req.params.propertyId;
-        const result = await updateReportStatus(userId,reportId,status,propertyId);
-        console.log("updated result:",result);
-        // updatePostReportStatus
-
-        // Implement logic to accept the report with the given reportId
-        // For example, update the status of the report in the database
-        // Once the report is accepted, you can redirect or respond accordingly
-        return res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' }).then(
-          res.redirect('/moderator')
-        );
-        // return res.status(200).json({ message: 'Report accepted successfully.' });
-    } catch (e) {
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-    }
-});
-
-router.route('/moderator/reject/:userId/:reportId/:property_id').post(async (req, res) => {
-    try {
-        const status = "Rejected";
-        const reportId = req.params.reportId;
-        const userId = req.params.userId;
-        const propertyId=req.params.property_id;
-        const result = await updateReportStatus(userId,reportId,status,propertyId);
-        // updatePostReportStatus
-
-        // Implement logic to accept the report with the given reportId
-        // For example, update the status of the report in the database
-        // Once the report is accepted, you can redirect or respond accordingly
-        return res.status(200).json({ message: 'Report Rejected successfully.' });
-    } catch (e) {
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-    }
-});
 
   export default router;
 

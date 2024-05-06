@@ -26,7 +26,8 @@
             {{/if}}
 
             <!-- Show bookmarked properties if the user is not a landlord -->
-            {{#if not user.isLandlord}}
+            {{#if user.isLandlord}}
+            {{else}}
                 <h3>Bookmarked Properties</h3>
                 <div class="list-group">
                     {{#each user.bookmarks}}

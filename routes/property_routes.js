@@ -6,8 +6,23 @@ import * as properties from '../data/properties.js';
 import {searchPropertiesByName} from '../data/users.js'; 
 import validators from "../helper.js";
 
+router.route('/')
+.get(async (req, res) => {
+    try{
+        res.render('allProperties', { layout: 'main'});
+
+    } catch (e) {
+
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+
+    }
+
+}
+
+)
+
 // Property details page
-router.route('/property/:propertyId')
+router.route('/id/:propertyId')
 .get(async (req, res) => {
     
     const propertyId = req.params.propertyId;
@@ -116,7 +131,7 @@ router.route('/property/:propertyId')
 ;
 
 //searchPropertyByName
-router.route('/property/searchPropertyByName/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByName/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
@@ -158,7 +173,7 @@ router.route('/property/searchPropertyByName/:searchQuery').post(async (req, res
 });
 
 //searchPropertyByAddress
-router.route('/property/searchPropertyByAddress/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByAddress/:searchQuery').post(async (req, res) => {
     try {
         
         const errorObject = {
@@ -200,7 +215,7 @@ router.route('/property/searchPropertyByAddress/:searchQuery').post(async (req, 
 });
 
 //searchPropertyByState
-router.route('/property/searchPropertyByState/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByState/:searchQuery').post(async (req, res) => {
     try {
         
         const errorObject = {
@@ -242,7 +257,7 @@ router.route('/property/searchPropertyByState/:searchQuery').post(async (req, re
 });
 
 //searchPropertyByCity
-router.route('/property/searchPropertyByCity/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByCity/:searchQuery').post(async (req, res) => {
     try {
         
         const errorObject = {
@@ -284,7 +299,7 @@ router.route('/property/searchPropertyByCity/:searchQuery').post(async (req, res
 });
 
 //searchPropertyByZip
-router.route('/property/searchPropertyByZip/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByZip/:searchQuery').post(async (req, res) => {
     try {
         
         const errorObject = {
@@ -326,7 +341,7 @@ router.route('/property/searchPropertyByZip/:searchQuery').post(async (req, res)
 });
 
 //searchPropertyById
-router.route('/property/searchPropertyById/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyById/:searchQuery').post(async (req, res) => {
     try {
         
         const errorObject = {
@@ -423,7 +438,9 @@ router.post('/addProperty', async (req, res) => {
 
     //Render addProperty Page with any caught errors
     if (errors.length > 0) {
-        res.status(400).render('addProperty', { errors }); 
+        console.log(errors);
+        return res.status(400).render("addProperty", {title: "Error", error: errors,});
+        // res.status(400).render('addProperty', { errors }); 
     } else {
        
         try{
@@ -441,7 +458,7 @@ router.post('/addProperty', async (req, res) => {
             bathrooms.trim()
         );
 
-        res.redirect(`/property/${propertyId}`)
+        res.redirect(`/property/id/${propertyId}`)
 
        } catch (e) {
 

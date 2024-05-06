@@ -32,6 +32,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     rootLink.hide();
 
     //Handle empty input
+    console.log(searchQuery.val());
     searchQuery = searchQuery.val().trim();
     if(searchQuery === ''){
       errorDiv.text('Please provide a search term.').show();

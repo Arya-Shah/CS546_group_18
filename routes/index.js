@@ -14,7 +14,7 @@ const constructorMethod = (app) => {
     app.use('/property', property_routes);
     app.use('/thread', thread_routes);
 app.use('*', (req, res) => {
-    return res.status(404).json({error: 'Not found'});
+    res.status(400).render('error', { error: "Page Not Found", form: req.body });
     });
 };
 
