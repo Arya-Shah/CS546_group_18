@@ -16,7 +16,8 @@ addLandLordReport,
 addLandlordReview,
 getLandlordById,
 getAllLandlordsByState,
-getAllLandlordsByCity
+getAllLandlordsByCity,
+registerUser
 } from '../data/users.js'; 
 
 
@@ -45,6 +46,73 @@ try {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
 })
+
+router.route('/addlandlord')
+.get(async (req, res) => {
+try {
+        let flag = true;
+    return res.status(200).render("register", {
+        flag:flag,
+        layout:"main"
+    });
+}catch (e) {
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+}
+})
+
+.post(async (req, res) => {
+    //code here for POST
+    try{
+    let firstName = req.body.firstName.trim();
+    let lastName = req.body.lastName.trim();
+    let username = req.body.username.trim();
+    let password = req.body.password.trim();
+    let confirmPassword = req.body.confirmPassword.trim();
+    let email = req.body.email.trim();
+    let city = req.body.city.trim();
+    let state = req.body.state.trim();
+  
+    if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !city || !state){
+      return res.status(400).render('register', { error: 'All fields must be provided.' });
+    }
+    if(firstName.length < 2 || lastName.length < 2 || firstName.length > 25 || lastName.length > 25){
+      return res.status(400).render('register', { error: 'firstName and lastName should be between 2 and 25.' });
+    }
+    if (!/^[a-zA-Z\s]+$/.test(firstName) || !/^[a-zA-Z\s]+$/.test(lastName)) {
+      return res.status(400).render('register', { error: 'First and last name must be characters and cannot contain numbers.' });
+  }
+  if(username.length < 5 || username.length > 10){
+    return res.status(400).render('register', { error: 'username should be between 5 and 10.' });
+  }
+  if (!/^[a-zA-Z\s]+$/.test(username)) {
+    return res.status(400).render('register', { error: 'username must be characters and cannot contain numbers.' });
+  }
+  if(password.length < 8){
+  return res.status(400).render('register', { error: 'password should be greater than 8.' });
+  }
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+  return res.status(400).render('register', { error: 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character' });
+  }
+  if(password !== confirmPassword){
+  return res.status(400).render('register', { error: 'Password did not match.' });
+  }
+  // Validate email
+  if (!/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email)) {
+    return res.status(400).render('register', { error: 'Invalid email format.' });
+  }
+  // Validate city and state if required
+  if (!/^[a-zA-Z\s]+$/.test(city) || !/^[a-zA-Z\s]+$/.test(state)) {
+    return res.status(400).render('error', { error: 'City and state must contain only alphabetic characters and spaces.' });
+  }
+  await registerUser(firstName, lastName, username, password, city, state, email,true);
+  return res.status(200).render('allLandlords', {
+  layout: 'main',
+  success: 'Landord Created successfully', 
+  });
+  }catch(e){
+        res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+    }
+  });
 
 // User profile page
 router.route('/profile')
@@ -210,7 +278,7 @@ router.post('/deleteLandlordReview/:reviewId', async (req, res) => {
 });
 
 // Route for searching landlords by state
-router.route('/user/searchLandlordByState/:searchQuery').post(async (req, res) => {
+router.route('/searchLandlordByState/:searchQuery').post(async (req, res) => {
     try {
         const errorObject = {
             status: 400,
@@ -247,7 +315,7 @@ router.route('/user/searchLandlordByState/:searchQuery').post(async (req, res) =
     }
 });
 
-router.route('/user/searchLandlordByCity/:searchQuery').post(async (req, res) => {
+router.route('/searchLandlordByCity/:searchQuery').post(async (req, res) => {
     try {
 
         const errorObject = { status: 400 };
@@ -279,221 +347,3 @@ router.route('/user/searchLandlordByCity/:searchQuery').post(async (req, res) =>
 
 export default router;
 
-/*// Search Results page
-    router.route('/searchResults')
-    .get(async (req, res) => {
-    const searchTerm = req.query.searchTerm;
-    if (!helpers.isValidString(searchTerm)) {
-    return res.status(400).render('error', { error: 'Invalid search term.', layout: 'main' });
-    }
-    try {
-    // Replace 'searchPropertiesByName' with the actual function
-    const results = await searchPropertiesByName(searchTerm);
-    res.render('searchResults', { results, searchTerm, layout: 'main' });
-    } catch (e) {
-    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
-    }
-    });
-*/
-
-/*// Property details page
-router.route('/property/:propertyId')
-.get(async (req, res) => {
-const propertyId = req.params.propertyId;
-if (!helpers.isValidUuid(propertyId)) {
-return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
-}
-try {
-const property = await getPropertyById(propertyId);
-if (!property) {
-    return res.status(404).render('error', { error: 'Property not found.', layout: 'main' });
-}
-res.render('propertyDetails', { property, layout: 'main' });
-} catch (e) {
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-}
-});*/
-
-/* // getPropertyByName
-router.route('/searchProperty').post(async (req, res) => {
-//code here for POST this is where your form will be submitting searchMoviesByName and then call your data function passing in the searchMoviesByName and then rendering the search results of up to 20 Movies.
-try {
-    const errorObject = {
-    status: 400,
-    };
-
-    if (typeof req.body.name !== "string") {
-    errorObject.error = "Provided input must be a string.";
-    throw errorObject;
-    }
-
-    req.body.name = req.body.name.trim();
-
-    if (!req.body.name) {
-    errorObject.error = "No input provided to search.";
-    throw errorObject;
-    }
-    const result = await searchPropertiesByName(req.body.name);
-    if (result.length === 0) {
-    return res.status(404).render("error", {
-        title: "Movie Not Found",
-        error:
-        "We're sorry, but no results were found for '" + req.body.name + "'",
-    });
-    } else {
-    return res.status(200).render("searchResults", {
-        title: "Movie Found",
-        searchTerm: "Search Input: " + req.body.name,
-        movies: result,
-    });
-    }
-} catch (e) {
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
-}
-});*/
-
-
-// .put(async (req, res) => {
-// try {
-//     // Example validation directly in the route
-//     if (!req.body.firstName || req.body.firstName.trim() === '') {
-//     throw new Error('First name is required');
-//     }
-//     const updatedUser = await updateUser(req.params.userId, req.body);
-//     return res.json(updatedUser);
-// } catch (e) {
-//     return res.status(400).json({ error: e.message });
-// }
-// })
-// .delete(async (req, res) => {
-// try {
-//     const result = await removeUser(req.params.userId);
-//     return res.status(200).json(result);
-// } catch (e) {
-//     return res.status(400).json({ error: e.toString() });
-// }
-// });
-
-// // Route for bookmark operations
-// router.route('/bookmarks/:userId')
-// .get(async (req, res) => {
-// try {
-//     const bookmarks = await getBookmarkedProperties(req.params.userId);
-//     return res.json(bookmarks);
-// } catch (e) {
-//     return res.status(404).json({ error: e.toString() });
-// }
-// })
-// .post(async (req, res) => {
-// try {
-//     if (!req.body.propertyId || req.body.propertyId.trim() === '') {
-//     throw new Error('Property ID is required');
-//     }
-//     const bookmark = await addBookmark(req.params.userId, req.body.propertyId);
-//     return res.status(200).json(bookmark);
-// } catch (e) {
-//     return res.status(400).json({ error: e.message });
-// }
-// })
-// .delete(async (req, res) => {
-// try {
-//     if (!req.body.propertyId || req.body.propertyId.trim() === '') {
-//     throw new Error('Property ID is required');
-//     }
-//     const result = await removeBookmark(req.params.userId, req.body.propertyId);
-//     return res.status(200).json(result);
-// } catch (e) {
-//     return res.status(400).json({ error: e.message });
-// }
-// });
-
-// // Route for property search
-// router.get('/properties/search', async (req, res) => {
-// try {
-// if (!req.query.title || req.query.title.trim() === '') {
-//     throw new Error('Title is required and cannot be empty');
-// }
-// const results = await searchPropertiesByName(req.query.title);
-// return res.json(results);
-// } catch (e) {
-// return res.status(404).json({ error: e.message });
-// }
-// });
-
-// // Route for adding a landlord review
-// router.post('/reviews/landlord/:landlordId', async (req, res) => {
-// try {
-// if (!req.body.userId || req.body.userId.trim() === '' || !req.body.reviewText || req.body.reviewText.trim() === '') {
-//     throw new Error('User ID and review text are required');
-// }
-// const review = await addLandlordReview(req.params.landlordId, req.body, req.body.userId);
-// return res.status(200).json(review);
-// } catch (e) {
-// return res.status(400).json({ error: e.message });
-// }
-// });
-
-// // Route for removing a landlord review
-// router.delete('/reviews/landlord/:landlordId/:reviewId', async (req, res) => {
-// try {
-// if (!req.body.userId || req.body.userId.trim() === '') {
-//     throw new Error('User ID is required');
-// }
-// const result = await removeLandlordReview(req.body.userId, req.params.landlordId, req.params.reviewId);
-// return res.status(200).json(result);
-// } catch (e) {
-// return res.status(400).json({ error: e.message });
-// }
-// });
-
-// // Route for adding a report about a landlord
-// router.post('/reports/landlord/:landlordId', async (req, res) => {
-// try {
-// if (!req.body.userId || req.body.userId.trim() === '' || !req.body.reportReason || req.body.reportReason.trim() === '' || !req.body.reportDescription || req.body.reportDescription.trim() === '') {
-//     throw new Error('User ID, report reason, and report description are required');
-// }
-// const report = await addLandLordReport(req.params.landlordId, req.body, req.body.userId);
-// return res.status(200).json(report);
-// } catch (e) {
-// return res.status(400).json({ error: e.message });
-// }
-// });
-
-/*
-
-NOTE FROM CONNOR: the render('landlordReview) and ('propertyReview) handle bars are now used
-for the intake forms to submit these reviews. Sorry - I thought that was their purpose.
-Below I've added redirects, which will render the individual landlord's and properties's ids. 
-
-// Landlord review page
-router.route('/review/landlord/:landlordId')
-    .get(async (req, res) => {
- 
-    const landlordId = req.params.landlordId;
-    if (!helpers.isValidUuid(landlordId)) {
-    return res.status(400).render('error', { error: 'Invalid landlord ID format.', layout: 'main' });
-    }
-    try {
-    const reviews = await getReviewsByUserId(landlordId); // Assume this function exists
-    res.render('landlordReview', { reviews, layout: 'main' });
-    } catch (e) {
-    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
-    }
-    });
-
-// Property review page
-router.route('/review/property/:propertyId')
-    .get(async (req, res) => {
-  
-    const propertyId = req.params.propertyId;
-    if (!helpers.isValidUuid(propertyId)) {
-    return res.status(400).render('error', { error: 'Invalid property ID format.', layout: 'main' });
-    }
-    try {
-    const reviews = await getReviewsByUserId(propertyId); // Assume this function exists
-    res.render('propertyReview', { reviews, layout: 'main' });
-    } catch (e) {
-    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
-    }
-    });
-*/

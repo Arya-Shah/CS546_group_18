@@ -2,12 +2,19 @@
 <h1 class="display-4">Register</h1>
 
 <p>Use this form to register an account.</p>
+{{#if flag}}
+{{else}}
 <a href="/login">Already have an account? Click here to log-in</a>
+{{/if}}
 
 {{#if error}}
 <p class="error">{{error}}</p>
 {{/if}}
+{{#if flag}}
+<form id="signup-form" method="POST" action="/user/addlandlord">
+{{else}}
 <form id="signup-form" method="POST" action="/register">
+{{/if}}
 <label for="firstname">First Name</label>
 <input type="text" id="firstName" name="firstName">
 
