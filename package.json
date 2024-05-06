@@ -12,6 +12,8 @@
   "author": "Arya Shah  20012884, Connor S. Durkin 10443573 , Jayanth Kanala 20020619 , Gnaneswar Koyalamoodi 20017853 ",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.0",
+    "@googlemaps/js-api-loader": "^1.16.6",
     "axios": "^1.6.7",
     "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",

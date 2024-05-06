@@ -13,16 +13,23 @@ export const getAllThreads = async () => {
 
 // Function: getThreadById
 export const getThreadById = async (id) => {
-    
+    const errorObject = {
+        status: 400,
+        };
     // Validation
-    if (!id || !validators.isValidUuid(id)) throw "Invalid ID input";
+    if (!id || !validators.isValidUuid(id)) {
+        errorObject.error = "Invalid ID input"
+        throw errorObject }
 
     //Thread Collection and Thread
     const threadCollection = await threads();
     const thread = await threadCollection.findOne({ threadId: id });
 
     // Validation (cont.)
-    if (!thread) throw "Thread not found";
+if (!thread) {
+    errorObject.error = "Thread not found"
+    throw errorObject;
+}
 
     // Return
     return thread;
@@ -31,9 +38,13 @@ export const getThreadById = async (id) => {
 // Function: getThreadByCategory
 export const getThreadByCategory = async (category) => {
    
+    const errorObject = {
+        status: 400,
+        };
     // Validation
     if (!category || !validators.isValidString(category) || category.trim().length === 0) {
-        throw "Invalid category input.";
+        errorObject.error = "Invalid category input.";
+        throw errorObject;
     }
     category = category.trim().toLowerCase();
 
@@ -60,18 +71,29 @@ export const addThread = async (
   ) => {
     
       // Validation
+      const errorObject = {
+        status: 400,
+        };
       if (!userId || !validators.isValidString(userId))
-        throw "Invalid userId input";
-  
+{
+            errorObject.error = "Invalid userId input";
+            throw errorObject;
+}  
       if (!title || !validators.isValidString(title) || title.trim().length === 0)
-        throw "Invalid title input";
-  
+{        errorObject.error = "Invalid title input";
+      throw errorObject;
+
+    }  
       if (!threadText || !validators.isValidString(threadText) || threadText.trim().length === 0)
-        throw "Invalid threadText input";
-  
+{        errorObject.error = "Invalid threadText input";
+    throw errorObject;
+
+    }  
       if (!category || !validators.isValidString(category) || !validators.isValidThreadCategory(category) || category.trim().length === 0)
-        throw "Invalid category input";
-  
+{
+            errorObject.error = "Invalid category input";
+            throw errorObject;
+        }  
       // Thread Collection
       const threadCollection = await threads();
   
@@ -95,7 +117,10 @@ export const addThread = async (
   
       // Validation (cont.)
       if (!insertInfo.acknowledged || !insertInfo.insertedId)
-        throw "Could not add new thread";
+        {
+            errorObject.error= "Could not add new thread";
+            throw errorObject;
+        }
 
       // Update User with thread id
         const userCollection = await users();
@@ -106,8 +131,9 @@ export const addThread = async (
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new thread.';
-    
+{            errorObject.error= 'Failed to update user information with new thread.';
+            throw errorObject
+    }    
       // Return
       return { threadInserted: true, threadId: newThread.threadId };
   };
@@ -115,12 +141,17 @@ export const addThread = async (
 // Function: updateThread
 export const updateThread = async (threadId, updatedThread) => {
     
+    const errorObject = {
+        status: 400,
+        };
     // Validation
     if (!threadId || !validators.isValidUuid(threadId)) 
-        throw "Invalid thread ID input";
+        {errorObject.error =  "Invalid thread ID input";
+        throw errorObject}
 
     if (!updatedThread || typeof updatedThread !== "object" || Array.isArray(updatedThread))
-        throw "Invalid updatedThread input";
+    {errorObject.error= "Invalid updatedThread input";
+    throw errorObject}
 
     //Thread collection
     const threadCollection = await threads();
@@ -131,22 +162,22 @@ export const updateThread = async (threadId, updatedThread) => {
     // Validate and add updated thread information to object
     if (updatedThread.title) {
         if (!updatedThread.title || !validators.isValidString(updatedThread.title) || updatedThread.title.trim().length === 0)
-            throw "Invalid title input";
-        
+            {errorObject.error= "Invalid title input";
+            throw errorObject}
         updatedThreadData.title = updatedThread.title.trim();
     }
 
     if (updatedThread.threadText) {
         if (!updatedThread.threadText || !validators.isValidString(updatedThread.threadText) || updatedThread.threadText.trim().length === 0)
-            throw "Invalid threadText input";
-        
+            {errorObject.error= "Invalid threadText input";
+        throw errorObject}        
         updatedThreadData.threadText = updatedThread.threadText.trim();
     }
 
     if (updatedThread.category) {
         if (!updatedThread.category || !validators.isValidString(updatedThread.category) || !validators.isValidThreadCategory(updatedThread.category) || updatedThread.category.trim().length === 0)
-            throw "Invalid category input";
-        
+            {errorObject.error= "Invalid category input";
+        throw errorObject}        
         updatedThreadData.category = updatedThread.category.trim();
     }
 
@@ -161,7 +192,8 @@ export const updateThread = async (threadId, updatedThread) => {
 
     // Validation (cont.)
     if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0)
-        throw "Error occurred while updating thread";
+    {errorObject.error= "Error occurred while updating thread";
+    throw errorObject}
 
     // Return
     return { threadUpdated: true };
@@ -170,6 +202,9 @@ export const updateThread = async (threadId, updatedThread) => {
 // Function: removeThread
 export const removeThread = async (userId, threadId) => {
     
+    const errorObject = {
+        status: 400,
+        };
     // Validation
     if (!threadId || !validators.isValidUuid(threadId)) throw "Invalid thread ID input";
     if (!userId || !validators.isValidString(userId)) throw "Invalid userId input";
@@ -182,7 +217,8 @@ export const removeThread = async (userId, threadId) => {
     
     // Validation (cont.)
     if (deletionInfo.deletedCount === 0) {
-        throw `Error occurred while deleting thread with ID ${threadId}`;
+        errorObject.error= `Error occurred while deleting thread with ID ${threadId}`;
+        throw errorObject
     }
 
     // Update User to remove thread id
@@ -194,7 +230,8 @@ export const removeThread = async (userId, threadId) => {
     );
 
     if (!userUpdateStatus)
-        throw 'Failed to update user information after removing the thread.';
+        {errorObject.error= 'Failed to update user information after removing the thread.';
+        throw errorObject}
     
     // Return
     return { threadRemoved: true };
@@ -204,15 +241,21 @@ export const removeThread = async (userId, threadId) => {
 // Function: addCommentReply, adds comment to property or reply to comment
 export const addCommentReply = async (userId, threadOrCommentId, commentText) => {
         
+    const errorObject = {
+        status: 400,
+        };
     //Validations
         if (!userId || !validators.isValidUuid(userId))
-            throw 'Invalid user ID input';
+            {errorObject.error= 'Invalid user ID input';
+            throw errorObject}
         
         if (!threadOrCommentId || !validators.isValidUuid(threadOrCommentId))
-            throw 'Invalid thread or comment ID input';
+            {errorObject.error= 'Invalid thread or comment ID input';
+        throw errorObject}
 
         if(!commentText || typeof commentText !== 'string'){
-            throw 'Invalid comment provided. Comment needs to be a string.'
+            errorObject.error= 'Invalid comment provided. Comment needs to be a string.'
+            throw errorObject
         }
 
     //Create Comment Object    
@@ -250,8 +293,9 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
 
     //Throw Error if Failed 
         if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-                throw 'Failed to add comment or reply.';
-
+            {errorObject.error= 'Failed to add comment or reply.';
+            throw errorObject
+}
     //Update User with comment id
 
         const userCollection = await users();
@@ -262,7 +306,8 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
         );
 
         if (!userUpdateStatus)
-            throw 'Failed to update user information with new review.';
+            {errorObject.error= 'Failed to update user information with new review.';
+            throw errorObject}
 
     //Return
         return { commentOrReplyAdded: true };

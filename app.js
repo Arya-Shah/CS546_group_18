@@ -7,8 +7,12 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import exphbs from 'express-handlebars';
 
+
+
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
 
 const app = express();
 const handlebarsInstance = exphbs.create({
@@ -74,6 +78,7 @@ app.use(authMiddleware);
 app.engine('handlebars', handlebarsInstance.engine);
 app.set('view engine', 'handlebars');
 configRoutes(app);
+
 
 app.listen(3000, () => {
     console.log("We've now got a server!");

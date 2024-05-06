@@ -20,3 +20,20 @@
 <a href="/register" class="btn btn-link">Click here to register!</a>
 </div>
 </div>
+ <div id="map"></div>
+ <script type="text/javascript">
+  function initMap() {
+  const mapCenter = { lat: -34.397, lng: 150.644 }; // Center of the map
+  const map = new google.maps.Map(document.getElementById("map"), {
+    center: mapCenter,
+    zoom: 8,
+  });
+
+  const marker = new google.maps.Marker({
+    position: mapCenter, // Position of the marker
+    map: map, // Map to add the marker to
+    title: "Marker Title", // Title shown when you hover over the marker
+  });
+}
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCDvaS1aQfxqdosmuu2gUJk-uE-pQeTKBI&callback=initMap" async defer></script>
