@@ -120,7 +120,7 @@ export const getUserById = async (id) => {
     //Retreive user collection and specific user
     const userCollection = await users();
     const user = await userCollection.findOne({ userId: id });
-    console.log("user:",user);
+    console.log("user:",user,typeof(id));
     //Validation (cont.)
     if (!user){
         errorObject.error = 'User not found';
@@ -930,8 +930,6 @@ return updatedReportData;
 };
 
 export const addLandLordReport = async ( userId, reportData,reportReason,reportedItemType) => {
-    //Retrieve Landlord
-    // const landlord = await getUserById(landlordId);
     const errorObject = {
         status:400
     }

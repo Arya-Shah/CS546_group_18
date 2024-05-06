@@ -147,7 +147,6 @@ router.route('/report/:reportState/:id').get(async (req,res)=>{
     // if(!landlordId || landlordId === undefined || landlordId === null || landlordId === ''){
     //   res.status(500).render('report', { layout: 'main',error: 'you cannot raise a report since you do not have an apartment!', });
     // }else{
-      console.log("get userData:",userData);
       const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type);
       res.status(200).render('report', { layout: 'main',
       success: 'successfully reported!', });
