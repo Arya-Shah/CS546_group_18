@@ -1,0 +1,33 @@
+<h2 class="display-4">See Properties</h2>
+
+<p>Use this page to see properties stored on the website's database.</p> 
+<p>Use the form to search by properties's location.</p>
+<p>Click on a property listing to see additional details and navigate to its listing page.</p>
+
+<a href="/property/addproperty">Want to add a property to the database? Click here.</a>
+
+
+<form id="searchForm" method="GET">
+    
+    <div id='errorDiv' hidden></div>
+
+    <label for="searchType">Search Type:</label>
+      <select id="searchType" name="type">
+        <option value="">Select filter</option>
+        <option value="name">Name</option>
+        <option value="address">Address</option>
+        <option value="city">City</option>
+        <option value="state">State</option>
+        <option value="zip">Zip Code</option>
+      </select>
+
+    <label for="searchQuery">Search Query:</label>
+      <input class="search-input" type="text" id="searchQuery" name="query" placeholder="Search here...">
+      <button class="search-button" type="submit">Search</button>
+
+    <ul id="searchResults" hidden></ul>
+    <div id="propertyDetails" hidden></div>
+    <a id="rootLink" href="/" hidden>New Search</a>
+
+</form>
+

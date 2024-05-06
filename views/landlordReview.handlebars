@@ -1,5 +1,8 @@
 {{!-- Landlord Review Form --}}
-<h2>Review for {{landlord.name}}</h2>
+<h2>Review for {{landlord.firstname}}{{landlord.lastname}}</h2>
+
+<p>Use this form to submit a review for {{landlord.firstname}}{{landlord.lastname}}.</p>
+<a href="/user/landlord/{{landlord.userId}}">Want to see reviews already written for this landlord? Click here.</a>
 
 {{#if error}}
 <p class="error">{{error}}</p>
@@ -10,25 +13,25 @@
 <form id="landlordReviewForm">
     
     <label for="kindnessRating">Kindness Rating:</label>
-    <input type="range" id="kindnessRating" name="kindnessRating" min="1" max="5" required>
+    <input type="range" id="kindnessRating" name="kindnessRating" min="1" max="5">
     
     <label for="maintenanceResponsivenessRating">Maintenance Responsiveness Rating:</label>
-    <input type="range" id="maintenanceResponsivenessRating" name="maintenanceResponsivenessRating" min="1" max="5" required>
+    <input type="range" id="maintenanceResponsivenessRating" name="maintenanceResponsivenessRating" min="1" max="5">
     
     <label for="overallCommunicationRating">Overall Communication Rating:</label>
-    <input type="range" id="overallCommunicationRating" name="overallCommunicationRating" min="1" max="5" required>
+    <input type="range" id="overallCommunicationRating" name="overallCommunicationRating" min="1" max="5">
     
     <label for="professionalismRating">Professionalism Rating:</label>
-    <input type="range" id="professionalismRating" name="professionalismRating" min="1" max="5" required>
+    <input type="range" id="professionalismRating" name="professionalismRating" min="1" max="5">
     
     <label for="handinessRating">Handiness Rating:</label>
-    <input type="range" id="handinessRating" name="handinessRating" min="1" max="5" required>
+    <input type="range" id="handinessRating" name="handinessRating" min="1" max="5">
     
     <label for="depositHandlingRating">Deposit Handling Rating:</label>
-    <input type="range" id="depositHandlingRating" name="depositHandlingRating" min="1" max="5" required>
+    <input type="range" id="depositHandlingRating" name="depositHandlingRating" min="1" max="5">
     
     <label for="reviewText">Review:</label>
-    <textarea id="reviewText" name="reviewText" required></textarea>
+    <textarea id="reviewText" name="reviewText"></textarea>
     
     <button type="submit">Submit Review</button>
     

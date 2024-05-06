@@ -4,13 +4,13 @@
 <!-- CORRECT BUTTON to go to path to add review -->
 
 <h2>Landlord Details</h2>
+<p>This page allows you to see all reviews for the landlord {{landlord.firstName}} {{landlord.lastName}}.</p>
 
-<!-- Button to add a review -->
-<button onclick="addReview()">Add Review</button>
+<a href="/user/addLandLordReview/{{landlord.userId}}">Want to add a review for this landlord? Click here.</a>
 
 <div class="landlord-details">
  
-<h3>Contant Information</h3>
+<h3>Contact Information</h3>
   <p>First Name: {{landlord.firstName}}</p>
   <p>Last Name: {{landlord.lastName}}</p>
   <p>City: {{landlord.city}}</p>
@@ -18,41 +18,40 @@
   <p>Email: {{landlord.email}}</p>
 
   <h3>Properties:</h3>
-  <ul>
+  <p>
     {{#each landlord.properties}}
-    <li>{{this.name}}</li>
+    <span>{{this.name}}</span><br>
     {{/each}}
-  </ul>
+  </p>
 
   <h3>Average Ratings</h3>
-  <ul>
-    <li>Kindness Rating: {{landlord.averageRatings.averageKindnessRating}}</li>
-    <li>Maintenance Responsiveness Rating: {{landlord.averageRatings.averageMaintenanceResponsivenessRating}}</li>
-    <li>Overall Communication Rating: {{landlord.averageRatings.averageOverallCommunicationRating}}</li>
-    <li>Professionalism Rating: {{landlord.averageRatings.averageProfessionalismRating}}</li>
-    <li>Handiness Rating: {{landlord.averageRatings.averageHandinessRating}}</li>
-    <li>Deposit Handling Rating: {{landlord.averageRatings.averageDepositHandlingRating}}</li>
-  </ul>
+  <div>
+    <p>Kindness Rating: {{landlord.averageRatings.averageKindnessRating}}</p>
+    <p>Maintenance Responsiveness Rating: {{landlord.averageRatings.averageMaintenanceResponsivenessRating}}</p>
+    <p>Overall Communication Rating: {{landlord.averageRatings.averageOverallCommunicationRating}}</p>
+    <p>Professionalism Rating: {{landlord.averageRatings.averageProfessionalismRating}}</p>
+    <p>Handiness Rating: {{landlord.averageRatings.averageHandinessRating}}</p>
+    <p>Deposit Handling Rating: {{landlord.averageRatings.averageDepositHandlingRating}}</p>
+  </div>
 
   <h3>All Landlord Reviews</h3>
-  <ul>
+  <div>
     {{#each landlord.reviews}}
-    <li>
-      Author: {{this.author}}<br>
-      Date: {{this.date}}<br>
-      Kindness Rating: {{this.kindnessRating}}<br>
-      Maintenance Responsiveness Rating: {{this.maintenanceResponsivenessRating}}<br>
-      Overall Communication Rating: {{this.overallCommunicationRating}}<br>
-      Professionalism Rating: {{this.professionalismRating}}<br>
-      Handiness Rating: {{this.handinessRating}}<br>
-      Deposit Handling Rating: {{this.depositHandlingRating}}<br>
-      Review Text: {{this.reviewText}}
-    </li>
+    <div>
+      <p>Author: {{this.author}}</p>
+      <p>Date: {{this.date}}</p>
+      <p>Kindness Rating: {{this.kindnessRating}}</p>
+      <p>Maintenance Responsiveness Rating: {{this.maintenanceResponsivenessRating}}</p>
+      <p>Overall Communication Rating: {{this.overallCommunicationRating}}</p>
+      <p>Professionalism Rating: {{this.professionalismRating}}</p>
+      <p>Handiness Rating: {{this.handinessRating}}</p>
+      <p>Deposit Handling Rating: {{this.depositHandlingRating}}</p>
+      <p>Review Text: {{this.reviewText}}</p>
+    </div>
     {{/each}}
-  </ul>
+  </div>
   
 </div>
-
 
 <!-- Landlord Details -->
 <!--
