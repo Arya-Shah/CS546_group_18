@@ -164,3 +164,17 @@ router.post('/threads_routes/removeComment/:threadId/:commentId', async (req, re
         res.status(500).render('error', { error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
     }
 });
+
+// Community Forum page
+router.route('/communityForum')
+.get(async (req, res) => {
+try {
+    
+    const threads = await thread.getAllThreads();
+    res.render('communityForum', { threads, layout: 'main' });
+
+    } catch (e) {
+    res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
+    }
+    
+});

@@ -12,6 +12,7 @@ const constructorMethod = (app) => {
 
     app.use('/addProperty', property_routes);
     app.use('/propertyReview', property_routes);
+    app.use('/property_routes', property_routes);
     app.use('/property', property_routes);
 
     app.use('/addThread', thread_routes);

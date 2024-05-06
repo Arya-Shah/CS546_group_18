@@ -133,6 +133,111 @@ export const getUserById = async (id) => {
     
 };
 
+//Function: getLandlordById
+export const getLandlordById = async (id) => {
+    const errorObject = {
+        status: 400,
+    };
+    if (!validators.isValidUuid(id)) {
+        errorObject.error= "Invalid ID input";
+        throw errorObject;
+    }
+
+    // Retrieve user collection and specific landlord
+    const userCollection = await users();
+    const landlord = await userCollection.findOne({ userId: id, isLandlord: true });
+
+    // Validation
+    if (!landlord) {
+        errorObject.error = 'Landlord not found';
+        errorObject.status = 404;
+        throw errorObject; 
+    }
+
+    // Return 
+    return landlord;    
+};
+
+//Function: getAllLandlords
+export const getAllLandlords = async () => {
+    const errorObject = {
+        status: 400,
+    };
+
+    // Retrieve user collection
+    const userCollection = await users();
+
+    // Find all users where isLandlord is true
+    const landlords = await userCollection.find({ isLandlord: true }).toArray();
+
+    // Validation
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = 'No landlords found';
+        errorObject.status = 404;
+        throw errorObject; 
+    }
+
+    // Return landlords
+    return landlords;    
+};
+
+// Function: getAllLandlordsByState
+export const getAllLandlordsByState = async (state) => {
+    
+    const errorObject = {
+        status: 400,
+    };
+
+    // Validation
+    if (!state || !validators.isValidString(state) || state.trim().length === 0) {
+        errorObject.error = "Invalid state input.";
+        throw errorObject;
+    }
+
+    state = state.trim().toLowerCase();
+
+    const userCollection = await users();
+
+    const landlords = await userCollection.find({ isLandlord: true, state: state }).toArray();
+
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = "No landlords found for the provided state.";
+        throw errorObject;
+    }
+
+    return landlords;
+
+};
+
+// Function: getAllLandlordsByCity
+export const getAllLandlordsByCity = async (city) => {
+    const errorObject = {
+        status: 400,
+    };
+
+    // Validation
+    if (!city || !validators.isValidString(city) || city.trim().length === 0) {
+        errorObject.error = "Invalid city input.";
+        throw errorObject;
+    }
+
+    city = city.trim().toLowerCase();
+
+    // Retrieve user collection
+    const userCollection = await users();
+
+    // Find all users where isLandlord is true and city matches
+    const landlords = await userCollection.find({ isLandlord: true, city: city }).toArray();
+
+    // Validation
+    if (!landlords || landlords.length === 0) {
+        errorObject.error = "No landlords found for the provided city.";
+        throw errorObject;
+    }
+
+    // Return landlords
+    return landlords;
+}
 
 //Function: registerUser    
 export const registerUser = async (firstName, lastName, username, password, city, state, email, isLandlord, isAdmin) => {

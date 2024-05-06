@@ -373,6 +373,29 @@ router.post('/addProperty', async (req, res) => {
 
 });
 
+// Delete a property (post)
+router.post('/deleteProperty/:propertyId', async (req, res) => {
+    try {
+        const propertyId = req.params.propertyId;
+
+        if (!propertyId || !validators.isValidUuid(propertyId)) {
+            throw new Error("Invalid property ID input");
+        }
+
+        const { propertyDeleted } = await removeProperty(propertyId);
+
+        if (!propertyDeleted) {
+            return res.status(500).json({ error: 'Failed to delete property.' });
+        }
+
+        // Redirect to the property page after successful deletion
+        res.redirect(`/property/${propertyId}`);
+
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+});
+
 // PropertyReview
 router.get('/propertyReview', (req, res) => {
     res.render('addPropertyReview', { layout: 'main' });
@@ -442,10 +465,79 @@ router.post('/propertyReview', async (req, res) => {
 
             // Render the property details page after successfully adding the review
             return res.redirect(`/property/${propertyId}`);
+
         } catch (error) {
             console.error('Error adding property review:', error);
             return res.status(500).render('error', { error: 'Internal Server Error.', layout: 'main' });
         }
     }
 });
+
+router.post('/deletePropertyReview/:reviewId', async (req, res) => {
+    try {
+        const reviewId = req.params.reviewId;
+
+        if (!reviewId || !validators.isValidUuid(reviewId)) {
+            throw new Error("Invalid review ID input");
+        }
+
+        const { reviewRemoved, propertyId } = await removePropertyReview(propertyId, reviewId);
+
+        if (!reviewRemoved) {
+            return res.status(500).json({ error: 'Failed to remove property review.' });
+        }
+
+        // Redirect to the property page after successful review deletion
+        res.redirect(`/property/${propertyId}`);
+
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+});
+
+
+//Add comment to property
+router.post('/property_routes/addComment/:propertyId', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const { propertyId } = req.params;
+        const { comment } = req.body; 
+
+        const result = await properties.addCommentReply(userId, propertyId, comment);
+
+        if (!result) {
+            return res.status(500).json({ error: 'Failed to add comment to thread.' });
+        }
+
+        res.redirect(`'/property/${propertyId}'`);
+
+    } catch (error) {
+       
+        res.status(500).render('error', { error: 'Internal Server Error when adding comment to thread.', layout: 'main' });
+    }
+});
+
+
+// Remove Comment
+router.post('/property_routes/removeComment/:propertyId/:commentId', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const { propertyId, commentId } = req.params;
+
+        const result = await properties.removeCommentReply(userId, commentId);
+
+        if (!result) {
+            return res.status(500).json({ error: 'Failed to remove comment from thread.' });
+        }
+
+        res.redirect(`'/property/${propertyId}'`);
+
+    } catch (error) {
+        // Handle errors
+        res.status(500).render('error', { error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
+    }
+});
+
+
+
 export default router;
