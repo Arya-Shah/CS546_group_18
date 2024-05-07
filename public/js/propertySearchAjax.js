@@ -32,9 +32,9 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     rootLink.hide();
 
     //Handle empty input
-    console.log(searchQuery.val());
-    searchQuery = searchQuery.val().trim();
-    if(searchQuery === ''){
+    //console.log(searchQuery.val());
+    let searchQueryValue = searchQuery.val().trim();
+    if(searchQueryValue === ''){
       errorDiv.text('Please provide a search term.').show();
       return;
     } 
@@ -47,66 +47,90 @@ You will make client - side AJAX requests to the API and use jQuery to target an
 
       requestConfig = {
         method: 'GET',
-        url: `property/searchPropertyByAddress/${searchQuery}`
+        url: `property/searchPropertyByAddress/${searchQueryValue}`
       }
 
     } else if ((searchType.val() === 'city')) {
 
       requestConfig = {
         method: 'GET',
-        url: `property/searchPropertyByCity/${searchQuery}`
+        url: `property/searchPropertyByCity/${searchQueryValue}`
       }
 
     } else if ((searchType.val() === 'state')) {
 
       requestConfig = {
         method: 'GET',
-        url: `property/searchPropertyByState/${searchQuery}`
+        url: `property/searchPropertyByState/${searchQueryValue}`
       }
       
     } else if ((searchType.val() === 'zip')){
 
       requestConfig = {
         method: 'GET',
-        url: `property/searchPropertyByZip/${searchQuery}`
+        url: `property/searchPropertyByZip/${searchQueryValue}`
       }
 
     } else if ((searchType.val() === 'name')){
 
       requestConfig = {
         method: 'GET',
-        url: `property/searchPropertyByName/${searchQuery}`
+        url: `property/searchPropertyByName/${searchQueryValue}`
       }
 
     } 
 
+    //console.log('Request Config:', requestConfig);
+
     //AJAX Call
+    /*$.ajax(requestConfig).then(function(responseMessage) {
 
-    $.ajax(requestConfig).then(function(responseMessage) {
+        console.log('Response Message:', responseMessage);
 
-      if(responseMessage.Response && Array.isArray(responseMessage.Search)){
+        if(responseMessage.Response && Array.isArray(responseMessage.Search)){
 
-          responseMessage.Search.forEach((property) => {
-            
-            let listItem = $(`<li> <a href="javascript:void(0)" data-id="${property.propertyId}">${property.name}, ${property.type}, ${property.city}, ${property.state}</a></li>`);
+            responseMessage.Search.forEach((property) => {
 
-            searchResults.append(listItem);
+              let listItem = $(`<li> <a href="javascript:void(0)" data-id="${property.propertyId}">${property.name}, ${property.type}, ${property.city}, ${property.state}</a></li>`);
 
-          });
+              searchResults.append(listItem);
 
-          //Show searchResults
-          searchResults.show();
+            });
 
-          //Show RootLink
-          rootLink.show();
+            //Show searchResults
+            searchResults.show();
 
-      } else {
+            //Show RootLink
+            rootLink.show();
 
-        errorDiv.text('Error in connecting with search results.').show();
+        } else {
 
-        return;
+          errorDiv.text('Error in connecting with search results. (AJAX CALL)').show();
 
-      };
+          return;
+
+        };*/
+
+      $.ajax(requestConfig).then(function(properties) {
+
+        if(properties && Array.isArray(properties)){
+
+            properties.forEach((property) => {
+
+                let listItem = $(`<li> <a href="javascript:void(0)" data-id="${property.propertyId}">${property.propertyName}, ${property.propertyCategory}, ${property.city}, ${property.state}</a></li>`);
+
+                searchResults.append(listItem);
+
+            });
+            // Show searchResults
+            searchResults.show();
+
+            // Show RootLink
+            rootLink.show();
+
+        } else {
+            errorDiv.text('Error: Invalid response from server.').show();
+        }
 
     });
   });
@@ -127,7 +151,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     searchResults.hide();
     propertyDetails.empty();
 
-    //Pull propertyId from the a element
+     //Pull propertyId from the a element
     let propertyId = $(this).data('id');
 
     //TO DO: USE PROPERTY ID HERE. CONSTRUCT URL PATH ACCORDING TO ROUTES
@@ -210,7 +234,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
       propertyDetails.show();
 
       } else {
-        errorDiv.text('Error in connecting with property details page.').show();
+        errorDiv.text('Error in connecting with property details page. (AJAX CALL 2)').show();
         return;
       };
   });

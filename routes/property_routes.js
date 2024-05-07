@@ -173,7 +173,7 @@ router.route('/searchPropertyByName/:searchQuery').get(async (req, res) => {
 });
 
 //searchPropertyByAddress
-router.route('/searchPropertyByAddress/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByAddress/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
@@ -215,7 +215,7 @@ router.route('/searchPropertyByAddress/:searchQuery').post(async (req, res) => {
 });
 
 //searchPropertyByState
-router.route('/searchPropertyByState/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByState/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
@@ -257,7 +257,7 @@ router.route('/searchPropertyByState/:searchQuery').post(async (req, res) => {
 });
 
 //searchPropertyByCity
-router.route('/searchPropertyByCity/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByCity/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
@@ -299,7 +299,7 @@ router.route('/searchPropertyByCity/:searchQuery').post(async (req, res) => {
 });
 
 //searchPropertyByZip
-router.route('/searchPropertyByZip/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyByZip/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
@@ -341,7 +341,7 @@ router.route('/searchPropertyByZip/:searchQuery').post(async (req, res) => {
 });
 
 //searchPropertyById
-router.route('/searchPropertyById/:searchQuery').post(async (req, res) => {
+router.route('/searchPropertyById/:searchQuery').get(async (req, res) => {
     try {
         
         const errorObject = {
