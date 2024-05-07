@@ -40,11 +40,45 @@ let id = req.session.user.userId;
 router.route('/landlord')
 .get(async (req, res) => {
 try {
-    const allLandlords = await getAllLandlords();
+
+    let allLandlords = await getAllLandlords();
+
+            // Check if sorting query parameter exists and sort accordingly
+            if (req.query.sort === 'kindnessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.kindnessRating - a.averageRatings.kindnessRating;
+                });
+            } else if (req.query.sort === 'maintenanceResponsivenessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.maintenanceResponsivenessRating - a.averageRatings.maintenanceResponsivenessRating;
+                });
+            } else if (req.query.sort === 'overallCommunicationRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.overallCommunicationRating - a.averageRatings.overallCommunicationRating;
+                });
+            } else if (req.query.sort === 'professionalismRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.professionalismRating - a.averageRatings.professionalismRating;
+                });
+            } else if (req.query.sort === 'handinessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.handinessRating - a.averageRatings.handinessRating;
+                });
+            } else if (req.query.sort === 'depositHandlingRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.depositHandlingRating - a.averageRatings.depositHandlingRating;
+                });
+            }
+
+            if (req.query.filter) {
+                allLandlords = allLandlords.filter(landlord => landlord.state === req.query.filter);
+            }
+
     return res.status(200).render("allLandlords", {
         landlords:allLandlords,
         layout:"main"
     });
+
 }catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
