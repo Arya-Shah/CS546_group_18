@@ -32,7 +32,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     rootLink.hide();
 
     //Handle empty input
-    //console.log(searchQuery.val());
+
     let searchQueryValue = searchQuery.val().trim();
     if(searchQueryValue === ''){
       errorDiv.text('Please provide a search term.').show();
@@ -79,13 +79,9 @@ You will make client - side AJAX requests to the API and use jQuery to target an
       }
 
     } 
-
-    //console.log('Request Config:', requestConfig);
-
     //AJAX Call
     /*$.ajax(requestConfig).then(function(responseMessage) {
 
-        console.log('Response Message:', responseMessage);
 
         if(responseMessage.Response && Array.isArray(responseMessage.Search)){
 
@@ -138,7 +134,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
             rootLink.show();
 
         } else {
-            errorDiv.text('Error: Invalid response from server.').show();
+            errorDiv.text(properties).show();
         }
 
     });
@@ -173,7 +169,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     //AJAX Call
 
     $.ajax(requestConfig).then(function(responseMessage) {
-      console.log(responseMessage);
+
       if(responseMessage.Response){
 
         let htmlToInsert = `

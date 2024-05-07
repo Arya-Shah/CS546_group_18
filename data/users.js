@@ -1013,7 +1013,6 @@ export const updateReportStatus= async(userId, reportId,newStatus,property_id) =
 }
 
 export const updatePostReportStatus= async(userId, reportId,status) =>{
-console.log(userId, reportId,status);
     const errorObject = {
         status:400
     }

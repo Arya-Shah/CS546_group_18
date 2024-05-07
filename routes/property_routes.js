@@ -146,13 +146,8 @@ router.route('/searchPropertyByName/:searchQuery').get(async (req, res) => {
         }
         
         const result = await properties.getPropertyByName(searchQuery);
-        
         if (result.length === 0) {
-            
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+            return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
 
         } else {
             return res.status(200).json(result);
@@ -183,18 +178,14 @@ router.route('/searchPropertyByAddress/:searchQuery').get(async (req, res) => {
         const searchQuery = req.params.searchQuery.trim();
 
         if (!searchQuery) {
-            errorObject.error = "No input provided to search.";
-            throw errorObject;
+            return res.status(200).json( "No input provided to search.");
         }
         
         const result = await properties.getPropertyByAddress(searchQuery);
         
         if (result.length === 0) {
             
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+            return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
 
         } else {
             return res.status(200).json(result);
@@ -225,18 +216,15 @@ router.route('/searchPropertyByState/:searchQuery').get(async (req, res) => {
         const searchQuery = req.params.searchQuery.trim();
 
         if (!searchQuery) {
-            errorObject.error = "No input provided to search.";
-            throw errorObject;
+            return res.status(200).json("No input provided to search.");
         }
         
         const result = await properties.getPropertyByState(searchQuery);
         
         if (result.length === 0) {
             
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+            return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
+          
 
         } else {
             return res.status(200).json(result);
@@ -267,18 +255,15 @@ router.route('/searchPropertyByCity/:searchQuery').get(async (req, res) => {
         const searchQuery = req.params.searchQuery.trim();
 
         if (!searchQuery) {
-            errorObject.error = "No input provided to search.";
-            throw errorObject;
+            return res.status(200).json("No input provided to search.");
         }
         
         const result = await properties.getPropertyByCity(searchQuery);
         
         if (result.length === 0) {
             
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+            return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
+        
 
         } else {
             return res.status(200).json(result);
@@ -309,18 +294,16 @@ router.route('/searchPropertyByZip/:searchQuery').get(async (req, res) => {
         const searchQuery = req.params.searchQuery.trim();
 
         if (!searchQuery) {
-            errorObject.error = "No input provided to search.";
-            throw errorObject;
+            return res.status(200).json("No input provided to search.");
+           
         }
         
         const result = await properties.getPropertyByZipcode(searchQuery);
         
         if (result.length === 0) {
             
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+            return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
+           
 
         } else {
             return res.status(200).json(result);
@@ -351,18 +334,17 @@ router.route('/searchPropertyById/:searchQuery').get(async (req, res) => {
         const searchQuery = req.params.searchQuery.trim();
 
         if (!searchQuery) {
-            errorObject.error = "No input provided to search.";
-            throw errorObject;
+            return res.status(200).json("No input provided to search.");
+            
         }
         
         const result = await properties.getPropertyById(searchQuery);
         
         if (result.length === 0) {
             
-            return res.status(404).render("error", {
-                title: "Property Not Found",
-                error: "We're sorry, but no results were found for '" + searchQuery + ".'",
-            });
+          
+                return res.status(200).json("We're sorry, but no results were found for '" + searchQuery + ".'");
+            
 
         } else {
             return res.status(200).json(result);
@@ -438,7 +420,7 @@ router.post('/addProperty', async (req, res) => {
 
     //Render addProperty Page with any caught errors
     if (errors.length > 0) {
-        console.log(errors);
+
         return res.status(400).render("addProperty", {title: "Error", error: errors,});
         // res.status(400).render('addProperty', { errors }); 
     } else {

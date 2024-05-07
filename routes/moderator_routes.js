@@ -20,7 +20,7 @@ router.route('/').get(async (req,res)=>{
           const userId = req.params.userId;
           const propertyId=req.params.propertyId;
           const result = await updateReportStatus(userId,reportId,status,propertyId);
-          console.log("updated result:",result);
+      
           // updatePostReportStatus
   
           // Implement logic to accept the report with the given reportId

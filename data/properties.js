@@ -60,9 +60,8 @@ export const getPropertyByName = async (name) => {
     const propertyCollection = await properties();
 
     //Regular expression to make search case insenstive and global
-    const regex = new RegExp(name, 'gi');
-
-    const propertiesMatchingName = await propertyCollection.find({ name: regex }).toArray();
+    const regex = new RegExp(`\\b${name}\\b`, 'gi');
+    const propertiesMatchingName = await propertyCollection.find({ propertyName: regex }).toArray();
     
     //Note: propertiesMatchingName is an array of objects
     return propertiesMatchingName;
@@ -91,7 +90,7 @@ export const getPropertyByAddress = async (address) => {
     const propertyCollection = await properties();
 
     //Regular expression to make search case insenstive and global
-    const regex = new RegExp(address, 'gi');
+    const regex = new RegExp(`\\b${address}\\b`, 'gi');
 
     const propertiesMatchingAddress = await propertyCollection.find({ address: regex }).toArray();
     
@@ -116,7 +115,7 @@ export const getPropertyByCity = async (city) => {
     const propertyCollection = await properties();
 
     // Regular expression to make search case insensitive and global
-    const regex = new RegExp(city, 'gi');
+    const regex = new RegExp(`\\b${city}\\b`, 'gi');
 
     const propertiesMatchingCity = await propertyCollection.find({ city: regex }).toArray();
     
@@ -142,7 +141,7 @@ export const getPropertyByState = async (state) => {
     const propertyCollection = await properties();
 
     // Regular expression to make search case insensitive and global
-    const regex = new RegExp(state, 'gi');
+    const regex = new RegExp(`\\b${state}\\b`, 'gi');
 
     const propertiesMatchingState = await propertyCollection.find({ state: regex }).toArray();
     
@@ -168,7 +167,7 @@ export const getPropertyByZipcode = async (zipcode) => {
     const propertyCollection = await properties();
 
     // Regular expression to make search case insensitive and global
-    const regex = new RegExp(zipcode, 'gi');
+    const regex = new RegExp(`\\b${zipcode}\\b`, 'gi');
 
     const propertiesMatchingZipcode = await propertyCollection.find({ zipcode: regex }).toArray();
     

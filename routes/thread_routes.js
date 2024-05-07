@@ -78,7 +78,7 @@ router
             res.redirect(`/thread/id/${threadId}`);
 
         } catch (e) {
-            console.log(error);
+           
             res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, layout: 'main' });
         }
 
@@ -139,7 +139,7 @@ router.route('/id/:threadId')
         res.render('threadIndividual', { title:'threads',threadData:threadData, layout: 'main' });
 
     } catch (error) {
-        console.log(error);
+       
         res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
 
     }
