@@ -1,33 +1,37 @@
-import { addProperty } from "./data/properties.js";
+import { addProperty,addPropertyReview } from "./data/properties.js";
+import { addLandLordReport,registerUser,addLandlordReview } from "./data/users.js";
+import { v4 as uuid } from "uuid";
 
 const seed = async () => {
   try {
-    const property = await addProperty(
+    const { userId } =  await registerUser( "John","Doe","johndoe","$2a$16$HjhM8bIy49fJFlWgbMsp0.gZRQ1cBY9x3cBJzlWMUtXpZEZHzM8W.","New York","NY","johndoe@example.com",false,false)
+    const report = await addLandLordReport(userId,"eherhrr", "property", "maintenance", "663902c1f1d649ff153c2938");
+    const {propertyId} = await addProperty("Cozy Cottage", "123 Oak Street", "Springfield", "Illinois", "62701", "-89.6501", "39.7817", "Apartment", "2","2");
+    // const addReview= await addLandlordReview(userId,1,2,3,5,3,2,"This is a sample review.",userId);
+    const addReview = await addLandlordReview(
+      userId,
       {
-        propertyName: "Cozy Cottage",
-        address: "   123 Oak Street   ",
-        city: "   Springfield   ",
-        state: "   Illinois   ",
-        zipcode: "   62701   ",
-        longitude: "   -89.6501   ",
-        latitude: "   39.7817   ",
-        category: "   Vacation Rental   ",
-        bedrooms: "   2   ",
-        bathrooms: "   1   ",
-      },
-      {
-        propertyName: "   Modern Loft   ",
-        address: "   456 Maple Avenue   ",
-        city: "   New York City   ",
-        state: "   New York   ",
-        zipcode: "   10001   ",
-        longitude:    -73.9877   ,
-        latitude:    40.7484   ,
-        category: "   Urban Apartment   ",
-        bedrooms: "   1   ",
-        bathrooms: "   1   ",
-      }
-    );
+        kindnessRating: 1,
+        maintenanceResponsivenessRating: 2,
+        overallCommunicationRating: 3,
+        professionalismRating: 5,
+        handinessRating: 3,
+        depositHandlingRating: 2,
+        reviewText: "This is a sample review."
+      },userId);
+      const addpropertyreview = await addPropertyReview(
+        propertyId,
+        {
+          maintenanceRating:1,
+          locationDesirabilityRating:2,
+          ownerResponsivenessRating:3,
+          propertyConditionRating:4 ,
+          communityRating:5 ,
+          amenitiesRating:3 ,
+          reviewText: "sample review"
+        },userId);
+
+
   } catch (error) {
     console.error("Error seeding data:", error);
   }
