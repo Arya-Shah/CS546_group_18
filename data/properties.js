@@ -512,8 +512,6 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     } else {
         updatedReviewData.userId = userId;
     }
-
-    console.log(userId);
     
     const validRatings = [1, 2, 3, 4, 5];
     
@@ -583,22 +581,17 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     } else {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
-
-    console.log('Through data validation.')
     
     //Update User with review id
     const userUpdateStatus = await usersfunctions.updateUser(
         userId,
         { reviewIds: updatedReviewData.reviewId }
     );
-
-    console.log(userUpdateStatus);
     
     if (!userUpdateStatus)
         {errorObject.error= "Failed to update user information with new property review.";
         throw errorObject}
     
-
     //ProperpertyCollection
     const propertyCollection = await properties();
 
@@ -606,8 +599,6 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         { propertyId: propertyId }, 
         { $push: { reviews: updatedReviewData } } 
     );
-
-    console.log(propertyUpdateStatus);
     
     if (!propertyUpdateStatus)
         {errorObject.error= "Failed to update property informatino with new review.";

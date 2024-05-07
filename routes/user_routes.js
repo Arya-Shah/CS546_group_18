@@ -184,11 +184,33 @@ router.route('/review/property/:propertyId')
     });
 
 //LandlordReview
-router.get('/landlordReview', (req, res) => {
-    res.render('addLandlordReview', { title:'review',layout: 'main' });
+router.get('/landlordReview/:userId', async (req, res) => {
+    
+    
+    try {
+        const landlordId = req.params.userId;
+        
+    
+        if (!landlordId || !helpers.isValidUuid(landlordId)) {
+            throw new Error("Invalid landlord ID input");
+        }
+
+        const  landlordPulled = await getLandlordById(landlordId);
+        
+
+        res.render('LandlordReview', { title: 'addLandlordReview', layout: 'main', landlord:  landlordPulled});
+    
+    } catch (e) {
+        res.status(e.status ? e.status : 500).render('error', { title: 'error', error: e.error ? e.error : e, form: req.body });
+    }
+
 });
 router.post('/landlordReview', async (req, res) => {
-    const { 
+    
+    
+    
+    const {
+        landlordId, 
         kindnessRating, 
         maintenanceResponsivenessRating, 
         overallCommunicationRating, 
@@ -200,6 +222,10 @@ router.post('/landlordReview', async (req, res) => {
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
+
+    if (!landlordId) {
+        errors.push("Invalid landlord id.");
+    }
 
     if (!kindnessRating || !validRatings.includes(parseInt(kindnessRating))) {
         errors.push("Invalid kindness rating input");
@@ -222,13 +248,13 @@ router.post('/landlordReview', async (req, res) => {
         errors.push("Invalid deposit handling rating input");
     }
 
-    if (!reviewText || !validators.isValidString(reviewText.trim())) {
+    if (!reviewText || !helpers.isValidString(reviewText.trim())) {
         errors.push("Review text is required");
     }
 
     //Render landlordReview Page with any caught errors
     if (errors.length > 0) {
-        return res.status(400).render('landlordReview', {title:'review', errors });
+        return res.status(400).render('landlordReview', {title:'addLandlordReview', errors});
     } else {
 
         try {
@@ -244,13 +270,14 @@ router.post('/landlordReview', async (req, res) => {
                     depositHandlingRating: parseInt(depositHandlingRating),
                     reviewText: reviewText.trim()
                 },
-                userId
+                req.session.user.userId
             );
 
             // Render the landlord details page after successfully adding the review
-            return res.redirect(`/landlord/${landlordId}`);
+            
+            return res.redirect(`/user/landlord/${landlordId}`);
+
         } catch (error) {
-            console.error('Error adding landlord review:', error);
             return res.status(500).render('error', {title:'error', error: 'Internal Server Error.', layout: 'main' });
         }
     }
@@ -262,7 +289,7 @@ router.post('/deleteLandlordReview/:reviewId', async (req, res) => {
         const reviewId = req.params.reviewId;
         const userId = req.user.id;
 
-        if (!reviewId || !validators.isValidUuid(reviewId)) {
+        if (!reviewId || !helpers.isValidUuid(reviewId)) {
             throw new Error("Invalid review ID input");
         }
 

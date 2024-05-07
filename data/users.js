@@ -506,7 +506,7 @@ export const updateUser = async (userId, updatedUser) => {
             { $push: { reportIds: updatedUser.reportsIds } }
         );
 
-        console.log(updateResponseReports);
+        
 
         if (!updateResponseReports.acknowledged || updateResponseReports.modifiedCount === 0) {
             errorObject.status = 500;
@@ -541,7 +541,6 @@ export const updateUser = async (userId, updatedUser) => {
         }   
     }
     
-    console.log('End of user update.')
 
     //Return
     return { userUpdated: true };
@@ -577,28 +576,17 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     }
     
     //Validation
-    if (!landlordId || !validators.isValidUuid(landlordId)){
-        errorObject.error =  "Invalid landlord ID input";
-        throw errorObject;
-    }
-
-    const landlord = await getUserById(landlordId);
+    /*const landlord = await getLandlordById(landlordId);
 
     if (!landlord){
         errorObject.error = 'No landlord found with specified id.';
         throw errorObject;
-    }
-    
-    if (!userId || !validators.isValidUuid(userId)){
-        errorObject.error =  "Invalid user ID input";
-        throw errorObject;
-    }
-    
-    if (!reviewData || Object.keys(reviewData).length === 0){
-        errorObject.error = "Invalid Review: Review data is required.";
-        throw errorObject;
-    }
-    
+    }*/
+
+    if (!reviewData || Object.keys(reviewData).length === 0)
+        {errorObject.error= "Invalid Review: Review data is required.";
+    throw errorObject}
+
     //Create Review Object
     const updatedReviewData = {
         userId: userId,
@@ -613,6 +601,15 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         depositHandlingRating: null,
         reviewText: null,
     };
+
+    //Validation (cont.) and add to review object
+
+    if (!userId || !validators.isValidUuid(userId)){
+        errorObject.error =  "Invalid user ID input";
+        throw errorObject;
+    } else {
+        updatedReviewData.userId = userId;
+    }
     
     const validRatings = [1, 2, 3, 4, 5];
     
@@ -665,19 +662,21 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
     
-    //Retreive User Collection
-    const userCollection = await users();
 
     //Update User with review id
-    const userUpdateStatus = await userCollection.updateOne(
-        { userId: userId },
-        { $push: { reviewIds: updatedReviewData.reviewId } }
+    const userUpdateStatus = await updateUser(
+        userId,
+        { reviewIds: updatedReviewData.reviewId }
     );
     
     if (!userUpdateStatus){
         errorObject.error =  "Failed to update user information with new review id."; 
         throw errorObject;
-    }    
+    }   
+     
+    //Retreive User Collection
+    const userCollection = await users();
+
     //Update Landlord with review
     const landlordUpdateStatus = await userCollection.updateOne(
         { userId: landlordId },
@@ -685,9 +684,10 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     );
     
     if (!landlordUpdateStatus)
-{    errorObject.error= "Failed to update landlord informaiton with new review.";
+    {errorObject.error= "Failed to update landlord informaiton with new review.";
     throw errorObject;
-}    
+    }
+    
     //Recalculate Landlord's average ratings
     validators.updateRating(landlordId);
     

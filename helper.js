@@ -100,7 +100,7 @@ const updateRating = async (landlordId) => {
         const userCollection = await users();
 
     //Pull Landlord
-        const landlord = await userCollection.findOne({userId: landlordId});
+        const landlord = await userCollection.findOne({ userId: landlordId });
 
     if (!landlord){
         throw 'Landlord not found.';
@@ -113,7 +113,7 @@ const updateRating = async (landlordId) => {
     let handinessRatingTotal = 0;
     let depositHandlingRatingTotal = 0;
 
-    for (let landlordReview of landlord.landlordReviews){
+    for (let landlordReview of landlord.reviews){
         kindnessRatingTotal += landlordReview.kindnessRating;
         maintenanceResponsivenessRatingTotal += landlordReview.maintenanceResponsivenessRating;
         overallCommunicationRatingTotal += landlordReview.overallCommunicationRating;
@@ -123,12 +123,12 @@ const updateRating = async (landlordId) => {
     }
 
     let newAverageRatings = {
-        kindnessRating: kindnessRatingTotal / landlord.landlordReviews.length,
-        maintenanceResponsivenessRating: maintenanceResponsivenessRatingTotal / landlord.landlordReviews.length,
-        overallCommunicationRating: overallCommunicationRatingTotal / landlord.landlordReviews.length, 
-        professionalismRating: professionalismRatingTotal / landlord.landlordReviews.length, 
-        handinessRating: handinessRatingTotal / landlord.landlordReviews.length, 
-        depositHandlingRating: depositHandlingRatingTotal / landlord.landlordReviews.length
+        kindnessRating: kindnessRatingTotal / landlord.reviews.length,
+        maintenanceResponsivenessRating: maintenanceResponsivenessRatingTotal / landlord.reviews.length,
+        overallCommunicationRating: overallCommunicationRatingTotal / landlord.reviews.length, 
+        professionalismRating: professionalismRatingTotal / landlord.reviews.length, 
+        handinessRating: handinessRatingTotal / landlord.reviews.length, 
+        depositHandlingRating: depositHandlingRatingTotal / landlord.reviews.length
     }
 
     await userCollection.updateOne(

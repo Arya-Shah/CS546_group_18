@@ -507,15 +507,6 @@ router.post('/propertyReview', async (req, res) => {
         reviewText 
     } = req.body;
 
-    console.log("Property ID:", propertyId);
-    console.log("Maintenance Rating:", maintenanceRating);
-    console.log("Location Desirability Rating:", locationDesirabilityRating);
-    console.log("Owner Responsiveness Rating:", ownerResponsivenessRating);
-    console.log("Property Condition Rating:", propertyConditionRating);
-    console.log("Community Rating:", communityRating);
-    console.log("Amenities Rating:", amenitiesRating);
-    console.log("Review Text:", reviewText);
-
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
 
@@ -551,7 +542,6 @@ router.post('/propertyReview', async (req, res) => {
         errors.push("Review text is required");
     }
 
-    console.log('Got through validation.');
 
     // Render propertyReview Page with any caught errors
     if (errors.length > 0) {
@@ -559,7 +549,7 @@ router.post('/propertyReview', async (req, res) => {
     } else {
         try {
 
-            console.log('In else.');
+            
             // Assuming functions like addPropertyReview exist to handle database operations
             const result = await properties.addPropertyReview(
                 propertyId,
@@ -575,12 +565,9 @@ router.post('/propertyReview', async (req, res) => {
                 req.session.user.userId
             );
 
-            console.log(result)
-
             return res.redirect(`/property/id/${propertyId}`);
 
         } catch (e) {
-            console.error('Error adding property review:', e.message);
             res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
         }
     }
