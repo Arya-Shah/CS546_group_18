@@ -2,8 +2,9 @@ import { users,reports,properties } from "../config/mongoCollections.js";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
-import {getPropertyById} from "../data/properties.js";
+import {getPropertyById, updateProperty} from "../data/properties.js";
 
+/*TODO: when accepted add it to the property*/
 
 const saltRounds = 16;
 
@@ -1088,19 +1089,31 @@ export const updateReportStatus = async (userId, reportId, newStatus, propertyId
         if (deleteResult.deletedCount === 0) {
             throw new Error("No report found with the provided ID, or it could not be deleted.");
         }
-        // const deletionResult = await removeProperty(propertyId);
-        // if (!deletionResult) {
-        //     throw { status: 500, message: "Failed to delete property." };
-        // }
         return { success: true, message: "Report rejected and report removed successfully." };
     } else if (newStatus === "Accepted") {
         // If the report is accepted, save changes to the property
         reportsData.status = newStatus;
-        const updateResult = await updateReportWithNewStatus(reportId, reportsData);
-        if (!updateResult) {
+        const updateReportResult = await updateReportWithNewStatus(reportId, reportsData);
+        const updatePropertyResult = await updatePropertyWithReportData(propertyId, reportsData);
+        if (!updatePropertyResult || !updateReportResult) {
             throw { status: 500, message: "Failed to update the report status." };
         }
-        return { success: true, message: "Report accepted successfully." };
+
+        // if (!userId || !validators.isValidUuid(userId)) {
+        //  errorObject.error="Invalid user ID input";
+        //  throw errorObject;
+        // } else{
+        //        updatedReportData.userId = userId;
+        //     }
+        // updatedReportData.property_id=propertyId;
+        // updatedReportData.reported_at = date;
+        // updatedReportData.report_description=reportsData;
+        // updatedReportData.report_reason = reportReason;
+        // updatedReportData.reported_item_type=reportedItemType;
+
+        //const updateProperty = await updateProperty(propertyId, reportId);
+
+        return { success: true, message: "Report accepted and status updated successfully." };
     } else {
         throw { status: 400, message: "Invalid status. Only 'Accepted' or 'Rejected' are valid." };
     }
@@ -1119,9 +1132,14 @@ async function removeProperty(propertyId) {
 }
 
 
-async function updateProperty(propertyId, updates) {
+async function updatePropertyWithReportData(propertyId, reportData) {
     const propertyCollection = await properties();
-    const updateResult = await propertyCollection.updateOne({ propertyId: propertyId }, { $set: updates });
+    const updateDocument = {
+        $push: {
+            reports: reportData
+        }
+    };
+    const updateResult = await propertyCollection.updateOne({ propertyId: propertyId },updateDocument);
     return updateResult.modifiedCount === 1;
 }
 
