@@ -4,8 +4,6 @@ import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
 import {getPropertyById, updateProperty} from "../data/properties.js";
 
-/*TODO: when accepted add it to the property*/
-
 const saltRounds = 16;
 
 
