@@ -1,5 +1,6 @@
-import { addProperty,addPropertyReview } from "./data/properties.js";
+import { addProperty,addPropertyReview,addCommentReply,addLikeDislike } from "./data/properties.js";
 import { addLandLordReport,registerUser,addLandlordReview } from "./data/users.js";
+import { addThread } from "./data/threads.js";
 import { v4 as uuid } from "uuid";
 
 const seed = async () => {
@@ -30,7 +31,9 @@ const seed = async () => {
           amenitiesRating:3 ,
           reviewText: "sample review"
         },userId);
-
+        const {commentId} = await addCommentReply(userId,propertyId,"too bad!!");
+        const {threadId} = await addThread(userId,"lmaooo","Properties","Properties");
+        // const likedislike=await addLikeDislike(threadId,"like");
 
   } catch (error) {
     console.error("Error seeding data:", error);
