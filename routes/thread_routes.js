@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
 //Upvote Thread
 router.get('/upvote/:threadOrCommentId', async (req, res) => {
     try {
-        const threadOrCommentId = req.params.threadOrCommentId;
+        const threadOrCommentId = xss(req.params.threadOrCommentId);
         await thread.addLikeDislike(threadOrCommentId, 'like');
         res.redirect('back');
     } catch (error) {
@@ -31,7 +31,7 @@ router.get('/upvote/:threadOrCommentId', async (req, res) => {
 //Downvote Thread
 router.get('/downvote/:threadOrCommentId', async (req, res) => {
     try {
-        const threadOrCommentId = req.params.threadOrCommentId;
+        const threadOrCommentId = xss(req.params.threadOrCommentId);
         await thread.addLikeDislike(threadOrCommentId, 'dislike');
         res.redirect('back');
     } catch (error) {
@@ -122,7 +122,7 @@ router.post('/delete/:threadId', async (req, res) => {
 router.route('/id/:threadId')
 .get(async (req, res) => {
     
-    const threadId = req.params.threadId;
+    const threadId = xss(req.params.threadId);
 
     if (!threadId || !validators.isValidUuid(threadId)) {
         return res.status(400).render('error', { title:'error',error: 'Invalid thread ID format.', layout: 'main' });
@@ -151,9 +151,9 @@ router.route('/id/:threadId')
 //Add comment to thread
 router.post('/addComment/:threadId', async (req, res) => {
     try {
-        const { userId } = xss(req.body);
-        const { threadId } = xss(req.params);
-        const { comment } = xss(req.body); 
+        const userId = xss(req.body).userId;
+        const threadId = xss(req.params).threadId;
+        const comment = xss(req.body).comment;
 
         const result = await thread.addCommentReply(userId, threadId, comment);
 
@@ -173,8 +173,9 @@ router.post('/addComment/:threadId', async (req, res) => {
 // Remove Comment
 router.post('/removeComment/:threadId/:commentId', async (req, res) => {
     try {
-        const { userId } = xss(req.body);
-        const { threadId, commentId } = xss(req.params);
+        const userId = xss(req.body).userId;
+        const threadId = xss(req.params).threadId;
+        const commentId = xss(req.params).commentId;
 
         const result = await thread.removeCommentReply(userId, commentId);
 
@@ -189,8 +190,6 @@ router.post('/removeComment/:threadId/:commentId', async (req, res) => {
         res.status(500).render('error', { title:'error',error: 'Internal Server Error when removing comment from thread.', layout: 'main' });
     }
 });
-
-
 
 
 export default router;

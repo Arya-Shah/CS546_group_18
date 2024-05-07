@@ -27,7 +27,7 @@ getAllLandlords
 router.route('/')
 .get(async (req, res) => {
 try {
-let id = req.session.user.userId;
+let id = xss(req.session.user.userId);
     const user = await getUserById(id);
     return res.status(200).render("user", {title:'user',
         user:user,
@@ -121,7 +121,7 @@ try {
 // User profile page
 router.route('/profile')
 .get(async (req, res) => {
-const userId = req.session.user.userId;
+const userId = xss(req.session.user.userId);
 if (!helpers.isValidUuid(userId)) {
 return res.status(400).render('error', {title:'error', error: 'Invalid user ID format.', layout: 'main' });
 }
@@ -139,7 +139,7 @@ res.render('user', { user:user, layout: 'main' });
 // Landlord details page
 router.route('/landlord/:landlordId')
 .get(async (req, res) => {
-const landlordId = req.params.landlordId;
+const landlordId = xss(req.params.landlordId);
 if (!helpers.isValidUuid(landlordId)) {
 return res.status(400).render('error', { title:'error',error: 'Invalid landlord ID format.', layout: 'main' });
 }
@@ -157,7 +157,7 @@ res.render('landlordDetails', {title:'landlord', landlord:landlord, layout: 'mai
 // Redirection the url below to landlord page
 router.route('/review/landlord/:landlordId')
     .get(async (req, res) => {
-        const landlordId = req.params.landlordId;
+        const landlordId = xss(req.params.landlordId);
         if (!landlordId || !helpers.isValidUuid(landlordId)) {
             return res.status(400).render('error', { title:'error',error: 'Invalid landlord ID format.', layout: 'main' });
         }
@@ -171,7 +171,7 @@ router.route('/review/landlord/:landlordId')
 // Redirection the url below to property page
 router.route('/review/property/:propertyId')
     .get(async (req, res) => {
-    const propertyId = req.params.propertyId;
+    const propertyId = xss(req.params.propertyId);
     
     if (!propertyId || !helpers.isValidUuid(propertyId)) {
         return res.status(400).render('error', { title:'error',error: 'Invalid property ID format.', layout: 'main' });
@@ -190,15 +190,23 @@ router.get('/landlordReview', (req, res) => {
     res.render('addLandlordReview', { title:'review',layout: 'main' });
 });
 router.post('/landlordReview', async (req, res) => {
-    const { 
-        kindnessRating, 
-        maintenanceResponsivenessRating, 
-        overallCommunicationRating, 
-        professionalismRating, 
-        handinessRating, 
-        depositHandlingRating, 
-        reviewText 
-    } = req.body;
+    // const { 
+    //     kindnessRating, 
+    //     maintenanceResponsivenessRating, 
+    //     overallCommunicationRating, 
+    //     professionalismRating, 
+    //     handinessRating, 
+    //     depositHandlingRating, 
+    //     reviewText 
+    // } = req.body;
+
+    const kindnessRating = xss(req.body.kindnessRating);
+    const maintenanceResponsivenessRating = xss(req.body.maintenanceResponsivenessRating);
+    const overallCommunicationRating = xss(req.body.overallCommunicationRating);
+    const professionalismRating = xss(req.body.professionalismRating);
+    const handinessRating = xss(req.body.handinessRating);
+    const depositHandlingRating = xss(req.body.depositHandlingRating);
+    const reviewText = xss(req.body.reviewText);
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];

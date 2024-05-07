@@ -26,7 +26,7 @@ router.route('/')
 router.route('/id/:propertyId')
 .get(async (req, res) => {
     
-    const propertyId = req.params.propertyId;
+    const propertyId = xss(req.params.propertyId);
 
     if (!propertyId || !validators.isValidUuid(propertyId)) {
         return res.status(400).render('error', { title:'error',error: 'Invalid property ID format.', layout: 'main' });
@@ -139,7 +139,7 @@ router.route('/searchPropertyByName/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             errorObject.error = "No input provided to search.";
@@ -176,7 +176,7 @@ router.route('/searchPropertyByAddress/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             return res.status(200).json( "No input provided to search.");
@@ -214,7 +214,7 @@ router.route('/searchPropertyByState/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             return res.status(200).json("No input provided to search.");
@@ -253,7 +253,7 @@ router.route('/searchPropertyByCity/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             return res.status(200).json("No input provided to search.");
@@ -292,7 +292,7 @@ router.route('/searchPropertyByZip/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             return res.status(200).json("No input provided to search.");
@@ -332,7 +332,7 @@ router.route('/searchPropertyById/:searchQuery').get(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             return res.status(200).json("No input provided to search.");
@@ -374,7 +374,18 @@ router.get('/addProperty', (req, res) => {
 // POST route to handle form submission and add a property
 router.post('/addProperty', async (req, res) => {
     
-    const { propertyName, address, city, state, zipcode, latitude, longitude, category, bedrooms, bathrooms } = req.body;
+    // const { propertyName, address, city, state, zipcode, latitude, longitude, category, bedrooms, bathrooms } = req.body;
+
+    const propertyName = xss(req.body.propertyName);
+const address = xss(req.body.address);
+const city = xss(req.body.city);
+const state = xss(req.body.state);
+const zipcode = xss(req.body.zipcode);
+const latitude = xss(req.body.latitude);
+const longitude = xss(req.body.longitude);
+const category = xss(req.body.category);
+const bedrooms = xss(req.body.bedrooms);
+const bathrooms = xss(req.body.bathrooms);
 
     //Validation
     const errors = [];
@@ -484,15 +495,16 @@ router.get('/propertyReview', (req, res) => {
 });
 
 router.post('/propertyReview', async (req, res) => {
-    const { 
-        maintenanceRating, 
-        locationDesirabilityRating, 
-        ownerResponsivenessRating, 
-        propertyConditionRating, 
-        communityRating, 
-        amenitiesRating, 
-        reviewText 
-    } = req.body;
+
+    // const{ maintenanceRating, locationDesirabilityRating, ownerResponsivenessRating, propertyConditionRating, communityRating, amenitiesRating, reviewText } = req.body;
+
+    const maintenanceRating = xss(req.body.maintenanceRating);
+    const locationDesirabilityRating = xss(req.body.locationDesirabilityRating);
+    const ownerResponsivenessRating = xss(req.body.ownerResponsivenessRating);
+    const propertyConditionRating = xss(req.body.propertyConditionRating);
+    const communityRating = xss(req.body.communityRating);
+    const amenitiesRating = xss(req.body.amenitiesRating);
+    const reviewText = xss(req.body.reviewText);
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
@@ -581,9 +593,13 @@ router.post('/deletePropertyReview/:reviewId', async (req, res) => {
 //Add comment to property
 router.post('/property_routes/addComment/:propertyId', async (req, res) => {
     try {
-        const { userId } = xss(req.body);
-        const { propertyId } = xss(req.params);
-        const { comment } = xss(req.body); 
+        // const { userId } = xss(req.body);
+        // const { propertyId } = xss(req.params);
+        // const { comment } = xss(req.body); 
+
+        const userId = xss(req.body).userId;
+        const propertyId = xss(req.params).propertyId;
+        const comment = xss(req.body).comment;
 
         const result = await properties.addCommentReply(userId, propertyId, comment);
 
@@ -603,8 +619,12 @@ router.post('/property_routes/addComment/:propertyId', async (req, res) => {
 // Remove Comment
 router.post('/property_routes/removeComment/:propertyId/:commentId', async (req, res) => {
     try {
-        const { userId } = xss(req.body);
-        const { propertyId, commentId } = xss(req.params);
+        // const { userId } = xss(req.body);
+        // const { propertyId, commentId } = xss(req.params);
+        
+        const userId = xss(req.body).userId;
+        const propertyId = xss(req.params).propertyId;
+        const commentId = xss(req.params).commentId;
 
         const result = await properties.removeCommentReply(userId, commentId);
 
