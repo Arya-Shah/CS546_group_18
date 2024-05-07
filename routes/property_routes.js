@@ -26,6 +26,7 @@ router.route('/id/:propertyId')
 .get(async (req, res) => {
     
     const propertyId = req.params.propertyId;
+    const userId=req.session.user.userId;
 
     if (!propertyId || !validators.isValidUuid(propertyId)) {
         return res.status(400).render('error', { title:'error',error: 'Invalid property ID format.', layout: 'main' });
@@ -39,7 +40,7 @@ router.route('/id/:propertyId')
             return res.status(404).render('error', { title:'error',error: 'Property not found.', layout: 'main' });
         }
 
-        res.render('propertyDetails', {property, title:'propertyDetails',layout: 'main'});
+        res.render('propertyDetails', {property,userId, title:'propertyDetails',layout: 'main'});
 
     } catch (e) {
 

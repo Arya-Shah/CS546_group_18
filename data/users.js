@@ -1209,6 +1209,21 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     } else {
         updatedReportData.userId = userId;
     }
+    if (!propertyId || !validators.isValidUuid(propertyId))
+    {       errorObject.error= "Invalid property ID input";
+            throw errorObject;
+    }
+
+    if (!reportData || Object.keys(reportData).length === 0)
+    {
+            errorObject.error= "Invalid report: report description is required.";
+            throw errorObject
+        }
+    if (!reportReason || Object.keys(reportReason).length === 0)
+    {
+        errorObject.error= "Invalid report: reportReason is required.";
+throw errorObject
+}
     updatedReportData.property_id=propertyId;
     updatedReportData.reported_at = date;
     updatedReportData.report_description=reportData;
