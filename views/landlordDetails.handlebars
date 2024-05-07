@@ -6,7 +6,6 @@
 <h2>Landlord Details</h2>
 <p>This page allows you to see all reviews for the landlord {{landlord.firstName}} {{landlord.lastName}}.</p>
 
-<p>{{landlord.userId}}</p>
 <a href="/user/landlordReview/{{landlord.userId}}">Want to add a review for this landlord? Click here.</a>
 
 <div class="landlord-details">
@@ -38,8 +37,9 @@
   <h3>All Landlord Reviews</h3>
   <div>
     {{#each landlord.reviews}}
-    <div>
-      <br>
+    <br>
+      <div>
+      <h4>Author: {{this.userRealName}} </h4>
       <p>Kindness Rating: {{this.kindnessRating}}</p>
       <p>Maintenance Responsiveness Rating: {{this.maintenanceResponsivenessRating}}</p>
       <p>Overall Communication Rating: {{this.overallCommunicationRating}}</p>

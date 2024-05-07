@@ -586,12 +586,36 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     if (!reviewData || Object.keys(reviewData).length === 0)
         {errorObject.error= "Invalid Review: Review data is required.";
     throw errorObject}
-
+    /*
+    //Check if landlord
+    const landlordCheck = await getLandlordById(userId);
+    if (landlordCheck){
+        errorObject.error = "User is a landlord. Landlords cannot leave reviews.";
+        throw errorObject;
+    }
+    console.log(2);
+    // Get the landlord object
+    const landlord = await getLandlordById(landlordId);
+    if (!landlord) {
+        errorObject.error = "Landlord not found.";
+        throw errorObject;
+    }
+    console.log(3);
+    // Check if the user has already reviewed the property
+    for (const review of landlord.reviews) {
+        if (review.userId === userId) {
+            errorObject.error = "User has already reviewed this landlord.";
+            throw errorObject;
+        }
+    }
+    console.log(4);
+    */
     //Create Review Object
     const updatedReviewData = {
-        userId: userId,
+        userId: null,
         reviewId: uuid(),
         date: new Date().toISOString(),
+        userRealName: '',
         reports: [],
         kindnessRating: null,
         maintenanceResponsivenessRating: null,
@@ -612,6 +636,14 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     }
     
     const validRatings = [1, 2, 3, 4, 5];
+
+    if (
+        !reviewData.userRealName) {
+        errorObject.error="Invalid name for user provided for review.";
+        throw errorObject
+    } else {
+        updatedReviewData.userRealName = reviewData.userRealName;
+    }
     
     if ( !reviewData.kindnessRating || typeof reviewData.kindnessRating !== "number" || !validRatings.includes(reviewData.kindnessRating)) {
         errorObject.error = "Invalid kindnessRating input";

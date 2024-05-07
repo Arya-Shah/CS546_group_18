@@ -549,11 +549,13 @@ router.post('/propertyReview', async (req, res) => {
     } else {
         try {
 
+            const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
             
             // Assuming functions like addPropertyReview exist to handle database operations
             const result = await properties.addPropertyReview(
                 propertyId,
                 {
+                    userRealName: userRealName,
                     maintenanceRating: parseInt(maintenanceRating),
                     locationDesirabilityRating: parseInt(locationDesirabilityRating),
                     ownerResponsivenessRating: parseInt(ownerResponsivenessRating),

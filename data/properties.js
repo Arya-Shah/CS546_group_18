@@ -490,12 +490,35 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         if (!reviewData || Object.keys(reviewData).length === 0)
             {errorObject.error= "Invalid Review: Review data is required.";
         throw errorObject}
+
+    //Check if landlord
+    const landlordCheck = await usersfunctions.getLandlordById(userId);
+    if (landlordCheck){
+        errorObject.error = "User is a landlord. Landlords cannot leave reviews.";
+        throw errorObject;
+    }
+    
+    // Get the property object
+    const property = await getPropertyById(propertyId);
+    if (!property) {
+        errorObject.error = "Property not found.";
+        throw errorObject;
+    }
+
+    // Check if the user has already reviewed the property
+    for (const review of property.reviews) {
+        if (review.userId === userId) {
+            errorObject.error = "User has already reviewed this property.";
+            throw errorObject;
+        }
+    }
     
     //Create Review Object
     const updatedReviewData = {
         userId: null,
         reviewId: uuid(),
         date: new Date().toISOString(),
+        userRealName: '',
         reports: [],
         locationDesirabilityRating: null, 
         ownerResponsivenessRating: null, 
@@ -515,6 +538,14 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     
     const validRatings = [1, 2, 3, 4, 5];
     
+    if (
+        !reviewData.userRealName) {
+        errorObject.error="Invalid name for user provided for review.";
+        throw errorObject
+    } else {
+        updatedReviewData.userRealName = reviewData.userRealName;
+    }
+
     if (
         !reviewData.locationDesirabilityRating ||
         typeof reviewData.locationDesirabilityRating !== "number" ||

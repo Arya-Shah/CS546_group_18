@@ -31,12 +31,13 @@
         {{#each property.reviews}}
         <br>
         <div>
-            <p>User ID: {{this.userId}}</p>
+            <h4>Author: {{this.userRealName}} </h4>
             <p>Location Desirability Rating: {{this.locationDesirabilityRating}}</p>
             <p>Owner Responsiveness Rating: {{this.ownerResponsivenessRating}}</p>
             <p>Property Condition Rating: {{this.propertyConditionRating}}</p>
             <p>Community Rating: {{this.communityRating}}</p>
             <p>Amenities Rating: {{this.amenitiesRating}}</p>
+            <p>Review Text:{{this.reviewText}}</p>
         </div>
         {{/each}}
     </div>

@@ -49,15 +49,13 @@ if (landlordReviewForm) {
                 reviewTextEl.value.trim().length === 0)
                 throw "Review text is required";
 
-        } catch (e) {
-            errors.push(e.message);
-        }
-
-        // Show Errors, If None Submit
-        if (errors.length > 0) {
-            landlordErrorDiv.textContent = errors.join('\n');
-        } else {
-            landlordReviewForm.submit();
-        }
-    });
-}
+            } catch (error) {
+                errors.push(error.message);
+                landlordErrorDiv.textContent = errors.join('\n');
+            }
+    
+            // Show Errors, If None Submit
+            if (errors.length === 0) 
+                landlordReviewForm.submit();
+        });
+    }

@@ -123,12 +123,12 @@ const updateRating = async (landlordId) => {
     }
 
     let newAverageRatings = {
-        kindnessRating: kindnessRatingTotal / landlord.reviews.length,
-        maintenanceResponsivenessRating: maintenanceResponsivenessRatingTotal / landlord.reviews.length,
-        overallCommunicationRating: overallCommunicationRatingTotal / landlord.reviews.length, 
-        professionalismRating: professionalismRatingTotal / landlord.reviews.length, 
-        handinessRating: handinessRatingTotal / landlord.reviews.length, 
-        depositHandlingRating: depositHandlingRatingTotal / landlord.reviews.length
+        kindnessRating: (kindnessRatingTotal / landlord.reviews.length).toFixed(2),
+        maintenanceResponsivenessRating: (maintenanceResponsivenessRatingTotal / landlord.reviews.length).toFixed(2),
+        overallCommunicationRating: (overallCommunicationRatingTotal / landlord.reviews.length).toFixed(2), 
+        professionalismRating: (professionalismRatingTotal / landlord.reviews.length).toFixed(2), 
+        handinessRating: (handinessRatingTotal / landlord.reviews.length).toFixed(2), 
+        depositHandlingRating: (depositHandlingRatingTotal / landlord.reviews.length).toFixed(2)
     }
 
     await userCollection.updateOne(
@@ -170,11 +170,11 @@ const updatePropertyRating = async (propertyId) => {
 
     // Calculate new average ratings
     let newAverageRatings = {
-        locationDesirabilityRating: locationDesirabilityRatingTotal / property.reviews.length,
-        ownerResponsivenessRating: ownerResponsivenessRatingTotal / property.reviews.length,
-        propertyConditionRating: propertyConditionRatingTotal / property.reviews.length,
-        communityRating: communityRatingTotal / property.reviews.length,
-        amenitiesRating: amenitiesRatingTotal / property.reviews.length
+        locationDesirabilityRating: (locationDesirabilityRatingTotal / property.reviews.length).toFixed(2),
+        ownerResponsivenessRating: (ownerResponsivenessRatingTotal / property.reviews.length).toFixed(2),
+        propertyConditionRating: (propertyConditionRatingTotal / property.reviews.length).toFixed(2),
+        communityRating: (communityRatingTotal / property.reviews.length).toFixed(2),
+        amenitiesRating: (amenitiesRatingTotal / property.reviews.length).toFixed(2)
     };
 
     // Update property with new average ratings

@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import helpers from '../helper.js';
+import * as users from '../data/users.js';
 
 import {
 getAllUsers,
@@ -207,8 +208,6 @@ router.get('/landlordReview/:userId', async (req, res) => {
 });
 router.post('/landlordReview', async (req, res) => {
     
-    
-    
     const {
         landlordId, 
         kindnessRating, 
@@ -222,6 +221,28 @@ router.post('/landlordReview', async (req, res) => {
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
+
+    /*
+    //Check if landlord
+    const landlordCheck = await users.getLandlordById(req.session.user.userId);
+    if (landlordCheck){
+        errors.push("User is a landlord. Landlords cannot leave reviews.");
+    }
+    console.log(2);
+    // Get the landlord object
+    const landlord = await users.getLandlordById(landlordId);
+    if (!landlord) {
+        errors.push("Landlord not found.");
+    }
+    console.log(3);
+    // Check if the user has already reviewed the property
+    for (const review of landlord.reviews) {
+        if (review.userId === req.session.user.userId) {
+            errors.push("User has already reviewed this landlord.");
+        }
+    }
+    console.log(4);
+    */    
 
     if (!landlordId) {
         errors.push("Invalid landlord id.");
@@ -254,14 +275,19 @@ router.post('/landlordReview', async (req, res) => {
 
     //Render landlordReview Page with any caught errors
     if (errors.length > 0) {
-        return res.status(400).render('landlordReview', {title:'addLandlordReview', errors});
+        return res.status(400).render('landlordReview', {title:'LandlordReview', errors});
+        //return res.status(400).render('error', { title: 'error', errors: errors, layout: 'main' });
+
     } else {
 
         try {
 
+            const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+
             const result = await addLandlordReview(
                 landlordId,
                 {
+                    userRealName: userRealName,
                     kindnessRating: parseInt(kindnessRating),
                     maintenanceResponsivenessRating: parseInt(maintenanceResponsivenessRating),
                     overallCommunicationRating: parseInt(overallCommunicationRating),
