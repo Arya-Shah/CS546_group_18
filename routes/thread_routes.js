@@ -18,7 +18,9 @@ router.get('/', async (req, res) => {
 //Upvote Thread
 router.get('/upvote/:threadOrCommentId', async (req, res) => {
     try {
+        console.log('in route');
         const threadOrCommentId = req.params.threadOrCommentId;
+        console.log(threadOrCommentId);
         await thread.addLikeDislike(threadOrCommentId, 'like');
         res.redirect('back');
     } catch (error) {
@@ -69,7 +71,8 @@ router
 
         try {
             const userId = req.session.user.userId;
-            const { threadInserted, threadId } = await thread.addThread(userId, title, content, category);
+            const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+            const { threadInserted, threadId } = await thread.addThread(userId, title, content, category, userRealName);
 
             if (!threadInserted) {
                 return res.status(500).render('error', { title:'error',error: 'Failed to add thread.', layout: 'main' });
@@ -136,7 +139,7 @@ router.route('/id/:threadId')
             return res.status(404).render('error', {title:'error', error: 'Thread not found.', layout: 'main' });
         }
 
-        res.render('threadIndividual', { title:'threads',threadData:threadData, layout: 'main' });
+        res.render('threadIndividual', { title:'threads',threadData:threadData, layout: 'main', threadId: threadId});
 
     } catch (error) {
        
@@ -150,17 +153,21 @@ router.route('/id/:threadId')
 //Add comment to thread
 router.post('/addComment/:threadId', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { threadId } = req.params;
-        const { comment } = req.body; 
+  
+        let userId = req.session.user.userId;
 
-        const result = await thread.addCommentReply(userId, threadId, comment);
+        const { threadId } = req.params;
+        const { comment } = req.body;
+
+        const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+   
+        const result = await thread.addCommentReply(userId, threadId, comment, userRealName);
 
         if (!result) {
             return res.status(500).json({ error: 'Failed to add comment to thread.' });
         }
 
-        res.redirect(`/thread/${threadId}`);
+        res.redirect(`/thread/id/${threadId}`);
 
     } catch (error) {
        
