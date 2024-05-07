@@ -18,6 +18,8 @@ if (propertyReviewForm) {
         
         const errors = [];
 
+        console.log(1);
+
         try {
             // Validation
             const validRatings = [1, 2, 3, 4, 5];
@@ -53,12 +55,13 @@ if (propertyReviewForm) {
 
         } catch (error) {
             errors.push(error.message);
+            propertyErrorDiv.textContent = errors.join('\n');
         }
 
+        console.log(2);
+
         // Show Errors, If None Submit
-        if (errors.length > 0) {
-            propertyErrorDiv.textContent = errors.join('\n');
-        } else {
+        if (errors.length === 0) {
             propertyReviewForm.submit();
         }
     });

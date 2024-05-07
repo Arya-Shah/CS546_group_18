@@ -463,7 +463,7 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
             throw new Error("Invalid property ID input");
         }
 
-        const { propertyDeleted } = await removeProperty(propertyId);
+        const { propertyDeleted } = await properties.removeProperty(propertyId);
 
         if (!propertyDeleted) {
             return res.status(500).json({ error: 'Failed to delete property.' });
@@ -478,12 +478,26 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
 });
 
 // PropertyReview
-router.get('/propertyReview', (req, res) => {
-    res.render('addPropertyReview', {title:'addPropertyReview', layout: 'main' });
+router.get('/propertyReview/:propertyId', async (req, res) => {
+    try {
+        const propertyId = req.params.propertyId;
+    
+        if (!propertyId || !validators.isValidUuid(propertyId)) {
+            throw new Error("Invalid property ID input");
+        }
+
+        const  propertyPulled = await properties.getPropertyById(propertyId);
+        res.render('PropertyReview', { title: 'addPropertyReview', layout: 'main', property:  propertyPulled});
+    
+    } catch (e) {
+        res.status(e.status ? e.status : 500).render('error', { title: 'error', error: e.error ? e.error : e, form: req.body });
+    }
+
 });
 
 router.post('/propertyReview', async (req, res) => {
     const { 
+        propertyId,
         maintenanceRating, 
         locationDesirabilityRating, 
         ownerResponsivenessRating, 
@@ -493,8 +507,21 @@ router.post('/propertyReview', async (req, res) => {
         reviewText 
     } = req.body;
 
+    console.log("Property ID:", propertyId);
+    console.log("Maintenance Rating:", maintenanceRating);
+    console.log("Location Desirability Rating:", locationDesirabilityRating);
+    console.log("Owner Responsiveness Rating:", ownerResponsivenessRating);
+    console.log("Property Condition Rating:", propertyConditionRating);
+    console.log("Community Rating:", communityRating);
+    console.log("Amenities Rating:", amenitiesRating);
+    console.log("Review Text:", reviewText);
+
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
+
+    if (!propertyId) {
+        errors.push("Invalid property id.");
+    }
 
     if (!maintenanceRating || !validRatings.includes(parseInt(maintenanceRating))) {
         errors.push("Invalid maintenance rating input");
@@ -524,13 +551,17 @@ router.post('/propertyReview', async (req, res) => {
         errors.push("Review text is required");
     }
 
+    console.log('Got through validation.');
+
     // Render propertyReview Page with any caught errors
     if (errors.length > 0) {
         return res.status(400).render('propertyReview', {title:'propertyReview', errors });
     } else {
         try {
+
+            console.log('In else.');
             // Assuming functions like addPropertyReview exist to handle database operations
-            const result = await addPropertyReview(
+            const result = await properties.addPropertyReview(
                 propertyId,
                 {
                     maintenanceRating: parseInt(maintenanceRating),
@@ -541,14 +572,15 @@ router.post('/propertyReview', async (req, res) => {
                     amenitiesRating: parseInt(amenitiesRating),
                     reviewText: reviewText.trim()
                 },
-                userId
+                req.session.user.userId
             );
 
-            // Render the property details page after successfully adding the review
-            return res.redirect(`/property/${propertyId}`);
+            console.log(result)
+
+            return res.redirect(`/property/id/${propertyId}`);
 
         } catch (e) {
-            console.error('Error adding property review:', error);
+            console.error('Error adding property review:', e.message);
             res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
         }
     }

@@ -3,6 +3,7 @@ import { users } from '../config/mongoCollections.js';
 import { properties } from '../config/mongoCollections.js';
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
+import * as usersfunctions from './users.js';
 
 
 //Function: getAllProperties
@@ -18,7 +19,7 @@ export const getAllProperties = async () => {
 
 //Function: getPropertyById
 export const getPropertyById = async (id) => {
- 
+  
     const errorObject = {
         status: 400,
         };
@@ -26,16 +27,17 @@ export const getPropertyById = async (id) => {
     if (!id || !validators.isValidUuid(id)) {errorObject.error= "Invalid ID input";
         throw errorObject;
     }
-
+  
     //Retreive property collection and specific property
     const propertyCollection = await properties();
+    
     const property = await propertyCollection.findOne({ propertyId: id });
-
+   
     //Validation (cont.)
     if (!property) {errorObject.error= "Property not found";
     throw errorObject
     }
-
+ 
     //Return
     return property;
 
@@ -510,6 +512,8 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     } else {
         updatedReviewData.userId = userId;
     }
+
+    console.log(userId);
     
     const validRatings = [1, 2, 3, 4, 5];
     
@@ -579,28 +583,38 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     } else {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
+
+    console.log('Through data validation.')
     
     //Update User with review id
-    const userUpdateStatus = await users.updateUser(
-        { userId: userId },
-        { $push: { reviewIds: updatedReviewData.reviewId } }
+    const userUpdateStatus = await usersfunctions.updateUser(
+        userId,
+        { reviewIds: updatedReviewData.reviewId }
     );
+
+    console.log(userUpdateStatus);
     
     if (!userUpdateStatus)
         {errorObject.error= "Failed to update user information with new property review.";
         throw errorObject}
     
-    //Update property with review
-    const propertyUpdateStatus = await updateProperty(propertyId, {
-        $push: { reviews: updatedReviewData },
-    });
+
+    //ProperpertyCollection
+    const propertyCollection = await properties();
+
+    const propertyUpdateStatus = await propertyCollection.updateOne(
+        { propertyId: propertyId }, 
+        { $push: { reviews: updatedReviewData } } 
+    );
+
+    console.log(propertyUpdateStatus);
     
     if (!propertyUpdateStatus)
         {errorObject.error= "Failed to update property informatino with new review.";
     throw errorObject}
     
     //To Do: Recalculate Property's average ratings
-    validators.updateRatingProperty(propertyId);
+    validators.updatePropertyRating(propertyId);
     
     //Return
     return { reviewAdded: true };

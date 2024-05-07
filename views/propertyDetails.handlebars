@@ -4,7 +4,7 @@
 
 <p>This page allows you to see all reviews for the property {{property.name}}.</p>
 
-<a href="/property/addPropertyReview/{{property.propertyId}}">Want to add a review for this property? Click here.</a>
+<a href="/property/PropertyReview/{{property.propertyId}}">Want to add a review for this property? Click here.</a>
 
 <div class="property-details">
     
@@ -19,16 +19,17 @@
 
     <h3>Average Ratings</h3>
     <div>
-        <p>Location Desirability Rating: {{property.averageRatings.averageLocationDesirabilityRating}}</p>
-        <p>Owner Responsiveness Rating: {{property.averageRatings.averageOwnerResponsivenessRating}}</p>
-        <p>Property Condition Rating: {{property.averageRatings.averagePropertyConditionRating}}</p>
-        <p>Community Rating: {{property.averageRatings.averageCommunityRating}}</p>
-        <p>Amenities Rating: {{property.averageRatings.averageAmenitiesRating}}</p>
+        <p>Location Desirability Rating: {{property.averageRatings.locationDesirabilityRating}}</p>
+        <p>Owner Responsiveness Rating: {{property.averageRatings.ownerResponsivenessRating}}</p>
+        <p>Property Condition Rating: {{property.averageRatings.propertyConditionRating}}</p>
+        <p>Community Rating: {{property.averageRatings.communityRating}}</p>
+        <p>Amenities Rating: {{property.averageRatings.amenitiesRating}}</p>
     </div>
 
     <h3>Reviews</h3>
     <div>
         {{#each property.reviews}}
+        <br>
         <div>
             <p>User ID: {{this.userId}}</p>
             <p>Location Desirability Rating: {{this.locationDesirabilityRating}}</p>
@@ -58,7 +59,7 @@
     <form action="/property_routes/addComment/{{property.propertyId}}" method="post">
       <label for="comment">Add a comment:</label><br>
       <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
-      <input type="submit" value="Submit">
+      <input type="submit" value="Submit" id="submitCommentButton">
     </form>
 
 <!-- Map --> 

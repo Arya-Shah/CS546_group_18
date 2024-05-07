@@ -1,3 +1,7 @@
+//Imports
+import { users } from './config/mongoCollections.js';
+import { properties } from './config/mongoCollections.js';
+
 // valid strings
 export const isValidString = (str) => {
         if (typeof str !== 'string' || str.trim().length === 0) return false;
@@ -134,6 +138,52 @@ const updateRating = async (landlordId) => {
 
 }
 
+const updatePropertyRating = async (propertyId) => {
+    
+    isValidUuid(propertyId);
+
+    // Retrieve Property Collection
+        const propertyCollection = await properties();
+
+    // Pull Property
+        const property = await propertyCollection.findOne({ propertyId });
+
+    if (!property) {
+        throw 'Property not found.';
+    }
+
+    // Initialize rating totals
+        let locationDesirabilityRatingTotal = 0;
+        let ownerResponsivenessRatingTotal = 0;
+        let propertyConditionRatingTotal = 0;
+        let communityRatingTotal = 0;
+        let amenitiesRatingTotal = 0;
+
+    // Iterate through property reviews
+    for (let propertyReview of property.reviews) {
+        locationDesirabilityRatingTotal += propertyReview.locationDesirabilityRating;
+        ownerResponsivenessRatingTotal += propertyReview.ownerResponsivenessRating;
+        propertyConditionRatingTotal += propertyReview.propertyConditionRating;
+        communityRatingTotal += propertyReview.communityRating;
+        amenitiesRatingTotal += propertyReview.amenitiesRating;
+    }
+
+    // Calculate new average ratings
+    let newAverageRatings = {
+        locationDesirabilityRating: locationDesirabilityRatingTotal / property.reviews.length,
+        ownerResponsivenessRating: ownerResponsivenessRatingTotal / property.reviews.length,
+        propertyConditionRating: propertyConditionRatingTotal / property.reviews.length,
+        communityRating: communityRatingTotal / property.reviews.length,
+        amenitiesRating: amenitiesRatingTotal / property.reviews.length
+    };
+
+    // Update property with new average ratings
+    await propertyCollection.updateOne(
+        { propertyId },
+        { $set: { averageRatings: newAverageRatings } }
+    );
+};
+
 export default {
   isValidString,
   isValidEmail,
@@ -145,5 +195,6 @@ export default {
   isValidLatitude,
   isValidPropertyCategory,
   updateRating,
-  isValidThreadCategory
+  isValidThreadCategory,
+  updatePropertyRating
 };

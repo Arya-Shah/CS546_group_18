@@ -475,25 +475,74 @@ export const updateUser = async (userId, updatedUser) => {
         
     }
 
+    /* const pushUpdates = {};
+
     if(updatedUser.reportsIds){
 
-        updatedUserData.reportsIds = updatedUser.reportsIds;
+        pushUpdates.reportIds = updatedUser.reportIds;
         
     }
-    
-    //Update user with object
-    const updateResponse = await userCollection.updateOne(
-        { userId: userId },
-        { $set: updatedUserData });
 
-    
-    //Validation (cont.)
-    if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0){
-        errorObject.status = 500;
-        errorObject.error =  "Error occurred while updating user";
-        throw errorObject;
+    if(updatedUser.reviewIds){
+        console.log('In Review Ids');
+        pushUpdates.reviewIds = updatedUser.reviewIds;
+        
+    }
+
+    console.log('Throught review and reports.');
+
+    //Combine push updates
+    if (Object.keys(pushUpdates).length > 0) {
+        updatedUserData.$push = pushUpdates;
+    }
+    */
+
+    //Update user with object
+
+
+    if (updatedUser.reportsIds) {
+        const updateResponseReports = await userCollection.updateOne(
+            { userId: userId },
+            { $push: { reportIds: updatedUser.reportsIds } }
+        );
+
+        console.log(updateResponseReports);
+
+        if (!updateResponseReports.acknowledged || updateResponseReports.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user with reportsIds";
+            throw errorObject;
+        }
+    }
+
+    else if (updatedUser.reviewIds) {
+
+        const updateResponseReviews = await userCollection.updateOne(
+            { userId: userId },
+            { $push: { reviewIds: updatedUser.reviewIds } }
+        );
+
+        if (!updateResponseReviews.acknowledged || updateResponseReviews.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user with reviewIds";
+            throw errorObject;
+        }
+    }
+    else {
+        const updateResponse = await userCollection.updateOne(
+        { userId: userId },
+        updatedUserData
+    );
+
+        if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user";
+            throw errorObject;
+        }   
     }
     
+    console.log('End of user update.')
+
     //Return
     return { userUpdated: true };
     
