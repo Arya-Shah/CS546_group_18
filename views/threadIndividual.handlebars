@@ -1,31 +1,31 @@
 {{!-- ADD ROUTES. UPVOTE/DOWNVOTE THREADS AND COMMENTS --}}
 
 {{!-- Community Forum --}}
-<h2>{{this.title}}</h2>
+<h2>{{threadData.title}}</h2>
 
-<a href="/thread}}">Want to see all threads? Click here.</a>
+<a href="/thread">Want to see all threads? Click here.</a>
 
 <div class="forum-threads">
 
-    <p>Category: {{this.category}}</p>
-    <p>Created by: {{this.userId}}</p>
-    <p>Created Date: {{this.createdDate}}</p>
-    <p>Last Updated: {{this.lastUpdated}}</p>
-    <p>Likes: {{this.likes}} <a href="/threads_routes/upvoteThread/{{this.threadId}}">Like Thread</a></p>
-    <p>Dislikes: {{this.dislikes}} <a href="/threads_routes/downvoteThread/{{this.threadId}}">Downvote Thread</a></p>
+    <p>Category: {{threadData.category}}</p>
+    <p>Created by: {{threadData.userId}}</p>
+    <p>Created Date: {{threadData.createdDate}}</p>
+    <p>Last Updated: {{threadData.lastUpdated}}</p>
+    <p>Likes: {{threadData.likes}} <a href="/thread/upvote/{{threadData.threadId}}">Like Thread</a></p>
+    <p>Dislikes: {{threadData.dislikes}} <a href="/thread/downvote/{{threadData.threadId}}">Downvote Thread</a></p>
 
     <p>Comments:</p>
 
-    <p><a href="/threads_routes/addComment/{{this.threadId}}"></a>Add a comment to this thread.</p>
+    <p><a href="/addComment/{{threadData.threadId}}"></a>Add a comment to this thread.</p>
 
     <div class="comments">
-    {{#each this.comments}}
+    {{#each threadData.comments}}
     <div class="comment">
-        <p>User ID: {{this.userId}}</p>
-        <p>Comment Text: {{this.commentText}}</p>
-        <p>Date Created: {{this.dateCreated}}</p>
-        <p>Likes: {{this.likes}} <a href="/threads_routes/upvoteComment/{{this.commentId}}">Like Comment</a></p>
-        <p>Dislikes: {{this.dislikes}} <a href="/threads_routes/downvoteComment/{{this.commentId}}">Dislike Comment</a></p>
+        <p>User ID: {{threadData.userId}}</p>
+        <p>Comment Text: {{threadData.commentText}}</p>
+        <p>Date Created: {{threadData.dateCreated}}</p>
+        <p>Likes: {{threadData.likes}} <a href="/thread/upvoteComment/{{threadData.commentId}}">Like Comment</a></p>
+        <p>Dislikes: {{threadData.dislikes}} <a href="/thread/downvoteComment/{{threadData.commentId}}">Dislike Comment</a></p>
     </div>
     {{/each}}
 
@@ -33,12 +33,11 @@
 
 
   <!-- Add Comment Form -->
-    <form action="/threads_routes/addComment/{{this.threadId}}" method="post">
+    <form action="/thread/addComment/{{this.threadId}}" method="post">
       <label for="comment">Add a comment:</label><br>
       <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
       <input type="submit" value="Submit">
     </form>
-  {{/each}}
 
 </div>
 

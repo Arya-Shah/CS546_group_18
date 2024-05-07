@@ -1,10 +1,22 @@
 import express from 'express';
 const router = express.Router();
 import * as thread from '../data/threads.js';
+import validators from "../helper.js";
 
+router.get('/', async (req, res) => {
+        try {
+            
+            const threads = await thread.getAllThreads();
+            res.render('communityForum', { title:'Forums',threads:threads, layout: 'main' });
+        
+            } catch (e) {
+            res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
+            }
+            
+        });
 
 //Upvote Thread
-router.get('/thread_routes/upvote/:threadOrCommentId', async (req, res) => {
+router.get('/upvote/:threadOrCommentId', async (req, res) => {
     try {
         const threadOrCommentId = req.params.threadOrCommentId;
         await thread.addLikeDislike(threadOrCommentId, 'like');
@@ -16,7 +28,7 @@ router.get('/thread_routes/upvote/:threadOrCommentId', async (req, res) => {
 
 
 //Downvote Thread
-router.get('/threads_routes/downvote/:threadOrCommentId', async (req, res) => {
+router.get('/downvote/:threadOrCommentId', async (req, res) => {
     try {
         const threadOrCommentId = req.params.threadOrCommentId;
         await thread.addLikeDislike(threadOrCommentId, 'dislike');
@@ -28,7 +40,17 @@ router.get('/threads_routes/downvote/:threadOrCommentId', async (req, res) => {
 
 
 //Add Thread
-router.post('/addThread', async (req, res) => {
+router
+.get('/addThread', async (req, res) => {
+    try {
+        
+        res.render('addThread', { title:'Forums', layout: 'main' });
+    
+        } catch (e) {
+        res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
+        }
+        
+    }).post('/addThread', async (req, res) => {
     try {
         
         const { title, content, category } = req.body;
@@ -46,27 +68,29 @@ router.post('/addThread', async (req, res) => {
         }
 
         try {
+            const userId = req.session.user.userId;
             const { threadInserted, threadId } = await thread.addThread(userId, title, content, category);
 
             if (!threadInserted) {
                 return res.status(500).render('error', { title:'error',error: 'Failed to add thread.', layout: 'main' });
             }
 
-            res.redirect(`/thread/${threadId}`);
+            res.redirect(`/thread/id/${threadId}`);
 
-        } catch (error) {
-            res.status(500).render('error', { title:'error',error: 'Internal Server Error when trying to add thread.', layout: 'main' });
+        } catch (e) {
+            console.log(error);
+            res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, layout: 'main' });
         }
 
         
     } catch (error) {
-        res.render('addThreadForm', {title:'error', error: error.message });
+        res.render('addThread', {title:'error', error: error.message });
     }
 });
 
 
 //Delete Thread
-router.post('/deleteThread/:threadId', async (req, res) => {
+router.post('/delete/:threadId', async (req, res) => {
     
     try {
 
@@ -94,7 +118,7 @@ router.post('/deleteThread/:threadId', async (req, res) => {
 
 
 //Thread Individual Page
-router.route('/thread/:threadId')
+router.route('/id/:threadId')
 .get(async (req, res) => {
     
     const threadId = req.params.threadId;
@@ -106,16 +130,16 @@ router.route('/thread/:threadId')
     try {
     
         // Assuming you have a function to get the thread by ID
-        const thread = await threads.getThreadById(threadId);
+        const threadData = await thread.getThreadById(threadId);
     
-        if (!thread) {
+        if (!threadData) {
             return res.status(404).render('error', {title:'error', error: 'Thread not found.', layout: 'main' });
         }
 
-        res.render('threadIndividual', { title:'threads',thread, layout: 'main' });
+        res.render('threadIndividual', { title:'threads',threadData:threadData, layout: 'main' });
 
     } catch (error) {
-
+        console.log(error);
         res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
 
     }
@@ -124,7 +148,7 @@ router.route('/thread/:threadId')
 
 
 //Add comment to thread
-router.post('/threads_routes/addComment/:threadId', async (req, res) => {
+router.post('/addComment/:threadId', async (req, res) => {
     try {
         const { userId } = req.body;
         const { threadId } = req.params;
@@ -146,7 +170,7 @@ router.post('/threads_routes/addComment/:threadId', async (req, res) => {
 
 
 // Remove Comment
-router.post('/threads_routes/removeComment/:threadId/:commentId', async (req, res) => {
+router.post('/removeComment/:threadId/:commentId', async (req, res) => {
     try {
         const { userId } = req.body;
         const { threadId, commentId } = req.params;
@@ -165,18 +189,7 @@ router.post('/threads_routes/removeComment/:threadId/:commentId', async (req, re
     }
 });
 
-// Community Forum page
-router.route('/communityForum')
-.get(async (req, res) => {
-try {
-    
-    const threads = await thread.getAllThreads();
-    res.render('communityForum', { title:'Forums',threads, layout: 'main' });
 
-    } catch (e) {
-    res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
-    }
-    
-});
+
 
 export default router;

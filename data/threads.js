@@ -400,15 +400,15 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
     if(likeOrDislike === 'like'){
         
         updateInfo = await threadCollection.updateOne(
-            { 'comments.commentId': threadOrCommentId },
-            { $inc: { 'comments.$.likes': 1 } }
+            { 'threadId': threadOrCommentId },
+            { $inc: { 'likes': 1 } }
         );
 
     } else {
         
         updateInfo = await threadCollection.updateOne(
-            { 'comments.commentId': threadOrCommentId },
-            { $inc: { 'comments.$.dislikes': 1 } }
+            { 'threadId': threadOrCommentId },
+            { $inc: { 'dislikes': 1 } }
         );
 
     };
@@ -470,15 +470,15 @@ export const removeLikeDislike = async (threadOrCommentId, likeOrDislike) => {
         if(likeOrDislike === 'like'){
             
             updateInfo = await threadCollection.updateOne(
-                { 'comments.commentId': threadOrCommentId },
-                { $inc: { 'comments.$.likes': -1 } }
+                { 'threadId': threadOrCommentId },
+                { $inc: { 'likes': 1 } }
             );
     
         } else {
             
             updateInfo = await threadCollection.updateOne(
-                { 'comments.commentId': threadOrCommentId },
-                { $inc: { 'comments.$.dislikes': -1 } }
+                { 'threadId': threadOrCommentId },
+                { $inc: { 'dislikes': 1 } }
             );
     
         };
