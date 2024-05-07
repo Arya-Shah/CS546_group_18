@@ -117,8 +117,17 @@ You will make client - side AJAX requests to the API and use jQuery to target an
 
             properties.forEach((property) => {
 
-                let listItem = $(`<li> <a href="javascript:void(0)" data-id="${property.propertyId}">${property.propertyName}, ${property.propertyCategory}, ${property.city}, ${property.state}</a></li>`);
-
+              
+                //let listItem = $(`<li> <a href="#" data-id="${property.propertyId}">${property.propertyName}, ${property.propertyCategory}, ${property.city}, ${property.state}</a></li>`);
+                let listItem = $(`
+                <li>
+                    <a href="/property/id/${property.propertyId}">${property.propertyName}<br></a>
+                    ${property.propertyCategory},<br>
+                    ${property.city}, ${property.state}<br>
+                    Bedrooms: ${property.bedrooms}<br>
+                    Bathrooms: ${property.bathrooms}
+                </li>
+              `);
                 searchResults.append(listItem);
 
             });
@@ -134,7 +143,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
 
     });
   });
-
+/*
   //EVENT: Hide the rootLink when it's clicked
   rootLink.click(function(event) {
     rootLink.hide(); 
@@ -158,12 +167,13 @@ You will make client - side AJAX requests to the API and use jQuery to target an
     //Create  request configuration 
     requestConfig = {
       method: 'GET',
-      url: `property/searchPropertyById/${searchQuery}`
+      url: `property/searchPropertyById/${propertyId}`
     };
-
+    console.log(requestConfig);
     //AJAX Call
-    $.ajax(requestConfig).then(function(responseMessage) {
 
+    $.ajax(requestConfig).then(function(responseMessage) {
+      console.log(responseMessage);
       if(responseMessage.Response){
 
         let htmlToInsert = `
@@ -238,6 +248,6 @@ You will make client - side AJAX requests to the API and use jQuery to target an
         return;
       };
   });
-});
+});*/
 
 })(window.jQuery);
