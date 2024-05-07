@@ -1,24 +1,24 @@
-const usernameEl = document.querySelector('#username');
-const passwordEl = document.querySelector('#password');
-const firstNameEl = document.querySelector('#firstname');
-const lastNameEl = document.querySelector('#lastname');
-const confirmPasswordEl = document.querySelector('#confirmpassword');
-const emailEl = document.querySelector('#email');
-const cityEl = document.querySelector('#city');
-const form = document.querySelector('#signup-form');
+const usernameE = document.querySelector('#username');
+const passwordE = document.querySelector('#password');
+const firstNameE = document.querySelector('#firstname');
+const lastNameE = document.querySelector('#lastname');
+const confirmPasswordE = document.querySelector('#confirmpassword');
+const emailE = document.querySelector('#email');
+const cityE = document.querySelector('#city');
+const formRegister = document.querySelector('#signup-form');
 
 
 const checkUsername = () => {
     let valid = false;
     const min = 5,
         max = 10;
-    const username = usernameEl.value.trim();
+    const username = usernameE.value.trim();
     if (!isRequired(username)) {
-        showError(usernameEl, 'Username cannot be blank.');
+        showError(usernameE, 'Username cannot be blank.');
     } else if (!isBetween(username.length, min, max)) {
-        showError(usernameEl, `Username must be between ${min} and ${max} characters.`)
+        showError(usernameE, `Username must be between ${min} and ${max} characters.`)
     } else {
-        showSuccess(usernameEl);
+        showSuccess(usernameE);
         valid = true;
     }
     return valid;
@@ -26,13 +26,13 @@ const checkUsername = () => {
 
 const checkPassword = () => {
     let valid = false;
-    const password = passwordEl.value.trim();
+    const password = passwordE.value.trim();
     if (!isRequired(password)) {
-        showError(passwordEl, 'Password cannot be blank.');
+        showError(passwordE, 'Password cannot be blank.');
     } else if(!/[!@#$%^&*(),.?":{}|<>]/.test(password) || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
-        showError(passwordEl, 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character');
+        showError(passwordE, 'There needs to be at least one uppercase character, there has to be at least one number and there has to be at least one special character');
     } else {
-        showSuccess(passwordEl);
+        showSuccess(passwordE);
         valid = true;
     }
     return valid;
@@ -40,11 +40,11 @@ const checkPassword = () => {
 
 const checkFirstName = () => {
     let valid = false;
-    const firstName = firstNameEl.value.trim();
+    const firstName = firstNameE.value.trim();
     if (!isRequired(firstName)) {
-        showError(firstNameEl, 'First name cannot be blank.');
+        showError(firstNameE, 'First name cannot be blank.');
     } else {
-        showSuccess(firstNameEl);
+        showSuccess(firstNameE);
         valid = true;
     }
     return valid;
@@ -52,11 +52,11 @@ const checkFirstName = () => {
 
 const checkLastName = () => {
     let valid = false;
-    const lastName = lastNameEl.value.trim();
+    const lastName = lastNameE.value.trim();
     if (!isRequired(lastName)) {
-        showError(lastNameEl, 'Last name cannot be blank.');
+        showError(lastNameE, 'Last name cannot be blank.');
     } else {
-        showSuccess(lastNameEl);
+        showSuccess(lastNameE);
         valid = true;
     }
     return valid;
@@ -64,14 +64,14 @@ const checkLastName = () => {
 
 const checkConfirmPassword = () => {
     let valid = false;
-    const confirmPassword = confirmPasswordEl.value.trim();
-    const password = passwordEl.value.trim();
+    const confirmPassword = confirmpasswordE.value.trim();
+    const password = passwordE.value.trim();
     if (!isRequired(confirmPassword)) {
-        showError(confirmPasswordEl, 'Please confirm your password.');
+        showError(confirmpasswordE, 'Please confirm your password.');
     } else if (confirmPassword !== password) {
-        showError(confirmPasswordEl, 'Passwords do not match.');
+        showError(confirmpasswordE, 'Passwords do not match.');
     } else {
-        showSuccess(confirmPasswordEl);
+        showSuccess(confirmpasswordE);
         valid = true;
     }
     return valid;
@@ -79,14 +79,14 @@ const checkConfirmPassword = () => {
 
 const checkEmail = () => {
     let valid = false;
-    const email = emailEl.value.trim();
+    const email = emailE.value.trim();
     const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!isRequired(email)) {
-        showError(emailEl, 'Email cannot be blank.');
+        showError(emailE, 'Email cannot be blank.');
     } else if (!pattern.test(email)) {
-        showError(emailEl, 'Please enter a valid email address.');
+        showError(emailE, 'Please enter a valid email address.');
     } else {
-        showSuccess(emailEl);
+        showSuccess(emailE);
         valid = true;
     }
     return valid;
@@ -94,11 +94,11 @@ const checkEmail = () => {
 
 const checkCity = () => {
     let valid = false;
-    const city = cityEl.value.trim();
+    const city = cityE.value.trim();
     if (!isRequired(city)) {
-        showError(cityEl, 'City cannot be blank.');
+        showError(cityE, 'City cannot be blank.');
     } else {
-        showSuccess(cityEl);
+        showSuccess(cityE);
         valid = true;
     }
     return valid;
@@ -126,7 +126,7 @@ const showSuccess = (input) => {
 }
 
 
-form.addEventListener('submit', function (e) {
+formRegister.addEventListener('submit', function (e) {
     e.preventDefault();
     let isUsernameValid = checkUsername(),
         isPasswordValid = checkPassword(),
@@ -149,7 +149,7 @@ form.addEventListener('submit', function (e) {
     }
 });
 
-form.addEventListener('input', function (e) {
+formRegister.addEventListener('input', function (e) {
     switch (e.target.id) {
         case 'username':
             checkUsername();
