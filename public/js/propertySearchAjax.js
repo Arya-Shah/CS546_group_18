@@ -165,7 +165,7 @@ You will make client - side AJAX requests to the API and use jQuery to target an
       method: 'GET',
       url: `property/searchPropertyById/${propertyId}`
     };
-    console.log(requestConfig);
+    
     //AJAX Call
 
     $.ajax(requestConfig).then(function(responseMessage) {

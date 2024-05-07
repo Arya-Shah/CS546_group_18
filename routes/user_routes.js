@@ -17,7 +17,8 @@ addLandlordReview,
 getLandlordById,
 getAllLandlordsByState,
 getAllLandlordsByCity,
-registerUser
+registerUser,
+getAllLandlords
 } from '../data/users.js'; 
 
 
@@ -38,8 +39,9 @@ let id = req.session.user.userId;
 router.route('/landlord')
 .get(async (req, res) => {
 try {
-
+    const allLandlords = await getAllLandlords();
     return res.status(200).render("allLandlords", {
+        landlords:allLandlords,
         layout:"main"
     });
 }catch (e) {
@@ -144,7 +146,7 @@ const landlord = await getLandlordById(landlordId);
 if (!landlord) {
     return res.status(404).render('error', {title:'error', error: 'Landlord not found.', layout: 'main' });
 }
-res.render('landlordDetails', {title:'landlord', landlord, layout: 'main' });
+res.render('landlordDetails', {title:'landlord', landlord:landlord, layout: 'main' });
 } catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }

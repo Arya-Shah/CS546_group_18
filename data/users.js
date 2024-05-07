@@ -20,6 +20,8 @@ export const getAllUsers = async () => {
     };
 
 
+   
+
 //Function: loginUser
 export const loginUser = async (username, password) => {
 
@@ -971,7 +973,6 @@ export const updateReportStatus= async(userId, reportId,newStatus,property_id) =
         throw errorObject;
 }    
     const reportData = await getReportbyId(reportId,userId);
-    console.log(reportData);
     if(!reportData){
         errorObject.error="Report with report id provided is not found";
         throw errorObject;
