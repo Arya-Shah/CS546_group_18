@@ -1,3 +1,7 @@
+//Imports
+import { users } from './config/mongoCollections.js';
+import { properties } from './config/mongoCollections.js';
+
 // valid strings
 export const isValidString = (str) => {
         if (typeof str !== 'string' || str.trim().length === 0) return false;
@@ -96,7 +100,7 @@ const updateRating = async (landlordId) => {
         const userCollection = await users();
 
     //Pull Landlord
-        const landlord = await userCollection.findOne({userId: landlordId});
+        const landlord = await userCollection.findOne({ userId: landlordId });
 
     if (!landlord){
         throw 'Landlord not found.';
@@ -109,7 +113,7 @@ const updateRating = async (landlordId) => {
     let handinessRatingTotal = 0;
     let depositHandlingRatingTotal = 0;
 
-    for (let landlordReview of landlord.landlordReviews){
+    for (let landlordReview of landlord.reviews){
         kindnessRatingTotal += landlordReview.kindnessRating;
         maintenanceResponsivenessRatingTotal += landlordReview.maintenanceResponsivenessRating;
         overallCommunicationRatingTotal += landlordReview.overallCommunicationRating;
@@ -119,12 +123,12 @@ const updateRating = async (landlordId) => {
     }
 
     let newAverageRatings = {
-        kindnessRating: kindnessRatingTotal / landlord.landlordReviews.length,
-        maintenanceResponsivenessRating: maintenanceResponsivenessRatingTotal / landlord.landlordReviews.length,
-        overallCommunicationRating: overallCommunicationRatingTotal / landlord.landlordReviews.length, 
-        professionalismRating: professionalismRatingTotal / landlord.landlordReviews.length, 
-        handinessRating: handinessRatingTotal / landlord.landlordReviews.length, 
-        depositHandlingRating: depositHandlingRatingTotal / landlord.landlordReviews.length
+        kindnessRating: (kindnessRatingTotal / landlord.reviews.length).toFixed(2),
+        maintenanceResponsivenessRating: (maintenanceResponsivenessRatingTotal / landlord.reviews.length).toFixed(2),
+        overallCommunicationRating: (overallCommunicationRatingTotal / landlord.reviews.length).toFixed(2), 
+        professionalismRating: (professionalismRatingTotal / landlord.reviews.length).toFixed(2), 
+        handinessRating: (handinessRatingTotal / landlord.reviews.length).toFixed(2), 
+        depositHandlingRating: (depositHandlingRatingTotal / landlord.reviews.length).toFixed(2)
     }
 
     await userCollection.updateOne(
@@ -133,6 +137,52 @@ const updateRating = async (landlordId) => {
     );
 
 }
+
+const updatePropertyRating = async (propertyId) => {
+    
+    isValidUuid(propertyId);
+
+    // Retrieve Property Collection
+        const propertyCollection = await properties();
+
+    // Pull Property
+        const property = await propertyCollection.findOne({ propertyId });
+
+    if (!property) {
+        throw 'Property not found.';
+    }
+
+    // Initialize rating totals
+        let locationDesirabilityRatingTotal = 0;
+        let ownerResponsivenessRatingTotal = 0;
+        let propertyConditionRatingTotal = 0;
+        let communityRatingTotal = 0;
+        let amenitiesRatingTotal = 0;
+
+    // Iterate through property reviews
+    for (let propertyReview of property.reviews) {
+        locationDesirabilityRatingTotal += propertyReview.locationDesirabilityRating;
+        ownerResponsivenessRatingTotal += propertyReview.ownerResponsivenessRating;
+        propertyConditionRatingTotal += propertyReview.propertyConditionRating;
+        communityRatingTotal += propertyReview.communityRating;
+        amenitiesRatingTotal += propertyReview.amenitiesRating;
+    }
+
+    // Calculate new average ratings
+    let newAverageRatings = {
+        locationDesirabilityRating: (locationDesirabilityRatingTotal / property.reviews.length).toFixed(2),
+        ownerResponsivenessRating: (ownerResponsivenessRatingTotal / property.reviews.length).toFixed(2),
+        propertyConditionRating: (propertyConditionRatingTotal / property.reviews.length).toFixed(2),
+        communityRating: (communityRatingTotal / property.reviews.length).toFixed(2),
+        amenitiesRating: (amenitiesRatingTotal / property.reviews.length).toFixed(2)
+    };
+
+    // Update property with new average ratings
+    await propertyCollection.updateOne(
+        { propertyId },
+        { $set: { averageRatings: newAverageRatings } }
+    );
+};
 
 export default {
   isValidString,
@@ -145,5 +195,6 @@ export default {
   isValidLatitude,
   isValidPropertyCategory,
   updateRating,
-  isValidThreadCategory
+  isValidThreadCategory,
+  updatePropertyRating
 };

@@ -67,7 +67,8 @@ export const addThread = async (
     userId,
     title,
     threadText,
-    category
+    category,
+    userRealName
   ) => {
     
       // Validation
@@ -96,16 +97,32 @@ export const addThread = async (
         }  
       // Thread Collection
       const threadCollection = await threads();
+      let createdDate = new Date();
+      let lastUpdated = new Date();
+
+      // Function to format date
+        function formatDate(dateInput) {
+            const date = new Date(dateInput);
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return date.toLocaleDateString(undefined, options);
+        }
+
+        //FormattedDates
+        let formattedCreatedDate = formatDate(createdDate);
+        let formattedLastUpdated = formatDate(lastUpdated);
   
       // New Thread Object
       let newThread = {
           threadId: uuid(),
+          userRealName: userRealName,
           userId: userId,
           title: title,
           threadText: threadText,
           category: category,
-          createdDate: new Date(),
-          lastUpdated: new Date(),
+          createdDate: createdDate,
+          lastUpdated: lastUpdated,
+          formattedCreatedDate,
+          formattedLastUpdated,
           likes: 0,
           dislikes: 0,
           comments: [],
@@ -245,7 +262,7 @@ export const removeThread = async (userId, threadId) => {
 
 
 // Function: addCommentReply, adds comment to property or reply to comment
-export const addCommentReply = async (userId, threadOrCommentId, commentText) => {
+export const addCommentReply = async (userId, threadOrCommentId, commentText, userRealName) => {
         
     const errorObject = {
         status: 400,
@@ -264,12 +281,27 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
             throw errorObject
         }
 
+        //Create Dates
+        let createdDate = new Date();
+
+        // Function to format date
+            function formatDate(dateInput) {
+                const date = new Date(dateInput);
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return date.toLocaleDateString(undefined, options);
+            }
+
+        //FormattedDates
+        let formattedCreatedDate = formatDate(createdDate);
+
     //Create Comment Object    
         const commentToAdd = {
             commentId: uuid(),
+            userRealName: userRealName,
             userId : userId,
             commentText : commentText,
-            dateCreated : new Date(),
+            dateCreated : createdDate,
+            formattedCreatedDate,
             likes : 0,
             dislikes : 0,
             replies : [],
@@ -280,7 +312,7 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText) =>
         const threadCollection = await threads();
         
         const thread = await threadCollection.findOne({ threadId: threadOrCommentId });
-    
+
         let updateInfo;
     
         //If a property id, add a commment; Else: Add reply
@@ -393,7 +425,7 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
     //Pull property collection
     const threadCollection = await threads();
 
-    //Try to add like or dislike to comment from property
+    //Try to add like or dislike to comment from thread
     
     let updateInfo;    
 
@@ -412,26 +444,26 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
         );
 
     };
-    /*
+    
     //If failed, try to add like or dislike to reply
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
         
         if(likeOrDislike === 'like'){
             
             updateInfo = await threadCollection.updateOne(
-                { 'replies.commentId': threadOrCommentId },
-                { $inc: { 'replies.$.likes': 1 } }
+                { 'comments.commentId': threadOrCommentId },
+                { $inc: { 'comments.$.likes': 1 } }
             );
         
         } else{ 
             
             updateInfo = await threadCollection.updateOne(
-                { 'replies.commentId': threadOrCommentId },
-                { $inc: { 'replies.$.dislikes': 1 } }
+                { 'comments.commentId': threadOrCommentId },
+                { $inc: { 'comments.$.dislikes': 1 } }
             );
         }
 
-    }*/
+    }
 
     //Throw Error if Failed 
     if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)

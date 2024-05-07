@@ -2,7 +2,8 @@
 <h2>Review for {{property.propertyName}}</h2>
 
 <p>Use this form to submit a review for {{property.propertyName}}.</p>
-<a href="/property/{{property.propertyId}}">Want to see reviews already written for this property? Click here.</a>
+
+<a href="/property/id/{{property.propertyId}}">Want to see reviews already written for this property? Click here.</a>
 
 
 {{#if error}}
@@ -11,7 +12,9 @@
 
 <div id="errorDiv" class="error-message" style="color: red;"></div>
 
-<form id="propertyReviewForm">
+<form id="propertyReviewForm" method="post" action="/property/propertyReview">
+
+    <input type="hidden" id="propertyId" name="propertyId" value="{{property.propertyId}}">
 
     <label for="maintenanceRating">Maintenance Rating:</label>
     <input type="range" id="maintenanceRating" name="maintenanceRating" min="1" max="5">
@@ -35,4 +38,5 @@
     <textarea id="reviewText" name="reviewText" required></textarea>
     
     <button type="submit">Submit Review</button>
+
 </form>

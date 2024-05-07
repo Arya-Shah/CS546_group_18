@@ -56,7 +56,7 @@ background-color: #3334371b;
 }
 
 input[type="submit"] {
-    background-color: #ffffff;
+    background-color: #1f83ae;
     color: white;
     border: none;
     border-radius: 4px;
@@ -250,4 +250,10 @@ font-size: 90%;
   #searchQuery {
     width: 234px;
   }
-
+  
+  #submitCommentButton {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 14px;
+    padding: 5px 10px;
+  }

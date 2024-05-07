@@ -156,14 +156,7 @@ router.route('/searchPropertyByName/:searchQuery').get(async (req, res) => {
 
     
     } catch (e) {
-        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
-            return res.status(e.status).render("error", {
-                title: "Error",
-                error: e.error,
-            });
-        } else {
-            return res.status(400).render("error", {title: "Error", error: e,});
-        }
+        return res.status(200).json(e.error?e.error:e);
     }
 
 });
@@ -194,14 +187,8 @@ router.route('/searchPropertyByAddress/:searchQuery').get(async (req, res) => {
 
     
     } catch (e) {
-        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
-            return res.status(e.status).render("error", {
-                title: "Error",
-                error: e.error,
-            });
-        } else {
-            return res.status(400).render("error", {title: "Error", error: e,});
-        }
+        return res.status(200).json(e.error?e.error:e);
+
     }
 
 });
@@ -233,14 +220,8 @@ router.route('/searchPropertyByState/:searchQuery').get(async (req, res) => {
 
     
     } catch (e) {
-        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
-            return res.status(e.status).render("error", {
-                title: "Error",
-                error: e.error,
-            });
-        } else {
-            return res.status(400).render("error", {title: "Error", error: e,});
-        }
+        return res.status(200).json(e.error?e.error:e);
+
     }
 
 });
@@ -272,14 +253,8 @@ router.route('/searchPropertyByCity/:searchQuery').get(async (req, res) => {
 
     
     } catch (e) {
-        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
-            return res.status(e.status).render("error", {
-                title: "Error",
-                error: e.error,
-            });
-        } else {
-            return res.status(400).render("error", {title: "Error", error: e,});
-        }
+        return res.status(200).json(e.error?e.error:e);
+
     }
 
 });
@@ -312,14 +287,8 @@ router.route('/searchPropertyByZip/:searchQuery').get(async (req, res) => {
 
     
     } catch (e) {
-        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
-            return res.status(e.status).render("error", {
-                title: "Error",
-                error: e.error,
-            });
-        } else {
-            return res.status(400).render("error", {title: "Error", error: e,});
-        }
+        return res.status(200).json(e.error?e.error:e);
+
     }
 
 });
@@ -475,7 +444,7 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
             throw new Error("Invalid property ID input");
         }
 
-        const { propertyDeleted } = await removeProperty(propertyId);
+        const { propertyDeleted } = await properties.removeProperty(propertyId);
 
         if (!propertyDeleted) {
             return res.status(500).json({ error: 'Failed to delete property.' });
@@ -490,24 +459,41 @@ router.post('/deleteProperty/:propertyId', async (req, res) => {
 });
 
 // PropertyReview
-router.get('/propertyReview', (req, res) => {
-    res.render('addPropertyReview', {title:'addPropertyReview', layout: 'main' });
+router.get('/propertyReview/:propertyId', async (req, res) => {
+    try {
+        const propertyId = req.params.propertyId;
+    
+        if (!propertyId || !validators.isValidUuid(propertyId)) {
+            throw new Error("Invalid property ID input");
+        }
+
+        const  propertyPulled = await properties.getPropertyById(propertyId);
+        res.render('PropertyReview', { title: 'addPropertyReview', layout: 'main', property:  propertyPulled});
+    
+    } catch (e) {
+        res.status(e.status ? e.status : 500).render('error', { title: 'error', error: e.error ? e.error : e, form: req.body });
+    }
+
 });
 
 router.post('/propertyReview', async (req, res) => {
-
-    // const{ maintenanceRating, locationDesirabilityRating, ownerResponsivenessRating, propertyConditionRating, communityRating, amenitiesRating, reviewText } = req.body;
-
-    const maintenanceRating = xss(req.body.maintenanceRating);
-    const locationDesirabilityRating = xss(req.body.locationDesirabilityRating);
-    const ownerResponsivenessRating = xss(req.body.ownerResponsivenessRating);
-    const propertyConditionRating = xss(req.body.propertyConditionRating);
-    const communityRating = xss(req.body.communityRating);
-    const amenitiesRating = xss(req.body.amenitiesRating);
-    const reviewText = xss(req.body.reviewText);
+    const { 
+        propertyId,
+        maintenanceRating, 
+        locationDesirabilityRating, 
+        ownerResponsivenessRating, 
+        propertyConditionRating, 
+        communityRating, 
+        amenitiesRating, 
+        reviewText 
+    } = req.body;
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
+
+    if (!propertyId) {
+        errors.push("Invalid property id.");
+    }
 
     if (!maintenanceRating || !validRatings.includes(parseInt(maintenanceRating))) {
         errors.push("Invalid maintenance rating input");
@@ -537,15 +523,20 @@ router.post('/propertyReview', async (req, res) => {
         errors.push("Review text is required");
     }
 
+
     // Render propertyReview Page with any caught errors
     if (errors.length > 0) {
         return res.status(400).render('propertyReview', {title:'propertyReview', errors });
     } else {
         try {
+
+            const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+            
             // Assuming functions like addPropertyReview exist to handle database operations
-            const result = await addPropertyReview(
+            const result = await properties.addPropertyReview(
                 propertyId,
                 {
+                    userRealName: userRealName,
                     maintenanceRating: parseInt(maintenanceRating),
                     locationDesirabilityRating: parseInt(locationDesirabilityRating),
                     ownerResponsivenessRating: parseInt(ownerResponsivenessRating),
@@ -554,14 +545,12 @@ router.post('/propertyReview', async (req, res) => {
                     amenitiesRating: parseInt(amenitiesRating),
                     reviewText: reviewText.trim()
                 },
-                userId
+                req.session.user.userId
             );
 
-            // Render the property details page after successfully adding the review
-            return res.redirect(`/property/${propertyId}`);
+            return res.redirect(`/property/id/${propertyId}`);
 
         } catch (e) {
-            console.error('Error adding property review:', error);
             res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
         }
     }

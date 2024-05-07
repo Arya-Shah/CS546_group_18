@@ -1,10 +1,9 @@
-import { users,reports } from "../config/mongoCollections.js";
-// import uuid from 'uuid';
-// import bcrypt from 'bcrypt';
+import { users,reports,properties } from "../config/mongoCollections.js";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
-// import {ObjectId} from 'mongodb';
+import {getPropertyById} from "../data/properties.js";
+
 
 const saltRounds = 16;
 
@@ -18,8 +17,6 @@ export const getAllUsers = async () => {
     //Return collection as array
     return await userCollection.find({}).toArray();
     };
-
-
    
 
 //Function: loginUser
@@ -476,25 +473,73 @@ export const updateUser = async (userId, updatedUser) => {
         
     }
 
+    /* const pushUpdates = {};
+
     if(updatedUser.reportsIds){
 
-        updatedUserData.reportsIds = updatedUser.reportsIds;
+        pushUpdates.reportIds = updatedUser.reportIds;
         
     }
-    
-    //Update user with object
-    const updateResponse = await userCollection.updateOne(
-        { userId: userId },
-        { $set: updatedUserData });
 
-    
-    //Validation (cont.)
-    if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0){
-        errorObject.status = 500;
-        errorObject.error =  "Error occurred while updating user";
-        throw errorObject;
+    if(updatedUser.reviewIds){
+        console.log('In Review Ids');
+        pushUpdates.reviewIds = updatedUser.reviewIds;
+        
+    }
+
+    console.log('Throught review and reports.');
+
+    //Combine push updates
+    if (Object.keys(pushUpdates).length > 0) {
+        updatedUserData.$push = pushUpdates;
+    }
+    */
+
+    //Update user with object
+
+
+    if (updatedUser.reportsIds) {
+        const updateResponseReports = await userCollection.updateOne(
+            { userId: userId },
+            { $push: { reportIds: updatedUser.reportsIds } }
+        );
+
+        
+
+        if (!updateResponseReports.acknowledged || updateResponseReports.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user with reportsIds";
+            throw errorObject;
+        }
+    }
+
+    else if (updatedUser.reviewIds) {
+
+        const updateResponseReviews = await userCollection.updateOne(
+            { userId: userId },
+            { $push: { reviewIds: updatedUser.reviewIds } }
+        );
+
+        if (!updateResponseReviews.acknowledged || updateResponseReviews.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user with reviewIds";
+            throw errorObject;
+        }
+    }
+    else {
+        const updateResponse = await userCollection.updateOne(
+        { userId: userId },
+        updatedUserData
+    );
+
+        if (!updateResponse.acknowledged || updateResponse.modifiedCount === 0) {
+            errorObject.status = 500;
+            errorObject.error = "Error occurred while updating user";
+            throw errorObject;
+        }   
     }
     
+
     //Return
     return { userUpdated: true };
     
@@ -529,33 +574,46 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     }
     
     //Validation
-    if (!landlordId || !validators.isValidUuid(landlordId)){
-        errorObject.error =  "Invalid landlord ID input";
-        throw errorObject;
-    }
-
-    const landlord = await getUserById(landlordId);
+    /*const landlord = await getLandlordById(landlordId);
 
     if (!landlord){
         errorObject.error = 'No landlord found with specified id.';
         throw errorObject;
-    }
-    
-    if (!userId || !validators.isValidUuid(userId)){
-        errorObject.error =  "Invalid user ID input";
+    }*/
+
+    if (!reviewData || Object.keys(reviewData).length === 0)
+        {errorObject.error= "Invalid Review: Review data is required.";
+    throw errorObject}
+    /*
+    //Check if landlord
+    const landlordCheck = await getLandlordById(userId);
+    if (landlordCheck){
+        errorObject.error = "User is a landlord. Landlords cannot leave reviews.";
         throw errorObject;
     }
-    
-    if (!reviewData || Object.keys(reviewData).length === 0){
-        errorObject.error = "Invalid Review: Review data is required.";
+    console.log(2);
+    // Get the landlord object
+    const landlord = await getLandlordById(landlordId);
+    if (!landlord) {
+        errorObject.error = "Landlord not found.";
         throw errorObject;
     }
-    
+    console.log(3);
+    // Check if the user has already reviewed the property
+    for (const review of landlord.reviews) {
+        if (review.userId === userId) {
+            errorObject.error = "User has already reviewed this landlord.";
+            throw errorObject;
+        }
+    }
+    console.log(4);
+    */
     //Create Review Object
     const updatedReviewData = {
-        userId: userId,
+        userId: null,
         reviewId: uuid(),
         date: new Date().toISOString(),
+        userRealName: '',
         reports: [],
         kindnessRating: null,
         maintenanceResponsivenessRating: null,
@@ -565,8 +623,25 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         depositHandlingRating: null,
         reviewText: null,
     };
+
+    //Validation (cont.) and add to review object
+
+    if (!userId || !validators.isValidUuid(userId)){
+        errorObject.error =  "Invalid user ID input";
+        throw errorObject;
+    } else {
+        updatedReviewData.userId = userId;
+    }
     
     const validRatings = [1, 2, 3, 4, 5];
+
+    if (
+        !reviewData.userRealName) {
+        errorObject.error="Invalid name for user provided for review.";
+        throw errorObject
+    } else {
+        updatedReviewData.userRealName = reviewData.userRealName;
+    }
     
     if ( !reviewData.kindnessRating || typeof reviewData.kindnessRating !== "number" || !validRatings.includes(reviewData.kindnessRating)) {
         errorObject.error = "Invalid kindnessRating input";
@@ -617,19 +692,21 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
         updatedReviewData.reviewText = reviewData.reviewText;
     }
     
-    //Retreive User Collection
-    const userCollection = await users();
 
     //Update User with review id
-    const userUpdateStatus = await userCollection.updateOne(
-        { userId: userId },
-        { $push: { reviewIds: updatedReviewData.reviewId } }
+    const userUpdateStatus = await updateUser(
+        userId,
+        { reviewIds: updatedReviewData.reviewId }
     );
     
     if (!userUpdateStatus){
         errorObject.error =  "Failed to update user information with new review id."; 
         throw errorObject;
-    }    
+    }   
+     
+    //Retreive User Collection
+    const userCollection = await users();
+
     //Update Landlord with review
     const landlordUpdateStatus = await userCollection.updateOne(
         { userId: landlordId },
@@ -637,9 +714,10 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     );
     
     if (!landlordUpdateStatus)
-{    errorObject.error= "Failed to update landlord informaiton with new review.";
+    {errorObject.error= "Failed to update landlord informaiton with new review.";
     throw errorObject;
-}    
+    }
+    
     //Recalculate Landlord's average ratings
     validators.updateRating(landlordId);
     
@@ -912,154 +990,144 @@ export const getReportbyId = async(reportId, userId) =>{
     }
 
     return report;
+};
+
+// export const updateReportStatus= async(userId, reportId,newStatus,property_id) =>{
 //     const errorObject = {
 //         status:400
-//     }
+//     }
 //     if (!userId || !validators.isValidUuid(userId)) 
-// {        errorObject.error= "Invalid user ID input";
-//     throw errorObject;
-// }
+//         {errorObject.error= "Invalid user ID input";
+//         throw errorObject}
+
 //     if (!reportId || !validators.isValidUuid(reportId)) 
-// {        errorObject.error= "Invalid report ID input";
-//     throw errorObject;
-// }
+//         {errorObject.error= "Invalid report ID input";
+//     throw errorObject}
+    
 //     const adminData = await getUserById(userId);
     
 //     if (!adminData.isAdmin) 
 // {        errorObject.error="User does not have admin access.";
 //         throw errorObject;
 // }    
-//     const userData = await reports();
-    
-//     const usersWithReports = userData.filter((user) => 
-//         reports.length >0
-//     );
-    
-//     if (usersWithReports.length === 0) {
-//         errorObject.error="No reports found.";
-//         throw errorObject;
-//     }
-    
-
-//     const reportWithId = userData.flatMap(user => 
-//         (user.reportsIds || []).filter(report => report.report_id === reportId)
-//     );
-    
-
-//     if(!reportWithId){
+//     const reportData = await getReportbyId(reportId,userId);
+//     console.log(reportData);
+//     if(!reportData){
 //         errorObject.error="Report with report id provided is not found";
 //         throw errorObject;
 //     }
     
-//     return reportWithId;
-};
-
-export const updateReportStatus= async(userId, reportId,newStatus,property_id) =>{
-    const errorObject = {
-        status:400
-    }
-    if (!userId || !validators.isValidUuid(userId)) 
-        {errorObject.error= "Invalid user ID input";
-        throw errorObject}
-
-    if (!reportId || !validators.isValidUuid(reportId)) 
-        {errorObject.error= "Invalid report ID input";
-    throw errorObject}
-    
-    const adminData = await getUserById(userId);
-    
-    if (!adminData.isAdmin) 
-{        errorObject.error="User does not have admin access.";
-        throw errorObject;
-}    
-    const reportData = await getReportbyId(reportId,userId);
-    if(!reportData){
-        errorObject.error="Report with report id provided is not found";
-        throw errorObject;
-    }
-    
-    if( newStatus === "Accepted" || newStatus === "Rejected"){
-        reportData.status = newStatus;
-    }else {
-        errorObject.error="Invalid status update requested";
-        throw errorObject;
-    }
+//     if( newStatus === "Accepted" || newStatus === "Rejected"){
+//         reportData.status = newStatus;
+//     }else {
+//         errorObject.error="Invalid status update requested";
+//         throw errorObject;
+//     }
     
 
-    const userData = await getUserById(reportData.userId);
+//     const userData = await getUserById(reportData.userId);
 
-    if(!userData) 
-{        errorObject.error="No user data found.";
-        throw errorObject;
-}
-    // const reportWithId = userData.map(user =>
-    //     (user.reportsIds || []).filter(report => report.report_id === reportId));
+//     if(!userData) 
+// {        errorObject.error="No user data found.";
+//         throw errorObject;
+// }
+//     // const reportWithId = userData.map(user =>
+//     //     (user.reportsIds || []).filter(report => report.report_id === reportId));
     
 
-    //const reportWithId = userData.reportsIds.find(report => report.report_id === reportId);
-    // const updatedReportsIds = userData.reportsIds.filter(report => report.report_id !== reportId);
-    const updatedReportsIds = userData.reportsIds.map(report => 
-        report.report_id === reportId ? { ...report, status: newStatus } : report
-    );
+//     //const reportWithId = userData.reportsIds.find(report => report.report_id === reportId);
+//     // const updatedReportsIds = userData.reportsIds.filter(report => report.report_id !== reportId);
+//     const updatedReportsIds = userData.reportsIds.map(report => 
+//         report.report_id === reportId ? { ...report, status: newStatus } : report
+//     );
 
-    const updateResult = await updateUserReportIds(userId, updatedReportsIds);
-    if (!updateResult)
-{      errorObject.error="Failed to update user information with the report.";
-        throw errorObject;
-}
+//     const updateResult = await updateUserReportIds(userId, updatedReportsIds);
+//     if (!updateResult)
+// {      errorObject.error="Failed to update user information with the report.";
+//         throw errorObject;
+// }
 
-    return reportData[0].status;
+//     return reportData[0].status;
   
 
-}
+// }
 
-export const updatePostReportStatus= async(userId, reportId,status) =>{
-    const errorObject = {
-        status:400
-    }
-    if (!userId || !validators.isValidUuid(userId)) 
-{        errorObject.error= "Invalid user ID input";
-    throw errorObject;
-}
-    if (!reportId || !validators.isValidUuid(reportId)) 
-{        errorObject.error= "Invalid report ID input";
-    throw errorObject;
-}    
+// Function: updateReportStatus
+export const updateReportStatus = async (userId, reportId, newStatus, propertyId) => {
     const adminData = await getUserById(userId);
-    
-
-    if (!adminData.isAdmin) 
-{        errorObject.error="User does not have admin access.";
-    throw errorObject;
-}    
-    const reportData = await getReportbyId(reportId);
-
-    if(!reportData){
-        errorObject.error="Report with report id provided is not found.";
-        throw errorObject;
+    if (!adminData.isAdmin) {
+        throw { status: 403, message: "Access denied. Only admins can perform this action." };
+    }
+    const reportsData = await getReportbyId(reportId,userId);
+    //const report = await reportsData.findOne({ report_id: reportId });
+    if (!reportsData) {
+        throw { status: 404, message: "Report not found." };
     }
     
-    // const updatedReportData = reportData.status("Post Report");
-    
-    //Update status of report
-    reportData[0].status = "Accepted";
-    const updatedReportData = reportData[0].status;
+    // const property = await getPropertyById(propertyId);
+    // if (!property) {
+    //     throw { status: 404, message: "Property not found." };
+    // }
 
-    //Pull user data associated with report
-    const userData = await getUserById(reportData[0].userId);
-    
-    if(!userData) 
-{        errorObject.error="No user data found.";
-    throw errorObject
-}    
-    //Check the report with report ID is in user's reports
-    const reportWithId = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.report_id === reportId));
-        
+    // const reportIndex = property.reports.find(r => r.report_id === reportId);
+    // if (reportIndex === -1) {
+    //     throw { status: 404, message: "Report not found." };
+    // }
 
-    return updatedReportData;
+    // // Updating the report status
+    // property.reports[reportIndex].status = newStatus;
+    // property.reports[reportIndex].resolved_at = new Date().toISOString();
 
+    // If the report is rejected, remove the property
+    if (newStatus === "Rejected") {
+        reportsData.status = newStatus;
+        const reportsCollection = await reports();
+        const deleteResult = await reportsCollection.deleteOne({ report_id: reportId });
+        console.log("Delete result:", deleteResult);
+
+        if (deleteResult.deletedCount === 0) {
+            throw new Error("No report found with the provided ID, or it could not be deleted.");
+        }
+        // const deletionResult = await removeProperty(propertyId);
+        // if (!deletionResult) {
+        //     throw { status: 500, message: "Failed to delete property." };
+        // }
+        return { success: true, message: "Report rejected and report removed successfully." };
+    } else if (newStatus === "Accepted") {
+        // If the report is accepted, save changes to the property
+        reportsData.status = newStatus;
+        const updateResult = await updateReportWithNewStatus(reportId, reportsData);
+        if (!updateResult) {
+            throw { status: 500, message: "Failed to update the report status." };
+        }
+        return { success: true, message: "Report accepted successfully." };
+    } else {
+        throw { status: 400, message: "Invalid status. Only 'Accepted' or 'Rejected' are valid." };
+    }
 };
+
+async function updateReportWithNewStatus(reportId, updates) {
+    const reportCollection = await reports();
+    const result = await reportCollection.replaceOne({ report_id: reportId }, updates);
+    return result.acknowledged;
+}
+    
+async function removeProperty(propertyId) {
+    const propertyCollection = await properties();
+    const deleteResult = await propertyCollection.deleteOne({ propertyId: propertyId });
+    return deleteResult.deletedCount === 1;
+}
+
+
+async function updateProperty(propertyId, updates) {
+    const propertyCollection = await properties();
+    const updateResult = await propertyCollection.updateOne({ propertyId: propertyId }, { $set: updates });
+    return updateResult.modifiedCount === 1;
+}
+
+
+
+
 
 export const updateDeleteReportStatus= async(userId,reportId) =>{
     

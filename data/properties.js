@@ -3,6 +3,7 @@ import { users } from '../config/mongoCollections.js';
 import { properties } from '../config/mongoCollections.js';
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
+import * as usersfunctions from './users.js';
 
 
 //Function: getAllProperties
@@ -18,7 +19,7 @@ export const getAllProperties = async () => {
 
 //Function: getPropertyById
 export const getPropertyById = async (id) => {
- 
+  
     const errorObject = {
         status: 400,
         };
@@ -26,16 +27,17 @@ export const getPropertyById = async (id) => {
     if (!id || !validators.isValidUuid(id)) {errorObject.error= "Invalid ID input";
         throw errorObject;
     }
-
+  
     //Retreive property collection and specific property
     const propertyCollection = await properties();
+    
     const property = await propertyCollection.findOne({ propertyId: id });
-
+   
     //Validation (cont.)
     if (!property) {errorObject.error= "Property not found";
     throw errorObject
     }
-
+ 
     //Return
     return property;
 
@@ -488,12 +490,35 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         if (!reviewData || Object.keys(reviewData).length === 0)
             {errorObject.error= "Invalid Review: Review data is required.";
         throw errorObject}
+
+    //Check if landlord
+    const landlordCheck = await usersfunctions.getLandlordById(userId);
+    if (landlordCheck){
+        errorObject.error = "User is a landlord. Landlords cannot leave reviews.";
+        throw errorObject;
+    }
+    
+    // Get the property object
+    const property = await getPropertyById(propertyId);
+    if (!property) {
+        errorObject.error = "Property not found.";
+        throw errorObject;
+    }
+
+    // Check if the user has already reviewed the property
+    for (const review of property.reviews) {
+        if (review.userId === userId) {
+            errorObject.error = "User has already reviewed this property.";
+            throw errorObject;
+        }
+    }
     
     //Create Review Object
     const updatedReviewData = {
         userId: null,
         reviewId: uuid(),
         date: new Date().toISOString(),
+        userRealName: '',
         reports: [],
         locationDesirabilityRating: null, 
         ownerResponsivenessRating: null, 
@@ -513,6 +538,14 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     
     const validRatings = [1, 2, 3, 4, 5];
     
+    if (
+        !reviewData.userRealName) {
+        errorObject.error="Invalid name for user provided for review.";
+        throw errorObject
+    } else {
+        updatedReviewData.userRealName = reviewData.userRealName;
+    }
+
     if (
         !reviewData.locationDesirabilityRating ||
         typeof reviewData.locationDesirabilityRating !== "number" ||
@@ -581,26 +614,29 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     }
     
     //Update User with review id
-    const userUpdateStatus = await users.updateUser(
-        { userId: userId },
-        { $push: { reviewIds: updatedReviewData.reviewId } }
+    const userUpdateStatus = await usersfunctions.updateUser(
+        userId,
+        { reviewIds: updatedReviewData.reviewId }
     );
     
     if (!userUpdateStatus)
         {errorObject.error= "Failed to update user information with new property review.";
         throw errorObject}
     
-    //Update property with review
-    const propertyUpdateStatus = await updateProperty(propertyId, {
-        $push: { reviews: updatedReviewData },
-    });
+    //ProperpertyCollection
+    const propertyCollection = await properties();
+
+    const propertyUpdateStatus = await propertyCollection.updateOne(
+        { propertyId: propertyId }, 
+        { $push: { reviews: updatedReviewData } } 
+    );
     
     if (!propertyUpdateStatus)
         {errorObject.error= "Failed to update property informatino with new review.";
     throw errorObject}
     
     //To Do: Recalculate Property's average ratings
-    validators.updateRatingProperty(propertyId);
+    validators.updatePropertyRating(propertyId);
     
     //Return
     return { reviewAdded: true };

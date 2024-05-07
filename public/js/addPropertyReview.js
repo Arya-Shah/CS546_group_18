@@ -53,12 +53,11 @@ if (propertyReviewForm) {
 
         } catch (error) {
             errors.push(error.message);
+            propertyErrorDiv.textContent = errors.join('\n');
         }
 
         // Show Errors, If None Submit
-        if (errors.length > 0) {
-            propertyErrorDiv.textContent = errors.join('\n');
-        } else {
+        if (errors.length === 0) {
             propertyReviewForm.submit();
         }
     });

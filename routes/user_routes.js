@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import helpers from '../helper.js';
+import * as users from '../data/users.js';
 import xss from 'xss';
 
 import {
@@ -41,11 +42,45 @@ let id = xss(req.session.user.userId);
 router.route('/landlord')
 .get(async (req, res) => {
 try {
-    const allLandlords = await getAllLandlords();
+
+    let allLandlords = await getAllLandlords();
+
+            // Check if sorting query parameter exists and sort accordingly
+            if (req.query.sort === 'kindnessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.kindnessRating - a.averageRatings.kindnessRating;
+                });
+            } else if (req.query.sort === 'maintenanceResponsivenessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.maintenanceResponsivenessRating - a.averageRatings.maintenanceResponsivenessRating;
+                });
+            } else if (req.query.sort === 'overallCommunicationRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.overallCommunicationRating - a.averageRatings.overallCommunicationRating;
+                });
+            } else if (req.query.sort === 'professionalismRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.professionalismRating - a.averageRatings.professionalismRating;
+                });
+            } else if (req.query.sort === 'handinessRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.handinessRating - a.averageRatings.handinessRating;
+                });
+            } else if (req.query.sort === 'depositHandlingRating') {
+                allLandlords.sort((a, b) => {
+                    return b.averageRatings.depositHandlingRating - a.averageRatings.depositHandlingRating;
+                });
+            }
+
+            if (req.query.filter) {
+                allLandlords = allLandlords.filter(landlord => landlord.state === req.query.filter);
+            }
+
     return res.status(200).render("allLandlords", {
         landlords:allLandlords,
         layout:"main"
     });
+
 }catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
@@ -186,30 +221,68 @@ router.route('/review/property/:propertyId')
     });
 
 //LandlordReview
-router.get('/landlordReview', (req, res) => {
-    res.render('addLandlordReview', { title:'review',layout: 'main' });
+router.get('/landlordReview/:userId', async (req, res) => {
+    
+    
+    try {
+        const landlordId = req.params.userId;
+        
+    
+        if (!landlordId || !helpers.isValidUuid(landlordId)) {
+            throw new Error("Invalid landlord ID input");
+        }
+
+        const  landlordPulled = await getLandlordById(landlordId);
+        
+
+        res.render('LandlordReview', { title: 'addLandlordReview', layout: 'main', landlord:  landlordPulled});
+    
+    } catch (e) {
+        res.status(e.status ? e.status : 500).render('error', { title: 'error', error: e.error ? e.error : e, form: req.body });
+    }
+
 });
 router.post('/landlordReview', async (req, res) => {
-    // const { 
-    //     kindnessRating, 
-    //     maintenanceResponsivenessRating, 
-    //     overallCommunicationRating, 
-    //     professionalismRating, 
-    //     handinessRating, 
-    //     depositHandlingRating, 
-    //     reviewText 
-    // } = req.body;
-
-    const kindnessRating = xss(req.body.kindnessRating);
-    const maintenanceResponsivenessRating = xss(req.body.maintenanceResponsivenessRating);
-    const overallCommunicationRating = xss(req.body.overallCommunicationRating);
-    const professionalismRating = xss(req.body.professionalismRating);
-    const handinessRating = xss(req.body.handinessRating);
-    const depositHandlingRating = xss(req.body.depositHandlingRating);
-    const reviewText = xss(req.body.reviewText);
+    
+    const {
+        landlordId, 
+        kindnessRating, 
+        maintenanceResponsivenessRating, 
+        overallCommunicationRating, 
+        professionalismRating, 
+        handinessRating, 
+        depositHandlingRating, 
+        reviewText 
+    } = req.body;
 
     const validRatings = [1, 2, 3, 4, 5];
     const errors = [];
+
+    /*
+    //Check if landlord
+    const landlordCheck = await users.getLandlordById(req.session.user.userId);
+    if (landlordCheck){
+        errors.push("User is a landlord. Landlords cannot leave reviews.");
+    }
+    console.log(2);
+    // Get the landlord object
+    const landlord = await users.getLandlordById(landlordId);
+    if (!landlord) {
+        errors.push("Landlord not found.");
+    }
+    console.log(3);
+    // Check if the user has already reviewed the property
+    for (const review of landlord.reviews) {
+        if (review.userId === req.session.user.userId) {
+            errors.push("User has already reviewed this landlord.");
+        }
+    }
+    console.log(4);
+    */    
+
+    if (!landlordId) {
+        errors.push("Invalid landlord id.");
+    }
 
     if (!kindnessRating || !validRatings.includes(parseInt(kindnessRating))) {
         errors.push("Invalid kindness rating input");
@@ -232,20 +305,25 @@ router.post('/landlordReview', async (req, res) => {
         errors.push("Invalid deposit handling rating input");
     }
 
-    if (!reviewText || !validators.isValidString(reviewText.trim())) {
+    if (!reviewText || !helpers.isValidString(reviewText.trim())) {
         errors.push("Review text is required");
     }
 
     //Render landlordReview Page with any caught errors
     if (errors.length > 0) {
-        return res.status(400).render('landlordReview', {title:'review', errors });
+        return res.status(400).render('landlordReview', {title:'LandlordReview', errors});
+        //return res.status(400).render('error', { title: 'error', errors: errors, layout: 'main' });
+
     } else {
 
         try {
 
+            const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+
             const result = await addLandlordReview(
                 landlordId,
                 {
+                    userRealName: userRealName,
                     kindnessRating: parseInt(kindnessRating),
                     maintenanceResponsivenessRating: parseInt(maintenanceResponsivenessRating),
                     overallCommunicationRating: parseInt(overallCommunicationRating),
@@ -254,13 +332,14 @@ router.post('/landlordReview', async (req, res) => {
                     depositHandlingRating: parseInt(depositHandlingRating),
                     reviewText: reviewText.trim()
                 },
-                userId
+                req.session.user.userId
             );
 
             // Render the landlord details page after successfully adding the review
-            return res.redirect(`/landlord/${landlordId}`);
+            
+            return res.redirect(`/user/landlord/${landlordId}`);
+
         } catch (error) {
-            console.error('Error adding landlord review:', error);
             return res.status(500).render('error', {title:'error', error: 'Internal Server Error.', layout: 'main' });
         }
     }
@@ -272,7 +351,7 @@ router.post('/deleteLandlordReview/:reviewId', async (req, res) => {
         const reviewId = xss(req.params.reviewId);
         const userId = xss(req.user.id);
 
-        if (!reviewId || !validators.isValidUuid(reviewId)) {
+        if (!reviewId || !helpers.isValidUuid(reviewId)) {
             throw new Error("Invalid review ID input");
         }
 
