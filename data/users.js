@@ -1,4 +1,4 @@
-import { users,reports } from "../config/mongoCollections.js";
+import { users,reports,properties } from "../config/mongoCollections.js";
 import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
@@ -17,8 +17,6 @@ export const getAllUsers = async () => {
     //Return collection as array
     return await userCollection.find({}).toArray();
     };
-
-
    
 
 //Function: loginUser
@@ -1057,101 +1055,79 @@ export const getReportbyId = async(reportId, userId) =>{
 // Function: updateReportStatus
 export const updateReportStatus = async (userId, reportId, newStatus, propertyId) => {
     const adminData = await getUserById(userId);
-    
-    if (!adminData.isAdmin) 
-{        errorObject.error="User does not have admin access.";
-        throw errorObject;
-}    
-    const reportData = await getReportbyId(reportId,userId);
-    console.log(reportData);
-    if(!reportData){
-        errorObject.error="Report with report id provided is not found";
-        throw errorObject;
+    if (!adminData.isAdmin) {
+        throw { status: 403, message: "Access denied. Only admins can perform this action." };
+    }
+    const reportsData = await getReportbyId(reportId,userId);
+    //const report = await reportsData.findOne({ report_id: reportId });
+    if (!reportsData) {
+        throw { status: 404, message: "Report not found." };
     }
     
-    if( newStatus === "Accepted" || newStatus === "Rejected"){
-        reportData.status = newStatus;
-    }else {
-        errorObject.error="Invalid status update requested";
-        throw errorObject;
+    // const property = await getPropertyById(propertyId);
+    // if (!property) {
+    //     throw { status: 404, message: "Property not found." };
+    // }
+
+    // const reportIndex = property.reports.find(r => r.report_id === reportId);
+    // if (reportIndex === -1) {
+    //     throw { status: 404, message: "Report not found." };
+    // }
+
+    // // Updating the report status
+    // property.reports[reportIndex].status = newStatus;
+    // property.reports[reportIndex].resolved_at = new Date().toISOString();
+
+    // If the report is rejected, remove the property
+    if (newStatus === "Rejected") {
+        reportsData.status = newStatus;
+        const reportsCollection = await reports();
+        const deleteResult = await reportsCollection.deleteOne({ report_id: reportId });
+        console.log("Delete result:", deleteResult);
+
+        if (deleteResult.deletedCount === 0) {
+            throw new Error("No report found with the provided ID, or it could not be deleted.");
+        }
+        // const deletionResult = await removeProperty(propertyId);
+        // if (!deletionResult) {
+        //     throw { status: 500, message: "Failed to delete property." };
+        // }
+        return { success: true, message: "Report rejected and report removed successfully." };
+    } else if (newStatus === "Accepted") {
+        // If the report is accepted, save changes to the property
+        reportsData.status = newStatus;
+        const updateResult = await updateReportWithNewStatus(reportId, reportsData);
+        if (!updateResult) {
+            throw { status: 500, message: "Failed to update the report status." };
+        }
+        return { success: true, message: "Report accepted successfully." };
+    } else {
+        throw { status: 400, message: "Invalid status. Only 'Accepted' or 'Rejected' are valid." };
     }
-    
-
-    const userData = await getUserById(reportData.userId);
-
-    if(!userData) 
-{        errorObject.error="No user data found.";
-        throw errorObject;
-}
-    // const reportWithId = userData.map(user =>
-    //     (user.reportsIds || []).filter(report => report.report_id === reportId));
-    
-
-    //const reportWithId = userData.reportsIds.find(report => report.report_id === reportId);
-    // const updatedReportsIds = userData.reportsIds.filter(report => report.report_id !== reportId);
-    const updatedReportsIds = userData.reportsIds.map(report => 
-        report.report_id === reportId ? { ...report, status: newStatus } : report
-    );
-
-    const updateResult = await updateUserReportIds(userId, updatedReportsIds);
-    if (!updateResult)
-{      errorObject.error="Failed to update user information with the report.";
-        throw errorObject;
-}
-
-    return reportData[0].status;
-  
-
-}
-
-export const updatePostReportStatus= async(userId, reportId,status) =>{
-console.log(userId, reportId,status);
-    const errorObject = {
-        status:400
-    }
-    if (!userId || !validators.isValidUuid(userId)) 
-{        errorObject.error= "Invalid user ID input";
-    throw errorObject;
-}
-    if (!reportId || !validators.isValidUuid(reportId)) 
-{        errorObject.error= "Invalid report ID input";
-    throw errorObject;
-}    
-    const adminData = await getUserById(userId);
-    
-
-    if (!adminData.isAdmin) 
-{        errorObject.error="User does not have admin access.";
-    throw errorObject;
-}    
-    const reportData = await getReportbyId(reportId);
-
-    if(!reportData){
-        errorObject.error="Report with report id provided is not found.";
-        throw errorObject;
-    }
-    
-    // const updatedReportData = reportData.status("Post Report");
-    
-    //Update status of report
-    reportData[0].status = "Accepted";
-    const updatedReportData = reportData[0].status;
-
-    //Pull user data associated with report
-    const userData = await getUserById(reportData[0].userId);
-    
-    if(!userData) 
-{        errorObject.error="No user data found.";
-    throw errorObject
-}    
-    //Check the report with report ID is in user's reports
-    const reportWithId = userData.flatMap(user => 
-        (user.reportsIds || []).filter(report => report.report_id === reportId));
-        
-
-    return updatedReportData;
-
 };
+
+async function updateReportWithNewStatus(reportId, updates) {
+    const reportCollection = await reports();
+    const result = await reportCollection.replaceOne({ report_id: reportId }, updates);
+    return result.acknowledged;
+}
+    
+async function removeProperty(propertyId) {
+    const propertyCollection = await properties();
+    const deleteResult = await propertyCollection.deleteOne({ propertyId: propertyId });
+    return deleteResult.deletedCount === 1;
+}
+
+
+async function updateProperty(propertyId, updates) {
+    const propertyCollection = await properties();
+    const updateResult = await propertyCollection.updateOne({ propertyId: propertyId }, { $set: updates });
+    return updateResult.modifiedCount === 1;
+}
+
+
+
+
 
 export const updateDeleteReportStatus= async(userId,reportId) =>{
     
