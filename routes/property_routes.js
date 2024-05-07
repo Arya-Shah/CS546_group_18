@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import helpers from '../helper.js';
+import xss from 'xss';
 
 import * as properties from '../data/properties.js';
 import {searchPropertiesByName} from '../data/users.js'; 
@@ -457,7 +458,7 @@ router.post('/addProperty', async (req, res) => {
 // Delete a property (post)
 router.post('/deleteProperty/:propertyId', async (req, res) => {
     try {
-        const propertyId = req.params.propertyId;
+        const propertyId = xss(req.params.propertyId);
 
         if (!propertyId || !validators.isValidUuid(propertyId)) {
             throw new Error("Invalid property ID input");
@@ -556,7 +557,7 @@ router.post('/propertyReview', async (req, res) => {
 
 router.post('/deletePropertyReview/:reviewId', async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
+        const reviewId = xss(req.params.reviewId);
 
         if (!reviewId || !validators.isValidUuid(reviewId)) {
             throw new Error("Invalid review ID input");
@@ -580,9 +581,9 @@ router.post('/deletePropertyReview/:reviewId', async (req, res) => {
 //Add comment to property
 router.post('/property_routes/addComment/:propertyId', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { propertyId } = req.params;
-        const { comment } = req.body; 
+        const { userId } = xss(req.body);
+        const { propertyId } = xss(req.params);
+        const { comment } = xss(req.body); 
 
         const result = await properties.addCommentReply(userId, propertyId, comment);
 
@@ -602,8 +603,8 @@ router.post('/property_routes/addComment/:propertyId', async (req, res) => {
 // Remove Comment
 router.post('/property_routes/removeComment/:propertyId/:commentId', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { propertyId, commentId } = req.params;
+        const { userId } = xss(req.body);
+        const { propertyId, commentId } = xss(req.params);
 
         const result = await properties.removeCommentReply(userId, commentId);
 

@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import {getAllPendingReports,updateReportStatus} from '../data/users.js';
+import xss from "xss";
 
 router.route('/').get(async (req,res)=>{
     try{
@@ -16,9 +17,9 @@ router.route('/').get(async (req,res)=>{
   router.route('/accept/:userId/:reportId/:propertyId').post(async (req, res) => {
       try {
           const status = "Accepted";
-          const reportId = req.params.reportId;
-          const userId = req.params.userId;
-          const propertyId=req.params.propertyId;
+          const reportId = xss(req.params.reportId);
+          const userId = xss(req.params.userId);
+          const propertyId=xss(req.params.propertyId);
           const result = await updateReportStatus(userId,reportId,status,propertyId);
       
           // updatePostReportStatus
@@ -38,9 +39,9 @@ router.route('/').get(async (req,res)=>{
   router.route('/reject/:userId/:reportId/:property_id').post(async (req, res) => {
       try {
           const status = "Rejected";
-          const reportId = req.params.reportId;
-          const userId = req.params.userId;
-          const propertyId=req.params.property_id;
+          const reportId = xss(req.params.reportId);
+          const userId = xss(req.params.userId);
+          const propertyId=xss(req.params.property_id);
           const result = await updateReportStatus(userId,reportId,status,propertyId);
           // updatePostReportStatus
   

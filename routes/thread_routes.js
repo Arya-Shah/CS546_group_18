@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import * as thread from '../data/threads.js';
 import validators from "../helper.js";
+import xss from 'xss';
 
 router.get('/', async (req, res) => {
         try {
@@ -53,7 +54,7 @@ router
     }).post('/addThread', async (req, res) => {
     try {
         
-        const { title, content, category } = req.body;
+        const { title, content, category } = xss(req.body);
 
         if (!title || !validators.isValidString(title)) {
             throw new Error("Invalid title input");
@@ -68,7 +69,7 @@ router
         }
 
         try {
-            const userId = req.session.user.userId;
+            const userId = xss(req.session.user.userId);
             const { threadInserted, threadId } = await thread.addThread(userId, title, content, category);
 
             if (!threadInserted) {
@@ -78,7 +79,7 @@ router
             res.redirect(`/thread/id/${threadId}`);
 
         } catch (e) {
-           
+        
             res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, layout: 'main' });
         }
 
@@ -94,9 +95,9 @@ router.post('/delete/:threadId', async (req, res) => {
     
     try {
 
-        const threadId = req.params.threadId;
+        const threadId = xss(req.params.threadId);
 
-        const userId = req.user.id;
+        const userId = xss(req.user.id);
 
         if (!threadId || !validators.isValidUuid(threadId)) {
             throw new Error("Invalid thread ID input");
@@ -150,9 +151,9 @@ router.route('/id/:threadId')
 //Add comment to thread
 router.post('/addComment/:threadId', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { threadId } = req.params;
-        const { comment } = req.body; 
+        const { userId } = xss(req.body);
+        const { threadId } = xss(req.params);
+        const { comment } = xss(req.body); 
 
         const result = await thread.addCommentReply(userId, threadId, comment);
 
@@ -172,8 +173,8 @@ router.post('/addComment/:threadId', async (req, res) => {
 // Remove Comment
 router.post('/removeComment/:threadId/:commentId', async (req, res) => {
     try {
-        const { userId } = req.body;
-        const { threadId, commentId } = req.params;
+        const { userId } = xss(req.body);
+        const { threadId, commentId } = xss(req.params);
 
         const result = await thread.removeCommentReply(userId, commentId);
 

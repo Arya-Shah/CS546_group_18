@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import {addLandLordReport} from '../data/users.js';
+import xss from 'xss';
 
 router.route('/:reportState/:id/:propertyId').get(async (req,res)=>{
   if(!req.session.user || req.session.user.isAdmin){
@@ -17,8 +18,8 @@ router.route('/:reportState/:id/:propertyId').get(async (req,res)=>{
 .post(async (req,res) =>{
   //if report on property
 
-  let report_Reason = req.body.reportReason;
-  let reportedItem_type=req.params.reportState;
+  let report_Reason = xss(req.body.reportReason);
+  let reportedItem_type=xss(req.params.reportState);
   if(report_Reason.length < 5){
     return res.status(400).render('report', { error: 'Enter more Description!.' ,reportState: req.params.reportState,id:req.params.id,propertyId: req.params.propertyId});
   }else{

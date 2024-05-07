@@ -1,6 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import helpers from '../helper.js';
+import xss from 'xss';
 
 import {
 getAllUsers,
@@ -20,6 +21,7 @@ getAllLandlordsByCity,
 registerUser,
 getAllLandlords
 } from '../data/users.js'; 
+
 
 
 router.route('/')
@@ -65,14 +67,14 @@ try {
 .post(async (req, res) => {
     //code here for POST
     try{
-    let firstName = req.body.firstName.trim();
-    let lastName = req.body.lastName.trim();
-    let username = req.body.username.trim();
-    let password = req.body.password.trim();
-    let confirmPassword = req.body.confirmPassword.trim();
-    let email = req.body.email.trim();
-    let city = req.body.city.trim();
-    let state = req.body.state.trim();
+        let firstName = xss(req.body.firstName.trim());
+        let lastName = xss(req.body.lastName.trim());
+        let username = xss(req.body.username.trim());
+        let password = xss(req.body.password.trim());
+        let confirmPassword = xss(req.body.confirmPassword.trim());
+        let email = xss(req.body.email.trim());
+        let city = xss(req.body.city.trim());
+        let state = xss(req.body.state.trim());
   
     if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !city || !state){
       return res.status(400).render('register', { error: 'All fields must be provided.' });
@@ -259,8 +261,8 @@ router.post('/landlordReview', async (req, res) => {
 // Delete Landlord Review
 router.post('/deleteLandlordReview/:reviewId', async (req, res) => {
     try {
-        const reviewId = req.params.reviewId;
-        const userId = req.user.id;
+        const reviewId = xss(req.params.reviewId);
+        const userId = xss(req.user.id);
 
         if (!reviewId || !validators.isValidUuid(reviewId)) {
             throw new Error("Invalid review ID input");
@@ -286,7 +288,7 @@ router.route('/searchLandlordByState/:searchQuery').post(async (req, res) => {
             status: 400,
         };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             errorObject.error = "No input provided to search.";
@@ -322,7 +324,7 @@ router.route('/searchLandlordByCity/:searchQuery').post(async (req, res) => {
 
         const errorObject = { status: 400 };
 
-        const searchQuery = req.params.searchQuery.trim();
+        const searchQuery = xss(req.params.searchQuery.trim());
 
         if (!searchQuery) {
             errorObject.error = "No input provided to search.";

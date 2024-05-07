@@ -1,5 +1,6 @@
 import express from 'express';
 const router = express.Router();
+import xss from 'xss';
 
 import {registerUser,loginUser,addLandLordReport,getAllPendingReports,updateReportStatus} from '../data/users.js';
 
@@ -17,14 +18,14 @@ router
 .post(async (req, res) => {
   //code here for POST
   try{
-  let firstName = req.body.firstName.trim();
-  let lastName = req.body.lastName.trim();
-  let username = req.body.username.trim();
-  let password = req.body.password.trim();
-  let confirmPassword = req.body.confirmPassword.trim();
-  let email = req.body.email.trim();
-  let city = req.body.city.trim();
-  let state = req.body.state.trim();
+  let firstName = xss(req.body.firstName.trim());
+  let lastName = xss(req.body.lastName.trim());
+  let username = xss(req.body.username.trim());
+  let password = xss(req.body.password.trim());
+  let confirmPassword = xss(req.body.confirmPassword.trim());
+  let email = xss(req.body.email.trim());
+  let city = xss(req.body.city.trim());
+  let state = xss(req.body.state.trim());
 
   if(!firstName || !lastName || !username || !password || !confirmPassword || !email || !city || !state){
     return res.status(400).render('register', { error: 'All fields must be provided.' });
@@ -85,8 +86,8 @@ router
     const errorObject = {
       status: 400,
     };
-    let username = req.body.username.trim();
-    let password = req.body.password.trim();
+    let username = xss(req.body.username.trim());
+    let password = xss(req.body.password.trim());
     
     if(username.length < 5 || username.length > 10){
       return res.status(400).render('login', { error: 'username should be between 5 and 10.' });
@@ -111,8 +112,6 @@ router
 });
 
 
-
-
 router.route('/logout').get(async (req, res) => {
 //code here for GET
 req.session.destroy();
@@ -120,9 +119,6 @@ return res.status(200).render("logout", {
   title: "Logout",
 });
 });
-
-
-
 
   export default router;
 
