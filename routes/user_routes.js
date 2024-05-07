@@ -434,5 +434,67 @@ router.route('/searchLandlordByCity/:searchQuery').post(async (req, res) => {
     }
 });
 
+router.route('/addBookmark/:propertyId').post(async (req, res) => {
+    try {
+
+        const errorObject = { status: 400 };
+
+        const propertyId = req.params.propertyId.trim();
+ 
+        if (!propertyId) {
+            errorObject.error = "No input property provided to bookmark.";
+            throw errorObject;
+        }
+     
+        let userId = req.session.user.userId;
+   
+        let bookmarkSuccess = users.addBookmark(userId, propertyId);
+      
+        if (bookmarkSuccess) {
+            return res.redirect('/');
+        } else {
+            errorObject.error = "Bookmarking failed.";
+            throw errorObject;
+        }
+
+    } catch (e) {
+        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
+            return res.status(e.status).render("error", { title: "Error", error: e.error });
+        } else {
+            return res.status(400).render("error", { title: "Error", error: e });
+        }
+    }
+});
+
+router.route('/removeBookmark/:propertyID').post(async (req, res) => {
+    try {
+       
+        const errorObject = { status: 400 };
+        const propertyId = req.params.propertyID.trim();
+        if (!propertyId) {
+            errorObject.error = "No input property provided to remove bookmark.";
+            throw errorObject;
+        }
+
+        let userId = req.session.user.userId;
+
+        let bookmarkRemoved = users.removeBookmark(userId, propertyId);
+
+        if (bookmarkRemoved) {
+            return res.redirect('/');
+        } else {
+            errorObject.error = "Removing bookmark failed.";
+            throw errorObject;
+        }
+
+    } catch (e) {
+        if (typeof e === "object" && e !== null && !Array.isArray(e) && "status" in e && "error" in e) {
+            return res.status(e.status).render("error", { title: "Error", error: e.error });
+        } else {
+            return res.status(400).render("error", { title: "Error", error: e });
+        }
+    }
+});
+
 export default router;
 

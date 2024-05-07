@@ -787,16 +787,17 @@ export const addBookmark = async (userId, propertyId) => {
         throw errorObject;
 }
     const userCollection = await users();
-
+    
     const updateInfo = await userCollection.updateOne(
         { userId: userId },
         { $addToSet: { bookmarkedProperties: propertyId } }
     );
 
-    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-{        errorObject.error= "Failed to add bookmark";
+    
+    /*if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        {        errorObject.error= "Failed to add bookmark";
         throw errorObject;
-}
+        }*/
     return { bookmarkAdded: true };
     
 };
@@ -824,11 +825,11 @@ export const removeBookmark = async (userId, propertyId) => {
         { $pull: { bookmarkedProperties: propertyId } }
     );
 
-    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+   /* if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
 {        errorObject.error= "Failed to remove bookmark";
     throw errorObject;
 
-}
+}*/
 
     return { bookmarkRemoved: true };
     

@@ -4,8 +4,17 @@
 
 <p>This page allows you to see all reviews for the property {{property.name}}.</p>
 
-<a href="/property/PropertyReview/{{property.propertyId}}">Want to add a review for this property? Click here.</a>
+<hr>
+<h3>Would You Like to Bookmark This Property?</h3>
+<form id="bookmarkForm" method="POST" action = "/user/addBookmark/{{property.propertyId}}">
+    <label for="addBookmark">
+    <input type="radio" id="addBookmark" name="action" value="add" checked>
+        Yes, add this property to my bookmarks
+    </label>
+    <button type="submit" id="bookmarkButton">Submit</button>
+</form>
 
+<hr>
 <div class="property-details">
     
     <h3>Property Information</h3>
@@ -16,7 +25,7 @@
     <p>Bathrooms: {{property.bathrooms}}</p>
 
     <div id="map"></div> <!-- Placeholder for map integration -->
-
+<hr>
     <h3>Average Ratings</h3>
     <div>
         <p>Location Desirability Rating: {{property.averageRatings.locationDesirabilityRating}}</p>
@@ -25,11 +34,12 @@
         <p>Community Rating: {{property.averageRatings.communityRating}}</p>
         <p>Amenities Rating: {{property.averageRatings.amenitiesRating}}</p>
     </div>
+    <hr>
 
     <h3>Reviews</h3>
+    <p><a href="/property/PropertyReview/{{property.propertyId}}">Want to add a review for this property? Click here.</a></p>
     <div>
         {{#each property.reviews}}
-        <br>
         <div>
             <h4>Author: {{this.userRealName}} </h4>
             <p>Location Desirability Rating: {{this.locationDesirabilityRating}}</p>
@@ -39,10 +49,19 @@
             <p>Amenities Rating: {{this.amenitiesRating}}</p>
             <p>Review Text:{{this.reviewText}}</p>
         </div>
+        
         {{/each}}
     </div>
-
+    <hr>
     <h3>Comments</h3>
+    
+<!-- Add Comment Form -->
+    <form action="/property_routes/addComment/{{property.propertyId}}" method="post">
+      <label for="comment">Add a comment:</label><br>
+      <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+      <input type="submit" value="Submit" id="submitCommentButton">
+    </form>
+    <h4>Past Comments</h4>
     <div>
         {{#each property.comments}}
         <div>
@@ -55,14 +74,8 @@
         {{/each}}
     </div>
 </div>
-
-<!-- Add Comment Form -->
-    <form action="/property_routes/addComment/{{property.propertyId}}" method="post">
-      <label for="comment">Add a comment:</label><br>
-      <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
-      <input type="submit" value="Submit" id="submitCommentButton">
-    </form>
-
+<hr>
+<h3>Report This Property Page</h3>
   <form action="/report/property/{{userId}}/{{property.propertyId}}" method="get">
    <label for="submitCommentButton">Report property?</label><br>
       <input class="btn" type="submit" value="Report" id="submitCommentButton">

@@ -17,24 +17,27 @@
             <!-- Show  properties if the user is not a landlord -->
             {{#if user.isLandlord}}
                 <h3>Properties</h3>
-                <div class="list-group">
+                
                     {{#each user.properties}}
                             <h4>{{ this.propertyName }}</h4>
-                            <a href="#">{{ this.propertyName }} Property Details</a> 
+                            <a href="/property/id/{{this.propertyId}}">Property Details</a> 
                     {{/each}}
-                </div>
-            {{/if}}
-
-            <!-- Show bookmarked properties if the user is not a landlord -->
-            {{#if user.isLandlord}}
+                
             {{else}}
-                <h3>Bookmarked Properties</h3>
-                <div class="list-group">
-                    {{#each user.bookmarks}}
-                                <h4>{{ this.propertyName }}</h4>
-                                <a href="#">{{ this.propertyName }} Details</a> 
+
+                {{#if user.bookmarkedProperties.length}}
+
+                    <h3>Bookmarked Properties</h3>
+                    <ul>
+                    {{#each user.bookmarkedProperties}}
+                        <li><a href="/property/id/{{this}}">See your one of your bookmarked properties!</a><br></li>
                     {{/each}}
-                </div>
+                    </ul>
+
+                {{else}}
+
+                        <p>No bookmarked properties found.</p>
+               {{/if}}          
             {{/if}}
 
         </div>
