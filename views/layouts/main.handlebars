@@ -1,13 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{title}}</title>
-    <link rel="stylesheet" href="/public/css/styles.css">
+  <!-- Meta -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Title -->
+  <title>{{title}}</title>
+  
+
+  <!-- Styling 
+  <script src="https://kit.fontawesome.com/9eb0363441.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;700&display=swap">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">-->
+  <link rel="stylesheet" href="/public/css/styles.css">
+  <link rel="shortcut icon" href="#">
+
+  <!-- Javascript Scrips -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
 </head>
+
 <body>
-    {{{body}}}
-    <script src="/public/js/client_side_validation.js"></script>
+
+<header>
+
+<nav>
+  <div class="logo">
+    <h1><a href="/">Apartment Hunt Helper</a></h1>
+  </div>
+
+
+  <div class="user-container">
+  {{!-- to show/hide based on user session --}}
+    {{#if userData}}
+
+      <a href="/property">Property Search</a>
+      <a href="/user/landlord">Landlord Search</a>
+      <a href="/thread">Community Forum</a>
+      <a href="/user/profile">User Profile</a>
+      <a href="/logout">Logout</a>
+
+    {{/if}}
+  </div>
+
+</nav>
+</header>
+
+<main>
+  {{{body}}}
+    <!--
+    <ul id="searchResults" hidden></ul>
+    <div id="propertyDetails" hidden></div>
+    <a id="rootLink" href="/" hidden>New Search</a>
+    -->
+
+</main>
+
+{{#if success}}
+<p class="success"> {{success}}</p>
+{{/if}}
+
+<script src="/public/js/client_side_validation.js"></script>
+  <script src="/public/js/propertySearchAjax.js"></script>
+    <script src="/public/js/landlordSearchAjax.js"></script>
+        <script src="/public/js/register.js"></script>
+
+
 </body>
 </html>

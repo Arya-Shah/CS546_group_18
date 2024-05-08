@@ -1,0 +1,134 @@
+{{!-- <form action="/report">
+</form> --}}
+<form id="reportForm" action="/report/{{reportState}}/{{id}}/{{propertyId}}" method="POST">
+    {{#if error}}
+    <p class="error">{{error}}</p>
+    {{/if}}
+    {{!-- <label for="reportedItem_type">Report on:</label>
+    <select id="reportedItem_type" name="reportedItem_type" required>
+        <option value="">Select a reason</option>
+        <option value="property">Property</option>
+        <option value="landlord">Landlord</option>
+    </select> --}}
+    {{#ifEquals reportState 'comment'}}
+    <label for="reportedItemId">Reason to report:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="Hate_speech">Hate speech or symbols</option>
+        <option value="potential_fraud">Scam or fraud</option>
+        <option value="false_info">False information</option>
+        <option value="bullying">Bullying or harrasment</option>
+        <option value="spam">it's spam</option>
+        <option value="dont_like">i don't like it</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+    {{/ifEquals}}
+    {{#ifEquals reportState 'property'}}
+    <label for="reportedItemId">Reason to report property:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="safety">Safety Concerns</option>
+        <option value="unfair_treatment">Unfair Treatment</option>
+        <option value="violation_of_lease">Violation of Lease Agreement</option>
+        <option value="health_code_violations">Health Code Violations</option>
+        <option value="financial_disputes">Financial Disputes</option>
+        <option value="noise_or_disturbances">Noise or Disturbances</option>
+        <option value="illegal_activities">Illegal Activities</option>
+        <option value="property_mismanagement">Property Mismanagement</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+    {{/ifEquals}}
+    {{#ifEquals reportState 'thread'}}
+    <label for="reportedItemId">Reason to report thread:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="inappropriate_content">Inappropriate Content</option>
+        <option value="provocative">provocative</option>
+        <option value="false_info">False information</option>
+        <option value="bullying">Bullying or harrasment</option>
+        <option value="spam">it's spam</option>
+        <option value="dont_like">i don't like it</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+    {{/ifEquals}}
+    {{#ifEquals reportState 'landlord'}}
+    <label for="reportedItemId">Reason to report the landlord:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="safety">Safety Concerns</option>
+        <option value="unfair_treatment">Unfair Treatment</option>
+        <option value="violation_of_lease">Violation of Lease Agreement</option>
+        <option value="financial_disputes">Financial Disputes</option>
+        <option value="noise_or_disturbances">Noise or Disturbances</option>
+        <option value="illegal_activities">Illegal Activities</option>
+        <option value="property_mismanagement">Property Mismanagement</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+    {{/ifEquals}}
+    {{#ifEquals reportState 'review'}}
+    <label for="reportedItemId">Reason to report the review:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="maintenance">App not Maintained well.</option>
+        <option value="Hate_speech">Hate speech or symbols</option>
+        <option value="unfair_treatment">Unfair Treatment</option>
+        <option value="illegal_activities">Illegal Activities</option>
+        <option value="property_mismanagement">Property Mismanagement</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+    {{/ifEquals}}
+
+    <label for="reportReason">Reason for Report:</label>
+    <textarea id="reportReason" name="reportReason"
+        placeholder="Give more information on what's been bothering you."></textarea>
+    <p id="reportReasonError" class="error-msg"></p>
+
+    <button type="submit">Submit Report</button>
+    {{!-- {{#ifEquals reportState 'property'}}
+    write property report here
+    <label for="reportedItem_type">Report on property:</label>
+    <select value="{{reportState}}" id="reportedItem_type" name="reportedItem_type" required>
+        <option value="">Select a reason</option>
+        <option value="property">Property</option>
+        <option value="landlord">Landlord</option>
+    </select>
+    <label for="reportedItemId">Reason to report:</label>
+    <select id="reportedItemId" name="reportedItemId" required>
+        <option value="">Select a reason</option>
+        <option value="maintenance">Maintenance</option>
+        <option value="safety">Safety Concerns</option>
+        <option value="unfair_treatment">Unfair Treatment</option>
+        <option value="violation_of_lease">Violation of Lease Agreement</option>
+        <option value="health_code_violations">Health Code Violations</option>
+        <option value="financial_disputes">Financial Disputes</option>
+        <option value="noise_or_disturbances">Noise or Disturbances</option>
+        <option value="illegal_activities">Illegal Activities</option>
+        <option value="property_mismanagement">Property Mismanagement</option>
+    </select>
+    <p id="reportedItemIdError" class="error-msg"></p>
+
+    <label for="reportReason">Reason for Report:</label>
+    <textarea id="reportReason" name="reportReason"
+        placeholder="Give more information on what's been bothering you."></textarea>
+    <p id="reportReasonError" class="error-msg"></p>
+
+    <button type="submit">Submit Report</button>
+    {{/ifEquals}}
+    {{#ifEquals reportState 'comment'}}
+    write property comment here
+    {{/ifEquals}}
+    {{#ifEquals reportState 'review'}}
+    write property review here
+    {{/ifEquals}}
+    {{#ifEquals reportState 'thread'}}
+    write property thread here
+    {{/ifEquals}}
+    {{#ifEquals reportState 'landlord'}}
+    write property landlord here
+    {{/ifEquals}}
+    {{#ifEquals reportState 'reply'}}
+    write property reply here
+    {{/ifEquals}} --}}
+</form>

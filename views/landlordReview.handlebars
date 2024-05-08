@@ -1,0 +1,41 @@
+{{!-- Landlord Review Form --}}
+<h2>Review for {{landlord.firstName}} {{landlord.lastName}}</h2>
+
+<p>Use this form to submit a review for {{landlord.firstName}} {{landlord.lastName}}.</p>
+
+<a href="/user/landlord/{{landlord.userId}}">Want to see reviews already written for this landlord? Click here.</a>
+
+{{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
+
+<div id="errorDiv" class="error-message" style="color: red;"></div>
+
+<form id="landlordReviewForm" method = "post" action="/user/landlordReview">
+
+    <input type="hidden" id="landlordId" name="landlordId" value="{{landlord.userId}}">
+    
+    <label for="kindnessRating">Kindness Rating:</label>
+    <input type="range" id="kindnessRating" name="kindnessRating" min="1" max="5">
+    
+    <label for="maintenanceResponsivenessRating">Maintenance Responsiveness Rating:</label>
+    <input type="range" id="maintenanceResponsivenessRating" name="maintenanceResponsivenessRating" min="1" max="5">
+    
+    <label for="overallCommunicationRating">Overall Communication Rating:</label>
+    <input type="range" id="overallCommunicationRating" name="overallCommunicationRating" min="1" max="5">
+    
+    <label for="professionalismRating">Professionalism Rating:</label>
+    <input type="range" id="professionalismRating" name="professionalismRating" min="1" max="5">
+    
+    <label for="handinessRating">Handiness Rating:</label>
+    <input type="range" id="handinessRating" name="handinessRating" min="1" max="5">
+    
+    <label for="depositHandlingRating">Deposit Handling Rating:</label>
+    <input type="range" id="depositHandlingRating" name="depositHandlingRating" min="1" max="5">
+    
+    <label for="reviewText">Review:</label>
+    <textarea id="reviewText" name="reviewText"></textarea>
+    
+    <button type="submit">Submit Review</button>
+    
+</form>

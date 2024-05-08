@@ -1,0 +1,36 @@
+   <h1>Report Management</h1>
+    <div id="reports-list">
+        {{#each pendingReports}}
+            <div class="report">
+                <div class="report-content">
+                    <p><strong>Report ID:</strong> {{this.report_id}}</p>
+                    <p><strong>User ID:</strong> {{this.userId}}</p>
+                    {{!-- <p><strong>Property ID:</strong>{{this.property_id}}</p> --}}
+                    <p><strong>Reported Item Type:</strong> {{this.reported_item_type}}</p>
+                    {{!-- <p><strong>Reported Item ID:</strong> {{this.reported_item_id}}</p> --}}
+                    <p><strong>Report Reason:</strong> {{this.report_reason}}</p>
+                    <p><strong>Report Description:</strong> {{this.report_description}}</p>
+                    <p><strong>Reported At:</strong> {{this.reported_at}}</p>
+                </div>
+                <div class="report-actions">
+                <!-- Button to accept the report -->
+                <form action="/moderator/accept/{{this.userId}}/{{this.report_id}}/{{this.property_id}}" method="POST">
+                    <button class="btn btn-accept" type="submit">Keep content</button>
+                </form>
+                <!-- Button to reject the report -->
+                <form action="/moderator/reject/{{this.userId}}/{{this.report_id}}/{{this.property_id}}" method="POST">
+                    <button class="btn btn-reject" type="submit">Delete property</button>
+                </form>
+                <!-- Button to view the reported item -->
+
+
+            </div>
+            </div>
+        {{/each}}
+    </div>
+
+    <div id="addProperty">
+        <form id="addProperty" method="GET" action="/property/addProperty">
+            <button type="submit">Add Property</button>
+        </form>
+    </div>

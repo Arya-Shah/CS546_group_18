@@ -6,19 +6,29 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js"
+    "start": "node app.js",
+    "debug": "node --inspect app.js",
+    "seed": "node seed.js"
   },
   "author": "Arya Shah  20012884, Connor S. Durkin 10443573 , Jayanth Kanala 20020619 , Gnaneswar Koyalamoodi 20017853 ",
   "license": "ISC",
   "dependencies": {
+    "@googlemaps/google-maps-services-js": "^3.4.0",
+    "@googlemaps/js-api-loader": "^1.16.6",
     "axios": "^1.6.7",
-    "mongodb": "^6.3.0"  ,
-    "xss": "^1.0.8",
-    "handlebars": "^4.7.6",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^5.0.0",
     "bcryptjs": "^2.4.3",
+    "bootstrap": "^3.4.1",
     "express": "^4.19.2",
-    "express-handlebars": "^7.1.2",
-    "express-session": "^1.17.3"
+    "express-handlebars": "^5.2.0",
+    "express-session": "^1.17.1",
+    "handlebars": "^4.7.6",
+    "mongodb": "^6.5.0",
+    "uuid": "^9.0.1",
+    "xss": "^1.0.15"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.4"
   }
 }

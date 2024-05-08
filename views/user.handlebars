@@ -1,7 +1,51 @@
-{{#if error}}
-<p class="error">{{error}}</p>
-{{/if}}
-<div id="userView">
-<p id="welcome">Welcome {{data.firstName}} {{data.lastName}}, the time is now: {{currentTime}}.</p>
-<a id="logoutLink" href="/logout">Logout</a>
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="jumbotron">
+
+            <h2 class="display-4">{{ user.username }}'s Profile</h2>
+            
+            
+            <h3>User Details</h3>
+            <div class="propertylisting">
+            <p class="lead">Email: <i class="fas fa-envelope"></i> {{ user.email }}</p>
+            <p class="lead">First Name: {{ user.firstName }}</p>
+            <p class="lead">Last Name: {{ user.lastName }}</p>
+            <p class="lead">City: {{ user.city }}</p>
+            <p class="lead">State: {{ user.state }}</p>
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Show  properties if the user is not a landlord -->
+            {{#if user.isLandlord}}
+                <h3>Properties</h3>
+                
+                    {{#each user.properties}}
+                    <div class="propertylisting">
+                            <h4>{{ this.propertyName }}</h4>
+                            <a href="/property/id/{{this.propertyId}}">Property Details</a>
+                            </div>
+                    {{/each}}
+                
+            {{else}}
+
+                {{#if user.bookmarkedProperties.length}}
+
+                    <h3>Bookmarked Properties</h3>
+                    <div class="propertylisting">
+                    <ul>
+                    {{#each user.bookmarkedProperties}}
+                        <li><a href="/property/id/{{this}}">See your one of your bookmarked properties!</a><br></li>
+                    {{/each}}
+                    </ul>
+                    </div>
+
+                {{else}}
+
+                        <p>No bookmarked properties found.</p>
+               {{/if}}          
+            {{/if}}
+
+        </div>
+    </div>
 </div>

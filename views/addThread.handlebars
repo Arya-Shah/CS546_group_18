@@ -1,0 +1,35 @@
+<div class="container">
+
+<h2 class="display-4">Add Thread to Community Forum</h2>
+   
+<p>This page allows you to add a new thread to the community forum.</p> 
+<a href="/thread">Want to look at what's already on the community forum? Click here.</a>
+
+{{#if error}}
+<p class="error">{{error}}</p>
+{{/if}}
+
+<div id="errorDiv" class="error-message" style="color: red;"></div>
+
+<form id="addThread-form" method="POST" action="/thread/addThread">
+
+<label for="title">Thread Title</label>
+<input type="text" id="title" name="title">
+
+<label for="content">Thread Description</label>
+<textarea id="content" name="content" rows="4" cols="50"></textarea>
+
+<label for="category">Thread Category</label>
+<select id="category" name="category">
+    <option value="">Select a category</option>
+    <option value="Properties">Properties</option>
+    <option value="Landlords">Landlords</option>
+    <option value="Neighborhoods">Neighborhoods</option>
+    <option value="General">General</option>
+</select>
+
+<button id="submitButton" type="submit">Submit</button>
+</form>
+
+<a href="/thread">Back to Forum</a>
+</div>

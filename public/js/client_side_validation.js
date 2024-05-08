@@ -1,34 +1,7 @@
 const usernameEl = document.querySelector('#username');
 const passwordEl = document.querySelector('#password');
-const firstNameEl = document.querySelector('#firstname');
-const lastNameEl = document.querySelector('#lastname');
-const confirmPasswordEl = document.querySelector('#confirmpassword');
 const form = document.querySelector('#signin-form');
-const signupform = document.querySelector('#signup-form');
 
-const checkFirstName = () => {
-    let valid = false;
-    const firstName = firstNameEl.value.trim();
-    if (!isRequired(firstName)) {
-        showError(firstNameEl, 'First name cannot be blank.');
-    } else {
-        showSuccess(firstNameEl);
-        valid = true;
-    }
-    return valid;
-};
-
-const checkLastName = () => {
-    let valid = false;
-    const lastName = lastNameEl.value.trim();
-    if (!isRequired(lastName)) {
-        showError(lastNameEl, 'Last name cannot be blank.');
-    } else {
-        showSuccess(lastNameEl);
-        valid = true;
-    }
-    return valid;
-};
 
 const checkUsername = () => {
     let valid = false;
@@ -60,84 +33,37 @@ const checkPassword = () => {
     return valid;
 };
 
-const checkConfirmPassword = () => {
-    let valid = false;
-    // Check if confirm password is not blank and if it matches the password
-    const confirmPassword = confirmPasswordEl.value.trim();
-    const password = passwordEl.value.trim();
-    if (!isRequired(confirmPassword)) {
-        showError(confirmPasswordEl, 'Please confirm your password.');
-    } else if (password !== confirmPassword) {
-        showError(confirmPasswordEl, 'Passwords do not match.');
-    } else {
-        showSuccess(confirmPasswordEl);
-        valid = true;
-    }
-    return valid;
-};
-
 const isRequired = value => value === '' ? false : true;
 const isBetween = (length, min, max) => length < min || length > max ? false : true;
 const showError = (input, message) => {
-    // get the form-field element
     const formField = input.parentElement;
-    // add the error class
     formField.classList.remove('success');
     formField.classList.add('error');
 
-    // show the error message
     const error = formField.querySelector('small');
     error.textContent = message;
 };
 
 const showSuccess = (input) => {
-    // get the form-field element
     const formField = input.parentElement;
-
-    // remove the error class
     formField.classList.remove('error');
     formField.classList.add('success');
 
-    // hide the error message
     const error = formField.querySelector('small');
     error.textContent = '';
 }
 
 
 form.addEventListener('submit', function (e) {
-    // prevent the form from submitting
     e.preventDefault();
-    // validate fields
     let isUsernameValid = checkUsername(),
         isPasswordValid = checkPassword()
     let isFormValid = isUsernameValid &&
         isPasswordValid
-    // submit to the server if the form is valid
     if (isFormValid) {
         form.submit();
     }
 });
-
-// signupform.addEventListener('submit', function (e) {
-//     // prevent the form from submitting
-//     e.preventDefault();
-//     // validate fields
-//     let isUsernameValid = checkUsername(),
-//         isPasswordValid = checkPassword(),
-//         isFirstNameValid = checkFirstName(),
-//         isLastNameValid = checkLastName(),
-//         isConfirmPasswordValid = checkConfirmPassword()
-//     let isFormValid = isUsernameValid &&
-//         isPasswordValid &&
-//         isFirstNameValid &&
-//         isLastNameValid &&
-//         isConfirmPasswordValid;
-
-//     // submit to the server if the form is valid
-//     if (isFormValid) {
-//         signupform.submit();
-//     }
-// });
 
 form.addEventListener('input', function (e) {
     switch (e.target.id) {
@@ -149,23 +75,52 @@ form.addEventListener('input', function (e) {
     }
 });
 
-// signupform.addEventListener('input', function (e) {
-//     switch (e.target.id) {
-//         case 'first-name':
-//             checkFirstName();
-//             break;
-//         case 'last-name':
-//             checkLastName();
-//             break;
-//         case 'username':
-//             checkUsername();
-//             break;
-//         case 'password':
-//             checkPassword();
-//             break;
-//         case 'confirm-password':
-//             checkConfirmPassword();
-//             break;
-//     }
-// });
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the current URL pathname
+    const currentPath = window.location.pathname;
 
+
+    // Check if the current page is the '/report' page
+    if (currentPath === '/report/:reportState/:id') {
+        const reportForm = document.getElementById('reportForm');
+        if (reportForm) {
+            reportForm.addEventListener('submit', (event) => {
+                // Validate report form fields
+                const isValid = validateReportForm();
+                if (!isValid) {
+                    event.preventDefault(); // Prevent form submission
+
+                    // Display error message to the user
+                    const errorElement = document.getElementById('reportedItemIdError');
+                    errorElement.style.color = 'red';
+                    errorElement.innerText = 'Please fill in all fields.';
+                }
+            });
+        }
+    }
+});
+
+function validateReportForm() {
+    const reportedItemType = document.getElementById('reportedItem_type').value;
+    const reportedItemId = document.getElementById('reportedItemId').value;
+    const reportReason = document.getElementById('reportReason').value;
+    return (reportedItemType && reportedItemId && reportReason);
+}
+
+$(document).ready(() => {
+    $('#searchForm').show();
+    $('#searchForm').submit((event) => {
+        event.preventDefault();
+        const searchType = $('#searchType').val().trim();
+        $('#searchResults').empty();
+        if (searchType === '') {
+            alert('Please select a search type to filter what exaclty are you searching for!');
+            return;
+        }
+        const searchTerm = $('#searchQuery').val().trim();
+        if (searchTerm === '') {
+            alert('Please enter text in search bar to get results.');
+            return;
+        }
+    })
+});

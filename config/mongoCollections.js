@@ -1,19 +1,20 @@
-import {dbConnection} from './mongoConnection.js';
+import { dbConnection } from './mongoConnection.js';
 
-/* This will allow you to have one reference to each collection per app */
-/* Feel free to copy and paste this this */
 const getCollectionFn = (collection) => {
-let _col = undefined;
+  let _col = undefined;
 
-return async () => {
-if (!_col) {
-    const db = await dbConnection();
-    _col = await db.collection(collection);
-}
+  return async () => {
+    if (!_col) {
+      const db = await dbConnection();
+      _col = await db.collection(collection);
+    }
 
-return _col;
+    return _col;
+  };
 };
-};
 
-
+// Note: You will need to change the code below to have the collection required by the assignment!
+export const properties = getCollectionFn('properties');
 export const users = getCollectionFn('users');
+export const threads = getCollectionFn('threads');
+export const reports = getCollectionFn('reports');

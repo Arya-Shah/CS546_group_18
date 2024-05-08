@@ -1,0 +1,80 @@
+{{!-- ADD ROUTES. UPVOTE/DOWNVOTE THREADS AND COMMENTS --}}
+
+{{!-- Community Forum --}}
+<h2>Thread Title: {{threadData.title}}</h2>
+
+<a href="/thread">Want to see all threads? Click here.</a>
+<hr>
+<div class="forum-threads">
+
+    <h3>About this Thread</h3>
+    <p>Category: {{threadData.category}}</p>
+    <p>Created by: {{threadData.userRealName}}</p>
+    <p>Created Date: {{threadData.formattedCreatedDate}}</p>
+    <p>Likes: {{threadData.likes}}
+      {{#ifInArray userInfo threadData.isVoted}}
+      {{else}}
+       <a href="/thread/upvote/{{threadData.threadId}}">Add Like</a></p>
+       {{/ifInArray}}
+    <p>Dislikes: {{threadData.dislikes}} 
+      {{#ifInArray userInfo threadData.isVoted}}
+      {{else}}
+      <a href="/thread/downvote/{{threadData.threadId}}">Add Dislike</a>
+      {{/ifInArray}}
+      </p>
+  
+    <hr>
+
+    <!-- Add Comment Form -->
+    <h3>Add Comment</h3>
+    <form action="/thread/addComment/{{threadId}}" method="post">
+      <label for="comment">Use this text form to add your own comment!</label><br>
+      <textarea id="comment" name="comment" rows="4" cols="50"></textarea><br>
+      <input type="submit" value="Submit">
+    </form>
+    
+    <hr>
+
+    <h3>Comments</h3>
+
+    <div class="comments">
+    {{#each threadData.comments}}
+    <div class="comment">
+        <h4>User Name: {{this.userRealName}}</h4>
+        <p>Comment Text: {{this.commentText}}</p>
+        <p>Date Created: {{this.formattedCreatedDate}}</p>
+        <p>Likes: {{this.likes}}
+          {{#ifInArray userInfo this.isVoted}}
+          {{else}}
+          <a href="/thread/upvote/{{this.commentId}}">Add Like</a>
+          {{/ifInArray}}
+          </p>
+        <p>Dislikes: {{this.dislikes}}
+          {{#ifInArray userInfo this.isVoted}}
+          {{else}}
+          <a href="/thread/downvote/{{this.commentId}}">Add Dislike</a>
+          {{/ifInArray}}
+          </p>
+
+    </div>
+    <hr>
+    <br>
+    {{/each}}
+
+  </div>
+
+</div>
+
+<!--{{! Community Forum }}
+<h2>Community Forum</h2>
+<div class="forum-threads">
+{{#each threads}}
+<div class="thread">
+<h3>{{this.title}}</h3>
+<p>{{this.summary}}</p>
+<! Add link to full thread discussion >
+</div>
+{{/each}}
+</div>-->
+
+

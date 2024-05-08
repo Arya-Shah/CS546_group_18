@@ -1,0 +1,45 @@
+{{!-- CORRECT BUTTON TO ADD REVIEW PATH--}}
+
+{{!-- Community Forum --}}
+<h2>Community Forum</h2>
+<p>Join the conversation! Discover ongoing conversations within threads here. Simply click on them to view all comments posted within the thread or to contribute your own comment.</p> 
+
+<a href="/thread/addthread">Want to add a thread to the database? Click here.</a>
+
+<div class="forum-threads">
+
+  {{#each threads}}
+
+  <div class="thread">
+
+    <h3>{{this.title}}</h3>
+
+    <p>Category: {{this.category}}</p>
+    <p>Created by: {{this.userRealName}}</p>
+    <p>Created Date: {{this.formattedCreatedDate}}</p>
+    <p>Likes: {{this.likes}}</p>
+    <p>Dislikes: {{this.dislikes}}</p>
+    <p>Hello</p>{{userInfo.userId}}
+    {{#ifInArray userInfo.userId this.isVoted}}
+    {{else}}
+    <p><a href="/thread/upvote/{{this.threadId}}">Upvote Thread</a> / <a href="/thread/downvote/{{this.threadId}}">Downvote Thread</a></p>
+    {{/ifInArray}}
+    <p><a href="/thread/id/{{this.threadId}}">See the full thread.</a></p> 
+    
+  </div>
+  {{/each}}
+
+</div>
+
+<!--{{! Community Forum }}
+<h2>Community Forum</h2>
+<div class="forum-threads">
+{{#each threads}}
+<div class="thread">
+<h3>{{this.title}}</h3>
+<p>{{this.summary}}</p>
+<! Add link to full thread discussion >
+</div>
+{{/each}}
+</div>-->
+

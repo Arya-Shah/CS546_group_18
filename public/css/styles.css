@@ -1,70 +1,271 @@
 body {
-    font-size: 120%;
-    font-family: Arial, sans-serif;
-    background-color: rgb(255, 255, 255);
+font-size: 190%;
+font-family: 'Montserrat', sans-serif;
+font-weight: 500;
+background-color: rgb(255, 255, 255);
 }
 
-h1 {
-    color: #333;
-    padding: 10px;
-    text-align: center;
+#map {
+    height: 450px;
+    width: 550px;
+    border: solid;
+    border-color: #4a4a4a;
 }
 
 .error{
-    background-color: rgba(255, 0, 0, 0.642);
-    border: 1px solid rgba(255, 0, 0, 0.642);
+background-color: rgba(255, 0, 0, 0.642);
+border: 1px solid rgba(255, 0, 0, 0.642);
 }
 
 .success{
-    background-color: rgba(0, 255, 123, 0.749);
-    border: 1px solid rgba(26, 255, 0, 0.842);
+background-color: rgba(0, 255, 123, 0.749);
+border: 1px solid rgba(26, 255, 0, 0.842);
 }
 
+/* login and regsiter */
 form {
-    align-content: center;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 20px;
-    max-width: 720px;
-}
+align-content: center;
+display: flex;
+flex-direction: column;
+gap: 10px;
+margin-top: 20px;
+max-width: 720px;
+border: 1px solid #ccc;
+padding: 15px;}
 
 button{
-    border-radius: 20px;
-    padding: 1%;
+border-radius: 20px;
+padding: 1%;
 }
 
 button:hover{
-    background-color: aqua;
+background-color: aqua;
 }
 
 input[type="text"] {
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #3334371b;
+padding: 10px;
+border: 1px solid #ddd;
+border-radius: 4px;
+background-color: #3334371b;
 }
 
 input[type="password"]{
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: #3334371b;
+padding: 10px;
+border: 1px solid #ddd;
+border-radius: 4px;
+background-color: #3334371b;
 }
 
 input[type="submit"] {
-    background-color: #333;
+    background-color: #1f83ae;
     color: white;
     border: none;
-    padding: 10px 20px;
     border-radius: 4px;
     cursor: pointer;
 }
 
 input[type="submit"]:hover {
-    background-color: #1f83ae;
+background-color: #1f83ae;
 }
 a {
-    color: #0645AD;
-    text-decoration: none;
+color: #0645AD;
+text-decoration: none;
+}
+
+.jumbotron {
+    background-color: rgba(255, 255, 255, 0.566);
+    padding: 50px 0; 
+}
+
+.container {
+    max-width: 650px; 
+}
+
+
+/* Header styling */
+header {
+background: #000000;
+color: #ffffff ;
+padding: 10px 0;
+}
+
+nav {
+display: flex;
+justify-content: space-between;
+align-items: center;
+padding: 0 20px;
+}
+
+nav .logo a {
+color: #ffffff;
+font-size: xx-large;
+text-decoration: none;
+font-weight: bold;
+font-family: Georgia, 'Times New Roman', Times, serif;
+}
+
+nav .user-container a {
+color: #ffffff;;
+font-size: large;
+text-decoration: none;
+margin-left: 10px;
+}
+
+/* Main content styling */
+main {
+padding: 20px;
+}
+
+/* Footer styling */
+footer {
+background: #333;
+color: #fff;
+text-align: center;
+position: absolute;
+bottom: 0;
+width: 100%;
+height: 40px; /* Footer Height */
+line-height: 40px; /* Center the text vertically */
+}
+
+h2 {
+margin-bottom: 20px;
+}
+
+.review, .search-item, .thread {
+background: #fff;
+padding: 15px;
+margin-bottom: 15px;
+border-radius: 5px;
+box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media screen and (max-width: 768px) {
+nav {
+flex-direction: column;
+}
+
+nav .search-container, nav .user-container {
+margin-top: 10px;
+}
+
+nav .search-container form {
+width: 100%;
+}
+
+nav .search-container input[type="text"] {
+width: 80%;
+}
+
+nav .search-container button {
+width: 20%;
+}
+}
+
+.card {
+border-radius: 5px; 
+}
+
+.card-body h2 {
+margin-bottom: 0.5rem; /* Adjust margin for username */
+}
+
+.card-body p {
+font-size: 1rem; 
+color: #888; 
+}
+
+.list-group-item {
+border-color: rgba(0, 0, 0, 0.1); /* Add subtle border to list items */
+}
+
+.list-group-item h5 {
+font-size: 1rem; /* Maintain larger font size for property names */
+font-weight: bold; 
+}
+
+.badge {
+font-size: 0.8rem; 
+}
+
+/* search bar style */
+
+.search-input {
+padding: 8px;
+width: 600px;
+border: 1px solid #ccc;
+border-radius: 5px;
+margin-top: 20px;
+border-radius: 20px;
+font-size: 90%;
+}
+
+.search-button {
+    padding: 5px;
+    margin-left: 217px;
+    margin-top: 5px;
+    width: 150px;
+    font-size: 80%;
+    }
+
+
+.report {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+.report-content {
+    margin-bottom: 10px;
+}
+.btn {
+    padding: 5px 10px;
+    margin-right: 5px;
+    cursor: pointer;
+}
+.btn-accept {
+    background-color: green;
+    color: white;
+}
+.btn-reject {
+    background-color: red;
+    color: white;
+}
+#searchForm {
+    display: inline-block;
+    margin: 0;
+  }
+  
+  #searchForm label,
+  #searchForm select,
+  #searchForm input {
+    font-size: 14px;
+    padding: 5px;
+    margin-right: 5px;
+  }
+  
+  #searchForm button {
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+  
+  /* Optional: Adjust width of select and input fields */
+  #searchType,
+  #searchQuery {
+    width: 234px;
+  }
+  
+  #submitCommentButton {
+    background-color: #000000;
+    color: #ffffff;
+    font-size: 14px;
+    padding: 5px 10px;
+  }
+
+.propertylisting {
+    background-color: #f2f2f2; /* Very light gray background */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif;
 }

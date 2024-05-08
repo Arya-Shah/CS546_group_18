@@ -1,0 +1,69 @@
+{{!-- Landlord Details --}}
+
+<!-- CHECK THAT THIS WORKS Author: {{this.author}} -->
+<!-- CORRECT BUTTON to go to path to add review -->
+
+<h2>Landlord Details</h2>
+<p>This page allows you to see all reviews for the landlord {{landlord.firstName}} {{landlord.lastName}}.</p>
+
+<a href="/user/landlordReview/{{landlord.userId}}">Want to add a review for this landlord? Click here.</a>
+
+<div class="landlord-details">
+ 
+<h3>Contact Information</h3>
+  <p>First Name: {{landlord.firstName}}</p>
+  <p>Last Name: {{landlord.lastName}}</p>
+  <p>City: {{landlord.city}}</p>
+  <p>State: {{landlord.state}}</p>
+  <p>Email: {{landlord.email}}</p>
+
+  <h3>Properties:</h3>
+  <p>
+    {{#each landlord.properties}}
+    <span>{{this.name}}</span><br>
+    {{/each}}
+  </p>
+
+  <h3>Average Ratings</h3>
+  <div>
+    <p>Kindness Rating: {{landlord.averageRatings.kindnessRating}}</p>
+    <p>Maintenance Responsiveness Rating: {{landlord.averageRatings.maintenanceResponsivenessRating}}</p>
+    <p>Overall Communication Rating: {{landlord.averageRatings.overallCommunicationRating}}</p>
+    <p>Professionalism Rating: {{landlord.averageRatings.professionalismRating}}</p>
+    <p>Handiness Rating: {{landlord.averageRatings.handinessRating}}</p>
+    <p>Deposit Handling Rating: {{landlord.averageRatings.depositHandlingRating}}</p>
+  </div>
+
+  <h3>All Landlord Reviews</h3>
+  <div>
+    {{#each landlord.reviews}}
+    <br>
+      <div>
+      <h4>Author: {{this.userRealName}} </h4>
+      <p>Kindness Rating: {{this.kindnessRating}}</p>
+      <p>Maintenance Responsiveness Rating: {{this.maintenanceResponsivenessRating}}</p>
+      <p>Overall Communication Rating: {{this.overallCommunicationRating}}</p>
+      <p>Professionalism Rating: {{this.professionalismRating}}</p>
+      <p>Handiness Rating: {{this.handinessRating}}</p>
+      <p>Deposit Handling Rating: {{this.depositHandlingRating}}</p>
+      <p>Review Text: {{this.reviewText}}</p>
+    </div>
+    {{/each}}
+  </div>
+  
+</div>
+
+<!-- Landlord Details -->
+<!--
+<h2>{{landlord.name}}</h2>
+<div class="landlord-details">
+<p>Total Properties: {{landlord.propertiesCount}}</p>
+<p>Average Rating: {{landlord.averageRating}}</p>
+<h3>Reviews</h3>
+{{#each landlord.reviews}}
+<div class="review">
+<p>{{this.user}}: {{this.content}}</p>
+</div>
+{{/each}}
+</div>
+-->

@@ -1,0 +1,109 @@
+
+
+<h2 class="display-4">See Landlords</h2>
+
+<p>Use this page to see landlords stored on the website's database.</p> 
+<p>Use the form to search by landlord's city and state. Use the sort to order the landlords based on your preferred rating system.</p>
+
+<a href="/user/addlandlord">Want to add a landlord to the database? Click here.</a>
+
+<form action="/user/landlord" method="GET">
+    <label for="filter">State</label>
+      <select id="filter" name="filter">
+        <option value="">Select a state</option>
+        <option value="Alabama">Alabama</option>
+        <option value="Alaska">Alaska</option>
+        <option value="Arizona">Arizona</option>
+        <option value="Arkansas">Arkansas</option>
+        <option value="California">California</option>
+        <option value="Colorado">Colorado</option>
+        <option value="Connecticut">Connecticut</option>
+        <option value="Delaware">Delaware</option>
+        <option value="Florida">Florida</option>
+        <option value="Georgia">Georgia</option>
+        <option value="Hawaii">Hawaii</option>
+        <option value="Idaho">Idaho</option>
+        <option value="Illinois">Illinois</option>
+        <option value="Indiana">Indiana</option>
+        <option value="Iowa">Iowa</option>
+        <option value="Kansas">Kansas</option>
+        <option value="Kentucky">Kentucky</option>
+        <option value="Louisiana">Louisiana</option>
+        <option value="Maine">Maine</option>
+        <option value="Maryland">Maryland</option>
+        <option value="Massachusetts">Massachusetts</option>
+        <option value="Michigan">Michigan</option>
+        <option value="Minnesota">Minnesota</option>
+        <option value="Mississippi">Mississippi</option>
+        <option value="Missouri">Missouri</option>
+        <option value="Montana">Montana</option>
+        <option value="Nebraska">Nebraska</option>
+        <option value="Nevada">Nevada</option>
+        <option value="New Hampshire">New Hampshire</option>
+        <option value="New Jersey">New Jersey</option>
+        <option value="New Mexico">New Mexico</option>
+        <option value="New York">New York</option>
+        <option value="North Carolina">North Carolina</option>
+        <option value="North Dakota">North Dakota</option>
+        <option value="Ohio">Ohio</option>
+        <option value="Oklahoma">Oklahoma</option>
+        <option value="Oregon">Oregon</option>
+        <option value="Pennsylvania">Pennsylvania</option>
+        <option value="Rhode Island">Rhode Island</option>
+        <option value="South Carolina">South Carolina</option>
+        <option value="South Dakota">South Dakota</option>
+        <option value="Tennessee">Tennessee</option>
+        <option value="Texas">Texas</option>
+        <option value="Utah">Utah</option>
+        <option value="Vermont">Vermont</option>
+        <option value="Virginia">Virginia</option>
+        <option value="Washington">Washington</option>
+        <option value="West Virginia">West Virginia</option>
+        <option value="Wisconsin">Wisconsin</option>
+        <option value="Wyoming">Wyoming</option>
+      </select>
+
+    <label for="sort">Sort by:</label>
+    <select name="sort" id="sort">
+        <option value="">--Select--</option>
+        <option value="kindnessRating">Kindness Rating</option>
+        <option value="maintenanceResponsivenessRating">Maintenance Responsiveness Rating</option>
+        <option value="overallCommunicationRating">Overall Communication Rating</option>
+        <option value="professionalismRating">Professionalism Rating</option>
+        <option value="handinessRating">Handiness Rating</option>
+        <option value="depositHandlingRating">Deposit Handling Rating</option>
+    </select>
+    <input type="submit" value="Sort">
+</form>
+
+{{#each landlords}}
+
+<div class="propertylisting">
+  <hr> 
+  <h3>{{this.firstName}} {{this.lastName}}</h3>
+  <p>City: {{this.city}}</p> <p>State: {{this.state}}</p>
+  <p>Email: {{this.email}}</p>
+  
+  <h4>Properties:</h4>
+  <ul>
+    {{#each this.properties}}
+    {{#if this.name}}
+    <li><a href="/property/id/{{this.propertyId}}">{{this.name}}</a></li>
+    {{/if}}
+    {{/each}}
+  </ul>
+  
+  <h4>Average Ratings:</h4>
+  <ul>
+    <li>Kindness: {{this.averageRatings.kindnessRating}}</li>
+    <li>Maintenance Responsiveness: {{this.averageRatings.maintenanceResponsivenessRating}}</li>
+    <li>Overall Communication: {{this.averageRatings.overallCommunicationRating}}</li>
+    <li>Professionalism: {{this.averageRatings.professionalismRating}}</li>
+    <li>Handiness: {{this.averageRatings.handinessRating}}</li>
+    <li>Deposit Handling: {{this.averageRatings.depositHandlingRating}}</li>
+  </ul>
+
+  <p><a href="/user/landlord/{{this.userId}}">See the full information.</a></p> 
+
+</div>
+{{/each}}
