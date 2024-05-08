@@ -50,10 +50,10 @@ router.route('/').get(async (req,res)=>{
         const userId = req.session.user.userId;
         const newStatus = "Rejected";
         const result = await updateReportStatus(userId, reportId, newStatus, propertyId);
-        res.status(200).render('moderator', {title:"moderator", layout: 'main', success: 'Report rejected and property removed successfully.' });
+        res.status(200).render('moderator', {title:"moderator", layout: 'main', success: 'Report removed successfully.' });
     } catch (error) {
         console.error(error);
-        res.status(error.status || 500).json({ success: false, title:"moderator",message: error.message || 'Internal server error' });
+        res.status(error.status || 500).render('moderator', {title:"moderator", layout: 'main', error: 'Could not update report.' });
     }
 });
 
