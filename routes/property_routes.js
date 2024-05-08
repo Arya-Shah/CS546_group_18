@@ -22,6 +22,22 @@ router.route('/')
 
 )
 
+router.route('/all')
+.get(async (req, res) => {
+try {
+
+    let allProperties = await properties.getAllProperties();
+
+    return res.status(200).render("trueAllProperties", {
+        properties: allProperties,
+        layout:"main"
+    });
+
+}catch (e) {
+    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+}
+})
+
 // Property details page
 router.route('/id/:propertyId')
 .get(async (req, res) => {
@@ -123,7 +139,7 @@ router.route('/id/:propertyId')
         res.redirect(`/property/${propertyId}`)
 
        } catch (e) {
-        res.status(e.status?e.status:500).render('property', { error: e.error?e.error:e, form: req.body });
+        res.status(e.status?e.status:500).render('property', { title:"error",error: e.error?e.error:e, form: req.body });
        }
 
     }

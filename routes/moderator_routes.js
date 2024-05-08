@@ -7,10 +7,10 @@ router.route('/').get(async (req,res)=>{
     try{
       const userId = req.session.user.userId;
       const pendingReports = await getAllPendingReports(userId);
-      return res.status(200).render('moderator',{ layout: 'main',
+      return res.status(200).render('moderator',{title:"moderator", layout: 'main',
       error: '', pendingReports })
     }catch(e){
-      res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+      res.status(e.status?e.status:500).render('error', { title:"error",error: e.error?e.error:e, form: req.body });
     }
   });
   
@@ -24,11 +24,11 @@ router.route('/').get(async (req,res)=>{
           console.log("Result Accepted",result);
           if(result.success === true){
             
-            res.status(200).render('moderator', { layout: 'main', success: 'Report accepted successfully.' });
+            res.status(200).render('moderator', {title:"moderator", layout: 'main', success: 'Report accepted successfully.' });
           }
       } catch (error) {
           console.error(error);
-          res.status(error.status || 500).render('error', { error: error.error || error, form: req.body });
+          res.status(error.status || 500).render('error', { title:"error",error: error.error || error, form: req.body });
       }
     });
 
@@ -49,10 +49,10 @@ router.route('/').get(async (req,res)=>{
         const { userId, reportId, propertyId } = req.params;
         const newStatus = "Rejected";
         const result = await updateReportStatus(userId, reportId, newStatus, propertyId);
-        res.status(200).json({ success: true, message: 'Report rejected and property removed successfully.', result });
+        res.status(200).render('moderator', {title:"moderator", layout: 'main', success: 'Report rejected and property removed successfully.' });
     } catch (error) {
         console.error(error);
-        res.status(error.status || 500).json({ success: false, message: error.message || 'Internal server error' });
+        res.status(error.status || 500).json({ success: false, title:"moderator",message: error.message || 'Internal server error' });
     }
 });
 

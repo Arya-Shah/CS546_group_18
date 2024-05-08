@@ -492,8 +492,10 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
         throw errorObject}
 
     //Check if landlord
-    const landlordCheck = await usersfunctions.getLandlordById(userId);
-    if (landlordCheck){
+    
+    const user = await usersfunctions.getUserById(userId);
+   
+    if (user.isLandlord === 'true' || user.isLandlord === true ){
         errorObject.error = "User is a landlord. Landlords cannot leave reviews.";
         throw errorObject;
     }

@@ -168,7 +168,9 @@ const user = await getUserById(userId);
 if (!user) {
     return res.status(404).render('error', { title:'error',error: 'User not found.', layout: 'main' });
 }
-res.render('user', { user:user, layout: 'main', title:"Profile Page" });
+
+res.render('user', { title:"profile",user:user, layout: 'main' });
+
 } catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
@@ -188,7 +190,7 @@ if (!landlord) {
 }
 res.render('landlordDetails', {title:'landlord', landlord:landlord, layout: 'main' });
 } catch (e) {
-    res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
+    res.status(e.status?e.status:500).render('error', { title:"error",error: e.error?e.error:e, form: req.body });
 }
 });
 

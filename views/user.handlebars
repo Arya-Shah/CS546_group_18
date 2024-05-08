@@ -3,14 +3,16 @@
         <div class="jumbotron">
 
             <h2 class="display-4">{{ user.username }}'s Profile</h2>
-
+            
+            
             <h3>User Details</h3>
+            <div class="propertylisting">
             <p class="lead">Email: <i class="fas fa-envelope"></i> {{ user.email }}</p>
             <p class="lead">First Name: {{ user.firstName }}</p>
             <p class="lead">Last Name: {{ user.lastName }}</p>
             <p class="lead">City: {{ user.city }}</p>
             <p class="lead">State: {{ user.state }}</p>
-
+            </div>
 
             <hr class="my-4">
 
@@ -19,8 +21,10 @@
                 <h3>Properties</h3>
                 
                     {{#each user.properties}}
+                    <div class="propertylisting">
                             <h4>{{ this.propertyName }}</h4>
-                            <a href="/property/id/{{this.propertyId}}">Property Details</a> 
+                            <a href="/property/id/{{this.propertyId}}">Property Details</a>
+                            </div>
                     {{/each}}
                 
             {{else}}
@@ -28,11 +32,13 @@
                 {{#if user.bookmarkedProperties.length}}
 
                     <h3>Bookmarked Properties</h3>
+                    <div class="propertylisting">
                     <ul>
                     {{#each user.bookmarkedProperties}}
                         <li><a href="/property/id/{{this}}">See your one of your bookmarked properties!</a><br></li>
                     {{/each}}
                     </ul>
+                    </div>
 
                 {{else}}
 
