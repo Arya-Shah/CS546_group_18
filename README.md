@@ -31,5 +31,8 @@ Efficiently search for properties, landlords, or topics within the community for
 3. Install dependencies with npm install.
 4. Start the application with npm start.
 
+*Seed File*
+To populate the data, run: node seed.js
+
 *Note on Map Feature*
 Property Listings show a map, powered by Google. This feature works well on Chrome but has experienced issues on Edge.
