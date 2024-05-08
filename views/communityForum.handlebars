@@ -19,8 +19,11 @@
     <p>Created Date: {{this.formattedCreatedDate}}</p>
     <p>Likes: {{this.likes}}</p>
     <p>Dislikes: {{this.dislikes}}</p>
-
+    <p>Hello</p>{{userInfo.userId}}
+    {{#ifInArray userInfo.userId this.isVoted}}
+    {{else}}
     <p><a href="/thread/upvote/{{this.threadId}}">Upvote Thread</a> / <a href="/thread/downvote/{{this.threadId}}">Downvote Thread</a></p>
+    {{/ifInArray}}
     <p><a href="/thread/id/{{this.threadId}}">See the full thread.</a></p> 
     
   </div>

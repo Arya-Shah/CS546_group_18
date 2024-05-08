@@ -27,7 +27,14 @@ const handlebarsInstance = exphbs.create({
       },
       ifEquals: function (arg1, arg2, options) {
         return arg1 == arg2 ? options.fn(this) : options.inverse(this);
-      }
+      },
+      ifInArray: function(value, array, options) {
+        if (array.indexOf(value) > -1) {
+            return options.fn(this);
+        } else {
+            return options.inverse(this);
+        }
+    }
     },
     // partialsDir: ['views/partials/']
   });

@@ -11,8 +11,17 @@
     <p>Category: {{threadData.category}}</p>
     <p>Created by: {{threadData.userRealName}}</p>
     <p>Created Date: {{threadData.formattedCreatedDate}}</p>
-    <p>Likes: {{threadData.likes}} <a href="/thread/upvote/{{threadData.threadId}}">Add Like</a></p>
-    <p>Dislikes: {{threadData.dislikes}} <a href="/thread/downvote/{{threadData.threadId}}">Add Dislike</a></p>
+    <p>Likes: {{threadData.likes}}
+      {{#ifInArray userInfo threadData.isVoted}}
+      {{else}}
+       <a href="/thread/upvote/{{threadData.threadId}}">Add Like</a></p>
+       {{/ifInArray}}
+    <p>Dislikes: {{threadData.dislikes}} 
+      {{#ifInArray userInfo threadData.isVoted}}
+      {{else}}
+      <a href="/thread/downvote/{{threadData.threadId}}">Add Dislike</a>
+      {{/ifInArray}}
+      </p>
   
     <hr>
 
@@ -34,8 +43,19 @@
         <h4>User Name: {{this.userRealName}}</h4>
         <p>Comment Text: {{this.commentText}}</p>
         <p>Date Created: {{this.formattedCreatedDate}}</p>
-        <p>Likes: {{this.likes}} <a href="/thread/upvote/{{this.commentId}}">Add Like</a></p>
-        <p>Dislikes: {{this.dislikes}} <a href="/thread/downvote/{{this.commentId}}">Add Dislike</a></p>
+        <p>Likes: {{this.likes}}
+          {{#ifInArray userInfo this.isVoted}}
+          {{else}}
+          <a href="/thread/upvote/{{this.commentId}}">Add Like</a>
+          {{/ifInArray}}
+          </p>
+        <p>Dislikes: {{this.dislikes}}
+          {{#ifInArray userInfo this.isVoted}}
+          {{else}}
+          <a href="/thread/downvote/{{this.commentId}}">Add Dislike</a>
+          {{/ifInArray}}
+          </p>
+
     </div>
     <hr>
     <br>

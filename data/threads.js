@@ -12,7 +12,7 @@ export const getAllThreads = async () => {
 };
 
 // Function: getThreadById
-export const getThreadById = async (id) => {
+export const getThreadById = async (id,flag = false) => {
     const errorObject = {
         status: 400,
         };
@@ -27,8 +27,12 @@ export const getThreadById = async (id) => {
 
     // Validation (cont.)
 if (!thread) {
+    if(flag){
+        return false;
+    }else{
     errorObject.error = "Thread not found"
     throw errorObject;
+    }
 }
 
     // Return
@@ -126,7 +130,8 @@ export const addThread = async (
           likes: 0,
           dislikes: 0,
           comments: [],
-          reports: []
+          reports: [],
+          isVoted:[]
       };
       
       // Insert new thread object into collection
@@ -305,7 +310,8 @@ export const addCommentReply = async (userId, threadOrCommentId, commentText, us
             likes : 0,
             dislikes : 0,
             replies : [],
-            reports : []
+            reports : [],
+            isVoted:[]
         };
 
     //Pull thread collection
@@ -407,7 +413,7 @@ export const removeCommentReply = async (userId, threadOrCommentId) => {
 };
 
 //Function: addLikeDislike, adds like or dislike to comment or reply
-export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
+export const addLikeDislike = async (threadOrCommentId, likeOrDislike, userId) => {
     
     const errorObject = {
         status: 400,
@@ -428,38 +434,53 @@ export const addLikeDislike = async (threadOrCommentId, likeOrDislike) => {
     //Try to add like or dislike to comment from thread
     
     let updateInfo;    
-
+    const threadData = await getThreadById(threadOrCommentId,true);
     if(likeOrDislike === 'like'){
-        
+        let updateData = [];
+        if(threadData){updateData = threadData.isVoted;
+        updateData.push(userId);
         updateInfo = await threadCollection.updateOne(
             { 'threadId': threadOrCommentId },
-            { $inc: { 'likes': 1 } }
+            {$set:{isVoted:updateData},
+             $inc: { 'likes': 1 } }
+        
         );
+    }
 
     } else {
-        
+        let updateData = [];
+       if(threadData){ updateData = threadData.isVoted;
+        updateData.push(userId);
         updateInfo = await threadCollection.updateOne(
             { 'threadId': threadOrCommentId },
-            { $inc: { 'dislikes': 1 } }
+            {$set:{isVoted:updateData},
+            $inc: { 'dislikes': 1 } }
         );
-
+}
     };
     
     //If failed, try to add like or dislike to reply
-    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0){
-        
+    if (!threadData){
         if(likeOrDislike === 'like'){
-            
+            let updateData = [];
+            const threadData = await threadCollection.findOne({ 'comments.commentId': threadOrCommentId });
+            const comment = threadData.comments.find(comment => comment.commentId === threadOrCommentId);
+            updateData = comment.isVoted;
+            updateData.push(userId);
             updateInfo = await threadCollection.updateOne(
                 { 'comments.commentId': threadOrCommentId },
-                { $inc: { 'comments.$.likes': 1 } }
+                { $inc: { 'comments.$.likes': 1 }, $set:{'comments.$.isVoted':updateData} }
             );
         
         } else{ 
-            
+            let updateData = [];
+            const threadData = await threadCollection.findOne({ 'comments.commentId': threadOrCommentId });
+            const comment = threadData.comments.find(comment => comment.commentId === threadOrCommentId);
+            updateData = comment.isVoted;
+            updateData.push(userId);
             updateInfo = await threadCollection.updateOne(
                 { 'comments.commentId': threadOrCommentId },
-                { $inc: { 'comments.$.dislikes': 1 } }
+                { $inc: { 'comments.$.dislikes': 1 }, $set:{'comments.$.isVoted':updateData}}
             );
         }
 

@@ -6,9 +6,9 @@ import xss from 'xss';
 
 router.get('/', async (req, res) => {
         try {
-            
+            let sessionId = req.session.user.userId;
             const threads = await thread.getAllThreads();
-            res.render('communityForum', { title:'Forums',threads:threads, layout: 'main' });
+            res.render('communityForum', { title:'Forums', userInfo: req.session.user,threads:threads, layout: 'main' });
         
             } catch (e) {
             res.status(500).render('error', { title:'error',error: 'Internal Server Error.', layout: 'main' });
@@ -19,13 +19,12 @@ router.get('/', async (req, res) => {
 //Upvote Thread
 router.get('/upvote/:threadOrCommentId', async (req, res) => {
     try {
-        console.log('in route');
-        const threadOrCommentId = req.params.threadOrCommentId;
-        console.log(threadOrCommentId);
-        await thread.addLikeDislike(threadOrCommentId, 'like');
+        const threadOrCommentId = xss(req.params.threadOrCommentId);
+        await thread.addLikeDislike(threadOrCommentId, 'like', req.session.user.userId);
         res.redirect('back');
-    } catch (error) {
-        res.status(error.status || 500).json({ error: error.message });
+    } catch (e) {
+       
+         res.status(e.status?e.status:500).render('error',{ error:e.error?e.error:e, layout: 'main' }); 
     }
 });
 
@@ -34,10 +33,10 @@ router.get('/upvote/:threadOrCommentId', async (req, res) => {
 router.get('/downvote/:threadOrCommentId', async (req, res) => {
     try {
         const threadOrCommentId = xss(req.params.threadOrCommentId);
-        await thread.addLikeDislike(threadOrCommentId, 'dislike');
+        await thread.addLikeDislike(threadOrCommentId, 'dislike', req.session.user.userId);
         res.redirect('back');
     } catch (error) {
-        res.status(error.status || 500).json({ error: error.message });
+         res.status(error.status?error.status:500).render('error', { error:error.error?error.error:error}); 
     }
 });
 
@@ -56,7 +55,9 @@ router
     }).post('/addThread', async (req, res) => {
     try {
         
-        const { title, content, category } = xss(req.body);
+        let title  = xss(req.body.title);
+        let content  = xss(req.body.content);
+        let category  = xss(req.body.category);
 
         if (!title || !validators.isValidString(title)) {
             throw new Error("Invalid title input");
@@ -124,9 +125,7 @@ router.post('/delete/:threadId', async (req, res) => {
 //Thread Individual Page
 router.route('/id/:threadId')
 .get(async (req, res) => {
-    
     const threadId = xss(req.params.threadId);
-
     if (!threadId || !validators.isValidUuid(threadId)) {
         return res.status(400).render('error', { title:'error',error: 'Invalid thread ID format.', layout: 'main' });
     }
@@ -139,8 +138,8 @@ router.route('/id/:threadId')
         if (!threadData) {
             return res.status(404).render('error', {title:'error', error: 'Thread not found.', layout: 'main' });
         }
-
-        res.render('threadIndividual', { title:'threads',threadData:threadData, layout: 'main', threadId: threadId});
+        let sessionId = req.session.user.userId;
+        res.render('threadIndividual', { title:'threads',threadData:threadData, userInfo: sessionId, layout: 'main', threadId: threadId});
 
     } catch (error) {
        
@@ -157,8 +156,8 @@ router.post('/addComment/:threadId', async (req, res) => {
   
         let userId = req.session.user.userId;
 
-        const { threadId } = req.params;
-        const { comment } = req.body;
+        let threadId = xss(req.params.threadId);
+        let comment = xss(req.body.comment);
 
         const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
    
@@ -180,9 +179,9 @@ router.post('/addComment/:threadId', async (req, res) => {
 // Remove Comment
 router.post('/removeComment/:threadId/:commentId', async (req, res) => {
     try {
-        const userId = xss(req.body).userId;
-        const threadId = xss(req.params).threadId;
-        const commentId = xss(req.params).commentId;
+        const userId = xss(req.body.userId);
+        const threadId = xss(req.params.threadId);
+        const commentId = xss(req.params.commentId);
 
         const result = await thread.removeCommentReply(userId, commentId);
 
