@@ -25,8 +25,12 @@ router.route('/:reportState/:id/:propertyId').get(async (req,res)=>{
     try {
     const userId = req.session.user.userId;
       const result = await addLandLordReport(userId, report_Reason,req.body.reportedItemId,reportedItem_type,req.params.propertyId);
-      return res.status(200).render('report', { layout: 'main',
-      success: 'successfully reported!', });
+      //  res.status(200).render('report', { layout: 'main',
+      // success: 'successfully reported!', reportState: req.params.reportState,id:req.params.id,propertyId:req.params.propertyId});
+      if(!result){
+        return res.status(500).json({error:'Failed to rise a report.'});
+      }
+      return res.redirect(`/property/id/${req.params.propertyId}`)
     }catch(e){
       res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
       // res.status(500).render('report', { error: e, form: req.body });
