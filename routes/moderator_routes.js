@@ -18,7 +18,7 @@ router.route('/').get(async (req,res)=>{
       try {
           const status = "Accepted";
           const reportId = xss(req.params.reportId);
-          const userId = xss(req.params.userId);
+          const userId = xss(req.session.user.userId);
           const propertyId=xss(req.params.propertyId);
           const result = await updateReportStatus(userId,reportId,status,propertyId);
           console.log("Result Accepted",result);
@@ -46,7 +46,8 @@ router.route('/').get(async (req,res)=>{
 
   router.post('/reject/:userId/:reportId/:propertyId', async (req, res) => {
     try {
-        const { userId, reportId, propertyId } = req.params;
+        const { reportId, propertyId } = req.params;
+        const userId = req.session.user.userId;
         const newStatus = "Rejected";
         const result = await updateReportStatus(userId, reportId, newStatus, propertyId);
         res.status(200).render('moderator', {title:"moderator", layout: 'main', success: 'Report rejected and property removed successfully.' });
