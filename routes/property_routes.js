@@ -10,7 +10,7 @@ import validators from "../helper.js";
 router.route('/')
 .get(async (req, res) => {
     try{
-        res.render('allProperties', { layout: 'main'});
+        res.render('allProperties', { layout: 'main',  title: "All Properties"});
 
     } catch (e) {
 

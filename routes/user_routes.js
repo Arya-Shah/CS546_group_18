@@ -78,7 +78,8 @@ try {
 
     return res.status(200).render("allLandlords", {
         landlords:allLandlords,
-        layout:"main"
+        layout:"main",
+        title: "All Landlords",
     });
 
 }catch (e) {
@@ -92,7 +93,8 @@ try {
         let flag = true;
     return res.status(200).render("register", {
         flag:flag,
-        layout:"main"
+        layout:"main",
+        title: "Landlord Registration"
     });
 }catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
@@ -146,6 +148,7 @@ try {
   await registerUser(firstName, lastName, username, password, city, state, email,true);
   return res.status(200).render('allLandlords', {
   layout: 'main',
+  title:'Landlord Search',
   success: 'Landord Created successfully', 
   });
   }catch(e){
@@ -165,7 +168,7 @@ const user = await getUserById(userId);
 if (!user) {
     return res.status(404).render('error', { title:'error',error: 'User not found.', layout: 'main' });
 }
-res.render('user', { user:user, layout: 'main' });
+res.render('user', { user:user, layout: 'main', title:"Profile Page" });
 } catch (e) {
     res.status(e.status?e.status:500).render('error', { error: e.error?e.error:e, form: req.body });
 }
