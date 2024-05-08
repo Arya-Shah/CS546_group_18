@@ -1,0 +1,32 @@
+<!--CORRECT ROOT LINK PATH -->
+
+<h2 class="display-4">See All Properties</h2>
+
+<p>This page shows every property stored in the database.</p> 
+
+<ul>
+<li><a href="/property/addproperty">Want to add a property to the database? Click here.</a></li>
+<li><a href="/property">Want to go back to the property search? Click here.</a></li></ul>
+
+
+{{#each properties}}
+
+<div>
+  <hr> 
+  <h3>{{this.propertyName}}</h3>
+  <p>City: {{this.city}}, State: {{this.state}}</p>
+  
+  <h4>Property Details:</h4>
+  <ul>
+    <li>Address: {{this.address}}</li>
+    <li>City: {{this.city}}, State: {{this.state}}</li>
+    <li>Category: {{this.propertyCategory}}</li>
+    <li>Bedrooms: {{this.bedrooms}}</li>
+    <li>Bathrooms: {{this.bathrooms}}</li>
+  </ul>
+
+  <p><a href="/property/id/{{this.propertyId}}">See full property information.</a></p> 
+
+</div>
+
+{{/each}}
