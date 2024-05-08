@@ -4,8 +4,6 @@ import { v4 as uuid } from "uuid";
 import validators from "../helper.js";
 import {getPropertyById, updateProperty} from "../data/properties.js";
 
-/*TODO: when accepted add it to the property*/
-
 const saltRounds = 16;
 
 
@@ -789,16 +787,17 @@ export const addBookmark = async (userId, propertyId) => {
         throw errorObject;
 }
     const userCollection = await users();
-
+    
     const updateInfo = await userCollection.updateOne(
         { userId: userId },
         { $addToSet: { bookmarkedProperties: propertyId } }
     );
 
-    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
-{        errorObject.error= "Failed to add bookmark";
+    
+    /*if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+        {        errorObject.error= "Failed to add bookmark";
         throw errorObject;
-}
+        }*/
     return { bookmarkAdded: true };
     
 };
@@ -826,11 +825,11 @@ export const removeBookmark = async (userId, propertyId) => {
         { $pull: { bookmarkedProperties: propertyId } }
     );
 
-    if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
+   /* if (!updateInfo.acknowledged || updateInfo.modifiedCount === 0)
 {        errorObject.error= "Failed to remove bookmark";
     throw errorObject;
 
-}
+}*/
 
     return { bookmarkRemoved: true };
     
@@ -1211,6 +1210,21 @@ export const addLandLordReport = async ( userId, reportData,reportReason,reporte
     } else {
         updatedReportData.userId = userId;
     }
+    if (!propertyId || !validators.isValidUuid(propertyId))
+    {       errorObject.error= "Invalid property ID input";
+            throw errorObject;
+    }
+
+    if (!reportData || Object.keys(reportData).length === 0)
+    {
+            errorObject.error= "Invalid report: report description is required.";
+            throw errorObject
+        }
+    if (!reportReason || Object.keys(reportReason).length === 0)
+    {
+        errorObject.error= "Invalid report: reportReason is required.";
+throw errorObject
+}
     updatedReportData.property_id=propertyId;
     updatedReportData.reported_at = date;
     updatedReportData.report_description=reportData;

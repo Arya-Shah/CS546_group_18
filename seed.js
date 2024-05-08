@@ -5,7 +5,7 @@ import { v4 as uuid } from "uuid";
 
 const seed = async () => {
   try {
-    const { userId } =  await registerUser( "John","Doe","johndoe","$2a$16$HjhM8bIy49fJFlWgbMsp0.gZRQ1cBY9x3cBJzlWMUtXpZEZHzM8W.","New York","NY","johndoe@example.com",false,false)
+    const { userId } =  await registerUser( "John","Doe","johndoe","$2a$16$HjhM8bIy49fJ","New York","NY","johndoe@example.com",false,false)
     const report = await addLandLordReport(userId,"eherhrr", "property", "maintenance", "663902c1f1d649ff153c2938");
     const {propertyId} = await addProperty("Cozy Cottage", "123 Oak Street", "Springfield", "Illinois", "62701", "-89.6501", "39.7817", "Apartment", "2","2");
     // const addReview= await addLandlordReview(userId,1,2,3,5,3,2,"This is a sample review.",userId);
