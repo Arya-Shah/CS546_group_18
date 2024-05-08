@@ -7,7 +7,7 @@ const seed = async () => {
   try {
     const { userId } =  await registerUser("John","Doe","johndoe","Connor123@","New York","NY","johndoe@example.com",false,false);
     const {userId_one} =  await registerUser("jayanth","kanala","johndoek","Connor123@","New York","NY","johndoek@example.com",false,false);
-    const {userId_two} =  await registerUser("jayanthi","kana","johndoeki","Connor123@","New York","NY","johndoeking@example.com",false,false);
+    const {userId_two} =  await registerUser("jayanthi","kana","johndoeki","Connor123@","New York","NY","johndoeking@example.com",false,true);
     //landlord
     const {userId_three} =  await registerUser("jayanthi","kanas","johndoekid","Connor123@","New York","NY","johndoekidfng@example.com",true,false);
     const userone =  await registerUser("rajesh","akula","rajesha","Connor123@","Texas","TX","jkanala0@gmail.com",true,false);
