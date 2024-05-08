@@ -36,3 +36,16 @@ To populate the data, run: node seed.js
 
 *Note on Map Feature*
 Property Listings show a map, powered by Google. This feature works well on Chrome but has experienced issues on Edge.
+
+*User Credentials* You can use these credentials from the seed file to work with the project functionalities.
+Admin: 
+  johndoeki
+  Connor123@
+
+Landlord:
+  rajesha
+  Connor123@
+
+Tenant:
+  johndoek
+  Connor123@
