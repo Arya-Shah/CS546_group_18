@@ -634,13 +634,13 @@ export const addLandlordReview = async (landlordId, reviewData, userId) => {
     
     const validRatings = [1, 2, 3, 4, 5];
 
-    if (
-        !reviewData.userRealName) {
-        errorObject.error="Invalid name for user provided for review.";
-        throw errorObject
-    } else {
+    // if (
+    //     !reviewData.userRealName) {
+    //     errorObject.error="Invalid name for user provided for review.";
+    //     throw errorObject
+    // } else {
         updatedReviewData.userRealName = reviewData.userRealName;
-    }
+    // }
     
     if ( !reviewData.kindnessRating || typeof reviewData.kindnessRating !== "number" || !validRatings.includes(reviewData.kindnessRating)) {
         errorObject.error = "Invalid kindnessRating input";

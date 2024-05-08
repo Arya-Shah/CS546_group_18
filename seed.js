@@ -19,7 +19,7 @@ const seed = async () => {
         handinessRating: 3,
         depositHandlingRating: 2,
         reviewText: "This is a sample review."
-      },'jayanth',userId);
+      },userId);
       const addpropertyreview = await addPropertyReview(
         propertyId,
         {
@@ -30,9 +30,9 @@ const seed = async () => {
           communityRating:5 ,
           amenitiesRating:3 ,
           reviewText: "sample review"
-        },'jayanth',userId);
+        },userId);
         const {commentId} = await addCommentReply(userId,propertyId,"too bad!!");
-        const {threadId} = await addThread(userId,"lmaooo","Properties","Properties");
+        const {threadId} = await addThread(userId,"this is great!!","Properties","Properties");
 
   } catch (error) {
     console.error("Error seeding data:", error);

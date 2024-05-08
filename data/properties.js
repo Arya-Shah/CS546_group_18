@@ -540,13 +540,13 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
     
     const validRatings = [1, 2, 3, 4, 5];
     
-    if (
-        !reviewData.userRealName) {
-        errorObject.error="Invalid name for user provided for review.";
-        throw errorObject
-    } else {
+    // if (
+    //     !reviewData.userRealName) {
+    //     errorObject.error="Invalid name for user provided for review.";
+    //     throw errorObject
+    // } else {
         updatedReviewData.userRealName = reviewData.userRealName;
-    }
+    // }
 
     if (
         !reviewData.locationDesirabilityRating ||
