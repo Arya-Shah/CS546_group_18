@@ -18,9 +18,9 @@ router.get('/', async (req, res) => {
 //Upvote Thread
 router.get('/upvote/:threadOrCommentId', async (req, res) => {
     try {
-        console.log('in route');
+        //console.log('in route');
         const threadOrCommentId = req.params.threadOrCommentId;
-        console.log(threadOrCommentId);
+        //console.log(threadOrCommentId);
         await thread.addLikeDislike(threadOrCommentId, 'like');
         res.redirect('back');
     } catch (error) {

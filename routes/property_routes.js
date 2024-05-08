@@ -600,19 +600,23 @@ router.post('/deletePropertyReview/:reviewId', async (req, res) => {
 
 
 //Add comment to property
-router.post('/property_routes/addComment/:propertyId', async (req, res) => {
+router.post('/addComment/:propertyId', async (req, res) => {
     try {
-        const { userId } = req.body;
+
+        let userId = req.session.user.userId;
+
         const { propertyId } = req.params;
         const { comment } = req.body; 
 
-        const result = await properties.addCommentReply(userId, propertyId, comment);
+        const userRealName = req.session.user.firstName + ' ' + req.session.user.lastName;
+
+        const result = await properties.addCommentReply(userId, propertyId, comment, userRealName);
 
         if (!result) {
             return res.status(500).json({ error: 'Failed to add comment to thread.' });
         }
 
-        res.redirect(`'/property/${propertyId}'`);
+        res.redirect(`/property/id/${propertyId}`);
 
     } catch (e) {
        
@@ -640,6 +644,33 @@ router.post('/property_routes/removeComment/:propertyId/:commentId', async (req,
         res.status(e.status?e.status:500).render('error', { title:'error',error: e.error?e.error:e, form: req.body });
     }
 });
+
+
+//Upvote Thread
+router.get('/upvote/:commentId', async (req, res) => {
+    try {
+        //console.log('in route');
+        const commentId = req.params.commentId;
+        //console.log(commentId);
+        await properties.addLikeDislike(commentId, 'like');
+        res.redirect('back');
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+});
+
+
+//Downvote Thread
+router.get('/downvote/:commentId', async (req, res) => {
+    try {
+        const commentId = req.params.commentId;
+        await properties.addLikeDislike(commentId, 'dislike');
+        res.redirect('back');
+    } catch (error) {
+        res.status(error.status || 500).json({ error: error.message });
+    }
+});
+
 
 
 

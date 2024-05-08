@@ -693,7 +693,7 @@ export const addPropertyReview = async (propertyId, reviewData, userId) => {
 };
 
 // Function: addCommentReply, adds comment to property or reply to comment
-export const addCommentReply = async (userId, propertyOrCommentId, commentText) => {
+export const addCommentReply = async (userId, propertyOrCommentId, commentText, userRealName) => {
     const errorObject = {
         status: 400,
         };
@@ -711,12 +711,27 @@ export const addCommentReply = async (userId, propertyOrCommentId, commentText) 
             throw errorObject
         }
 
+        //Create Dates
+        let createdDate = new Date();
+
+        // Function to format date
+            function formatDate(dateInput) {
+                const date = new Date(dateInput);
+                const options = { year: 'numeric', month: 'short', day: 'numeric' };
+                return date.toLocaleDateString(undefined, options);
+            }
+
+        //FormattedDates
+        let formattedCreatedDate = formatDate(createdDate);
+
     //Create Comment Object    
         const commentToAdd = {
             commentId: uuid(),
+            userRealName: userRealName,
             userId : userId,
             commentText : commentText,
-            dateCreated : new Date().toISOString(),
+            dateCreated : createdDate,
+            formattedCreatedDate,
             likes : 0,
             dislikes : 0,
             replies : [],
