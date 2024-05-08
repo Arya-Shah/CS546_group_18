@@ -30,7 +30,8 @@ flex-direction: column;
 gap: 10px;
 margin-top: 20px;
 max-width: 720px;
-}
+border: 1px solid #ccc;
+padding: 15px;}
 
 button{
 border-radius: 20px;
@@ -83,8 +84,8 @@ text-decoration: none;
 
 /* Header styling */
 header {
-background: #ffffff;
-color: #000000 ;
+background: #000000;
+color: #ffffff ;
 padding: 10px 0;
 }
 
@@ -96,14 +97,16 @@ padding: 0 20px;
 }
 
 nav .logo a {
-color: #000000;
+color: #ffffff;
 font-size: xx-large;
 text-decoration: none;
 font-weight: bold;
+font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 nav .user-container a {
-color: #050505;
+color: #ffffff;;
+font-size: large;
 text-decoration: none;
 margin-left: 10px;
 }
@@ -257,3 +260,12 @@ font-size: 90%;
     font-size: 14px;
     padding: 5px 10px;
   }
+
+.propertylisting {
+    background-color: #f2f2f2; /* Very light gray background */
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: bold;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+}
